@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.media.audiofx.DynamicsProcessing;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -21,6 +22,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -29,9 +33,11 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,28 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
     Response.Listener<String> volleyStringListener;
     Response.ErrorListener volleyErrorListener;
+    Response.Listener<JSONObject> volleyJSONObjectListener;
 
-    private final int IMG_REQ=1;
+    private final int IMG_REQ = 1;
     Bitmap bitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-Button ChooseImageButtong=findViewById(R.id.chooseImage);
-ChooseImageButtong.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        SelectAnImage();
-    }
-});
-
-Button UpLoadImageButton=findViewById(R.id.upLoadImage);
-UpLoadImageButton.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        UploadImage();
-    }
-});
 
         volleyStringListener = new Response.Listener<String>() {
             @Override
@@ -71,72 +64,105 @@ UpLoadImageButton.setOnClickListener(new View.OnClickListener() {
                 ServerResponse(response);
             }
         };
-volleyErrorListener=new Response.ErrorListener() {
+        volleyErrorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                ServerResponseError(error.toString());
+            }
+        };
+        volleyJSONObjectListener=new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+               ServerResponse(response.toString());
+
+            }
+        };
+
+        Button SignUpButton=findViewById(R.id.signUp);
+        Button SignInButton=findViewById(R.id.signIn);
+        SignUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent goToSignUpActivity=new Intent(MainActivity.this,SignUpActivity.class);
+                startActivity(goToSignUpActivity);
+
+            }
+        });
+Button choose=findViewById(R.id.button4);
+choose.setOnClickListener(new View.OnClickListener() {
     @Override
-    public void onErrorResponse(VolleyError error) {
-ServerResponseError(error.toString());
+    public void onClick(View view) {
+        SelectAnImage();
     }
-};
-        ShopsNames.add("FirstShop");
-        ShopsNames.add("SecondShop");
-        ShopsNames.add("ThirdShop");
-        ShopsNames.add("FourthShop");
-        ShopsNames.add("FifthShop");
-
-        ShopsAddresses.add("Sahel");
-        ShopsAddresses.add("SidiDaoud");
-        ShopsAddresses.add("Dellys");
-        ShopsAddresses.add("Boumerdes");
-        ShopsAddresses.add("BabEzzouar");
-
-
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewResult);
-        CustomRecyclerViewAdapter customRecyclerViewAdapter = new CustomRecyclerViewAdapter(this, ShopsMainImages, ShopsNames, ShopsAddresses);
-        recyclerView.setAdapter(customRecyclerViewAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        Map<String,String> data=new HashMap<>();
-        data.put("Message", "Hello There");
-        PostToServer(data);
+});
+Button check=findViewById(R.id.button5);
+check.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        SendImageToServer();
     }
+});
 
+    }
+private void SendImageToServer(){
+     String ImageString= BitmapToString(bitmap);
+        JSONObject imageToSend=new JSONObject();
+
+    try {
+        imageToSend.put("Image",ImageString );
+    } catch (JSONException e) {
+        e.printStackTrace();
+    }
+    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL,imageToSend,volleyJSONObjectListener,volleyErrorListener);
+    RequestQueue requestQueue=Volley.newRequestQueue(this);
+    requestQueue.add(jsonObjectRequest);
+
+}
     private void PostToServer(Map<String, String> DataToSend) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringCommunication stringCommunication = new StringCommunication(Request.Method.POST, URL, DataToSend, volleyStringListener, volleyErrorListener);
         requestQueue.add(stringCommunication);
     }
+
     private void ServerResponse(String ReceivedData) {
+
+
+
         try {
             JSONObject jsonResponse = new JSONObject(ReceivedData);
-            if(jsonResponse.has("Message")){
+
+            if (jsonResponse.has("Message")) {
                 Toast.makeText(this, jsonResponse.getString("Message"), Toast.LENGTH_LONG).show();
             }
 
-            if(jsonResponse.has("Image")){
-             ShowImage(jsonResponse.getString("Image"));
+            if (jsonResponse.has("Image")) {
+                ShowImage(jsonResponse.getString("Image"));
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
     }
-    private void ServerResponseError(String error){
+
+    private void ServerResponseError(String error) {
         Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
-    public void SelectAnImage(){
-Intent ChooseImageIntent=new Intent();
-ChooseImageIntent.setType("image/*");
-ChooseImageIntent.setAction(Intent.ACTION_GET_CONTENT);
-startActivityForResult(ChooseImageIntent,IMG_REQ);
+
+    public void SelectAnImage() {
+        Intent ChooseImageIntent = new Intent();
+        ChooseImageIntent.setType("image/*");
+        ChooseImageIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(ChooseImageIntent, IMG_REQ);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==IMG_REQ && resultCode==RESULT_OK && data!=null){
-            Uri path=data.getData();
+        if (requestCode == IMG_REQ && resultCode == RESULT_OK && data != null) {
+            Uri path = data.getData();
             try {
-                bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(), path);
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), path);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -144,28 +170,27 @@ startActivityForResult(ChooseImageIntent,IMG_REQ);
         }
     }
 
-    private void UploadImage(){
-        Map<String,String> data=new HashMap<>();
-        String ImageString=BitmapToString(bitmap);
-        data.put("Image",ImageString);
-        PostToServer(data);
-    }
-    private String BitmapToString(Bitmap bitmap){
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 5, byteArrayOutputStream);
-        byte[] byteImage=byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteImage, Base64.DEFAULT);
-    }
-    private Bitmap StringToBitmap(String ImageString){
+    public String BitmapToString(Bitmap bitmap) {
 
-     byte[] byteImage=Base64.decode(ImageString, Base64.DEFAULT);
-    Bitmap bitmap = BitmapFactory.decodeByteArray(byteImage, 0, byteImage.length);
-    return bitmap;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+       Toast.makeText(this, "Bitmap Size is "+bitmap.getByteCount(), Toast.LENGTH_LONG).show();
+        bitmap.compress(Bitmap.CompressFormat.WEBP, 85, byteArrayOutputStream);
+      byte[] byteImage=byteArrayOutputStream.toByteArray();
+       Toast.makeText(this, "ByteImage Size is "+byteImage.length, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Base64 encoded Size is "+Base64.encodeToString(byteImage, Base64.DEFAULT).getBytes().length, Toast.LENGTH_LONG).show();
+        return  Base64.encodeToString(byteImage, Base64.DEFAULT);
     }
-    private void ShowImage(String ImageString){
 
-        ImageView imageView=findViewById(R.id.imageView);
+    private Bitmap StringToBitmap(String ImageString) {
+        byte[] imageByteArray=Base64.decode(ImageString, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
+        return bitmap;
+    }
+
+    private void ShowImage(String ImageString) {
+
+        ImageView imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(StringToBitmap(ImageString));
         imageView.setVisibility(View.VISIBLE);
     }
