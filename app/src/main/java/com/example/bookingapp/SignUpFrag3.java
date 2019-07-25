@@ -1,13 +1,24 @@
 package com.example.bookingapp;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Looper;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -22,33 +33,62 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class SignUpFrag3 extends Fragment {
     public List<String> StateList=new ArrayList<>();
     public List<String> CommunesForSelectedStateList=new ArrayList<>();
+
 
     public String SalonName;
     public String SelectedState;
     public String SelectedCommune;
     public Boolean isMen=false;
     public Boolean isWomen=false;
+    public Boolean UseCoordinatesAKAaddMap=false;
+
     View view;
+
+
     Spinner stateSpinner;
     Spinner communesSpinner;
+    CheckBox addMapToYourStoreCheckBox;
+
     ArrayAdapter<String> communesSpinnerArrayAdapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.signupfrag3_layout, container,false);
+
+        IntentFilter filter=new IntentFilter();
+        filter.addAction("ComingFromSignUpActivity");
+        BroadcastReceiver broadcastReceiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+               String action=intent.getAction();
+                if(action.equals("ComingFromSignUpActivity")){
+                    UseCoordinatesAKAaddMap=intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
+                 addMapToYourStoreCheckBox.setChecked(UseCoordinatesAKAaddMap);
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver,filter);
 
         LoadStateList();
         stateSpinner=view.findViewById(R.id.stateSpinner);
@@ -105,6 +145,25 @@ public class SignUpFrag3 extends Fragment {
                 isWomen=WomenCheckBox.isChecked();
             }
         });
+       addMapToYourStoreCheckBox=view.findViewById(R.id.addMap);
+
+     addMapToYourStoreCheckBox.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               addMapToYourStoreCheckBox.setChecked(false);
+               if( UseCoordinatesAKAaddMap){
+                   UseCoordinatesAKAaddMap=false;
+
+               }else{
+                   ((SignUpActivity)getActivity()).FindLocationUsingGPS();
+               }
+
+
+
+           }
+
+
+       });
  Button submitButton=view.findViewById(R.id.submit);
  submitButton.setOnClickListener(new View.OnClickListener() {
      @Override
@@ -115,9 +174,7 @@ public class SignUpFrag3 extends Fragment {
 
         return view;
     }
-void ShowToast(){
- //   Toast.makeText(getActivity(), State, Toast.LENGTH_LONG).show();
-}
+
 
     public String loadJSONFromAsset(String jsonFileName) {
         String json = null;
@@ -166,15 +223,16 @@ void ShowToast(){
         }
         communesSpinnerArrayAdapter.notifyDataSetChanged();
     }
-    void FindLocationUsingGPS(){
-        
-    }
+
+
     void DoneFillingFieldsGoNextFrag(){
 
         Boolean SomethingWentWrong=false;
         EditText salonNameEditText=view.findViewById(R.id.salonName);
         SalonName=salonNameEditText.getText().toString();
-        if(SalonName==""){
+
+        Toast.makeText(getActivity(), SalonName, Toast.LENGTH_LONG).show();
+        if(SalonName.length()<=0){
             SomethingWentWrong=true;
             Toast.makeText(getActivity(), "Please Make Sure to Enter Your Salon Name", Toast.LENGTH_LONG).show();
         }
@@ -182,7 +240,7 @@ void ShowToast(){
             SomethingWentWrong=true;
             Toast.makeText(getActivity(), "Please Choose a Nature", Toast.LENGTH_LONG).show();
         }
-
+        //NO NEED TO CHECK FOR ADDRESS BECAUSE THERE ARE DEFAULT VALUES APPLIED
         if(!SomethingWentWrong){
 
             ((SignUpActivity)getActivity()).SalonName=SalonName;

@@ -88,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        SignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent goToSignInAndStoreActivity=new Intent(MainActivity.this,SignInAndStore.class);
+                startActivity(goToSignInAndStoreActivity);
+            }
+        });
 Button choose=findViewById(R.id.button4);
 choose.setOnClickListener(new View.OnClickListener() {
     @Override
