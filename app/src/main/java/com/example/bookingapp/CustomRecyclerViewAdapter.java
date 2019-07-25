@@ -82,4 +82,5 @@ public class CustomRecyclerViewAdapter extends Adapter<CustomRecyclerViewAdapter
             RecyclerViewResultItemLayout = itemView.findViewById(R.id.recyclerViewResultItemLayout);
         }
     }
+
 }

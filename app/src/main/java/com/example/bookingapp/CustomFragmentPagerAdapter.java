@@ -26,9 +26,11 @@ public class CustomFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int i) {
         return mFragmentList.get(i);
     }
-
+    
     @Override
     public int getCount() {
         return mFragmentList.size();
     }
+
+
 }
