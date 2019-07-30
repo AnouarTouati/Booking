@@ -8,4 +8,81 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="diamond">
+
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+
+        <item name="android:textColor">
+            #8B10AA
+        </item>
+
+    </style>
+
+
+<style name="edit_text_custom">
+
+    <item name="android:textSize">
+        @dimen/_18ssp
+    </item>
+    <item name="android:textColor">
+        #8B8888
+    </item>
+
+</style>
+    <style name="edit_text_signin">
+
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+        <item name="android:textColor">
+            #8B8888
+        </item>
+
+    </style>
+
+    <style name="signup_button">
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+        <item name="android:textColor">
+            #FFFDFD
+        </item>
+    </style>
+    <style name="signin_button">
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+        <item name="android:textColor">
+            #FFFDFD
+        </item>
+    </style>
+
+    <style name="facebook_button">
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+        <item name="android:textColor">
+            #FFFDFD
+        </item>
+    </style>
+
+    <style name="ortext">
+        <item name="android:textColor">
+            #797575
+        </item>
+        <item name="android:textSize">
+            @dimen/_14ssp
+        </item>
+    </style>
+    <style name="signup_texts">
+        <item name="android:textColor">
+            #434343
+        </item>
+        <item name="android:textSize">
+            @dimen/_18ssp
+        </item>
+    </style>
+
 </resources>
