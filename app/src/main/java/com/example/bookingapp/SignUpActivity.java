@@ -128,6 +128,7 @@ public class SignUpActivity extends AppCompatActivity {
         viewPagerSignUP=findViewById(R.id.viewPagerSignUP);
         CustomFragmentPagerAdapter customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
 
+
         customFragmentPagerAdapter.addFragment(new SignUpFrag1(), "SignUpFrag1");
         customFragmentPagerAdapter.addFragment(new SignUpFrag2(), "SignUpFrag2");
         customFragmentPagerAdapter.addFragment(new SignUpFrag3(), "SignUpFrag3");

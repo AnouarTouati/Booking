@@ -26,6 +26,7 @@
         android:id="@+id/deletePerson"
         android:layout_width="123dp"
         android:layout_height="44dp"
+        android:background="@drawable/delete_person_button"
         android:text="Done"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
