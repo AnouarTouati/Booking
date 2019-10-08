@@ -68,7 +68,7 @@ public class SignUpFrag3 extends Fragment {
 
     Spinner stateSpinner;
     Spinner communesSpinner;
-    CheckBox addMapToYourStoreCheckBox;
+    CheckBox addMapToYourShopCheckBox;
 
     ArrayAdapter<String> communesSpinnerArrayAdapter;
     @Nullable
@@ -84,7 +84,7 @@ public class SignUpFrag3 extends Fragment {
                String action=intent.getAction();
                 if(action.equals("ComingFromSignUpActivity")){
                     UseCoordinatesAKAaddMap=intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
-                 addMapToYourStoreCheckBox.setChecked(UseCoordinatesAKAaddMap);
+                 addMapToYourShopCheckBox.setChecked(UseCoordinatesAKAaddMap);
                 }
             }
         };
@@ -145,12 +145,12 @@ public class SignUpFrag3 extends Fragment {
                 isWomen=WomenCheckBox.isChecked();
             }
         });
-       addMapToYourStoreCheckBox=view.findViewById(R.id.addMap);
+       addMapToYourShopCheckBox=view.findViewById(R.id.addMap);
 
-     addMapToYourStoreCheckBox.setOnClickListener(new View.OnClickListener() {
+     addMapToYourShopCheckBox.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
-               addMapToYourStoreCheckBox.setChecked(false);
+               addMapToYourShopCheckBox.setChecked(false);
                if( UseCoordinatesAKAaddMap){
                    UseCoordinatesAKAaddMap=false;
 

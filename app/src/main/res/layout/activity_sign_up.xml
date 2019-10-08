@@ -93,7 +93,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/goToStoreHomePage"
+        android:id="@+id/goToShopHomePage"
         android:layout_width="142dp"
         android:layout_height="76dp"
         android:layout_marginStart="8dp"

@@ -8,18 +8,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CustomRecyclerViewAdapterStore extends RecyclerView.Adapter<CustomRecyclerViewAdapterStore.ViewHolder> {
+public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRecyclerViewAdapterShop.ViewHolder> {
 
     ArrayList<String> PeoplePending=new ArrayList<>();
     Context mContext;
 
-    public CustomRecyclerViewAdapterStore(Context context, ArrayList<String> PeoplePending) {
+    public CustomRecyclerViewAdapterShop(Context context, ArrayList<String> PeoplePending) {
         this.PeoplePending=PeoplePending;
         this.mContext=context;
     }
@@ -39,7 +38,7 @@ public class CustomRecyclerViewAdapterStore extends RecyclerView.Adapter<CustomR
            viewHolder.deletePersonButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
-             StoreMenuFrag1.RemovePersonFromPending(PeoplePending.get(t));
+             ShopMenuFrag1.RemovePersonFromPending(PeoplePending.get(t));
                }
            });
     }

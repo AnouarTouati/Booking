@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class StoreMenuFrag2 extends Fragment {
+public class ShopMenuFrag2 extends Fragment {
     View view;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view=inflater.inflate(R.layout.storemenufrag2_layout, container,false);
+        view=inflater.inflate(R.layout.shopmenufrag2_layout, container,false);
 
         return view;
     }

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class SignUpFrag4 extends Fragment {
    public Bitmap SelectedImage;
-   public String StorePhoneNumber;
+   public String ShopPhoneNumber;
    public String FacebookLink;
    public String InstagramLink;
 
@@ -30,8 +30,9 @@ public class SignUpFrag4 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.signupfrag4_layout, container,false);
-        Button uploadImageAkaSelect=view.findViewById(R.id.upLoadPhotoFrag4);
-        uploadImageAkaSelect.setOnClickListener(new View.OnClickListener() {
+
+        ImageView imageView=view.findViewById(R.id.imageViewFrag4);
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SelectImage();
@@ -73,15 +74,15 @@ public class SignUpFrag4 extends Fragment {
     void DoneFillingFieldsGoNextFrag(){
         Boolean SomethingWentWrong=false;
 
-        EditText storePhoneNumberEditText=view.findViewById(R.id.storePhoneNumberFrag4);
-        StorePhoneNumber=storePhoneNumberEditText.getText().toString();
-        if(StorePhoneNumber==null){
+        EditText ShopPhoneNumberEditText=view.findViewById(R.id.ShopPhoneNumberFrag4);
+        ShopPhoneNumber=ShopPhoneNumberEditText.getText().toString();
+        if(ShopPhoneNumber==null){
             SomethingWentWrong=true;
-        }else if (StorePhoneNumber==""){
+        }else if (ShopPhoneNumber==""){
             SomethingWentWrong=true;
-        }else if(!(StorePhoneNumber.indexOf("0")==0 && (StorePhoneNumber.indexOf("2")==1||StorePhoneNumber.indexOf("5")==1 || StorePhoneNumber.indexOf("6")==1 || StorePhoneNumber.indexOf("7")==1))){
+        }else if(!(ShopPhoneNumber.indexOf("0")==0 && (ShopPhoneNumber.indexOf("2")==1||ShopPhoneNumber.indexOf("5")==1 || ShopPhoneNumber.indexOf("6")==1 || ShopPhoneNumber.indexOf("7")==1))){
             SomethingWentWrong=true;
-            Toast.makeText(getActivity(), "Incorrect Store Phone Number", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Incorrect Shop Phone Number", Toast.LENGTH_SHORT).show();
         }
 
         if(SelectedImage==null){
@@ -96,7 +97,7 @@ public class SignUpFrag4 extends Fragment {
         if(!SomethingWentWrong){
 
             ((SignUpActivity)getActivity()).SelectedImage=SelectedImage;
-            ((SignUpActivity)getActivity()).StorePhoneNumber=StorePhoneNumber;
+            ((SignUpActivity)getActivity()).ShopPhoneNumber=ShopPhoneNumber;
             ((SignUpActivity)getActivity()).FacebookLink=FacebookLink;
             ((SignUpActivity)getActivity()).InstagramLink=InstagramLink;
 
