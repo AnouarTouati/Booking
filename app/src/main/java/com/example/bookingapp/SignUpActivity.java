@@ -65,11 +65,11 @@ public class SignUpActivity extends AppCompatActivity {
     public String SelectedState;
     public String SelectedCommune;
     public Boolean UseCoordinatesAKAaddMap=false;
-    public Double StoreLatitude;
-    public Double StoreLongitude;
+    public Double ShopLatitude;
+    public Double ShopLongitude;
     public Boolean isMen=true;
     public Bitmap SelectedImage;
-    public String StorePhoneNumber;
+    public String ShopPhoneNumber;
     public String FacebookLink;
     public String InstagramLink;
     public Boolean Coiffure=false;
@@ -98,7 +98,7 @@ public class SignUpActivity extends AppCompatActivity {
     TextView signUpErrorText;
     TextView signUpSuccessfulText;
     Button retryButton;
-    Button goToStoreHomePageButton;
+    Button goToShopHomePageButton;
     ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
     @Override
@@ -116,8 +116,8 @@ public class SignUpActivity extends AppCompatActivity {
                 SignUp();
             }
         });
- goToStoreHomePageButton=findViewById(R.id.goToStoreHomePage);
- goToStoreHomePageButton.setOnClickListener(new View.OnClickListener() {
+ goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
+ goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
      @Override
      public void onClick(View view) {
          //something here
@@ -231,10 +231,10 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     void SaveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
-        StoreLatitude=Latitude;
-        StoreLongitude=Longitude;
-        Toast.makeText(this, "Latitude"+StoreLatitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(this, "Longitude"+StoreLongitude, Toast.LENGTH_LONG).show();
+        ShopLatitude=Latitude;
+        ShopLongitude=Longitude;
+        Toast.makeText(this, "Latitude"+ShopLatitude, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Longitude"+ShopLongitude, Toast.LENGTH_LONG).show();
         UseCoordinatesAKAaddMap=true;
         Intent intent=new Intent();
         intent.setAction("ComingFromSignUpActivity");
@@ -245,7 +245,7 @@ public class SignUpActivity extends AppCompatActivity {
         List<Address> addresses;
         try {
             Toast.makeText(this, "Trying To gET Address", Toast.LENGTH_LONG).show();
-          addresses =  geocoder.getFromLocation(StoreLatitude, StoreLongitude, 1);
+          addresses =  geocoder.getFromLocation(ShopLatitude, ShopLongitude, 1);
           SelectedState=addresses.get(0).getAdminArea();
           SelectedCommune=addresses.get(0).getLocality();
             Toast.makeText(this, SelectedCommune, Toast.LENGTH_LONG).show();
@@ -267,7 +267,7 @@ public class SignUpActivity extends AppCompatActivity {
             signUpErrorText.setVisibility(View.GONE);
             retryButton.setVisibility(View.GONE);
             signUpSuccessfulText.setVisibility(View.GONE);
-            goToStoreHomePageButton.setVisibility(View.GONE);
+            goToShopHomePageButton.setVisibility(View.GONE);
             signUpWasNotSuccessful=false;
         }
         if(viewPagerSignUP.getCurrentItem()>0){
@@ -283,7 +283,7 @@ public void SignUp(){
     signUpErrorText.setVisibility(View.GONE);
     retryButton.setVisibility(View.GONE);
     signUpSuccessfulText.setVisibility(View.GONE);
-    goToStoreHomePageButton.setVisibility(View.GONE);
+    goToShopHomePageButton.setVisibility(View.GONE);
 
    Response.Listener<JSONObject> volleyJSONObjectListener=new Response.Listener<JSONObject>() {
         @Override
@@ -316,15 +316,15 @@ public void SignUp(){
         signUpJsonObject.put("LastName",LastName );
         signUpJsonObject.put("PhoneNumber", PhoneNumber);
         signUpJsonObject.put("isBusinessOwner", isBusinessOwner);
-        signUpJsonObject.put("SalonName",SalonName );
+        signUpJsonObject.put("ShopName",SalonName );
        signUpJsonObject.put("SelectedState", SelectedState);
         signUpJsonObject.put("SelectedCommune",SelectedCommune );
         signUpJsonObject.put("UseCoordinatesAKAaddMap",UseCoordinatesAKAaddMap );
-        signUpJsonObject.put("StoreLatitude", StoreLatitude);
-        signUpJsonObject.put("StoreLongitude", StoreLongitude);
+        signUpJsonObject.put("ShopLatitude", ShopLatitude);
+        signUpJsonObject.put("ShopLongitude", ShopLongitude);
         signUpJsonObject.put("isMen", isMen);
         signUpJsonObject.put("SelectedImage", ConvertBitmapToString(SelectedImage));//photo
-        signUpJsonObject.put("StorePhoneNumber", StorePhoneNumber);
+        signUpJsonObject.put("ShopPhoneNumber", ShopPhoneNumber);
         signUpJsonObject.put("FacebookLink", FacebookLink);
         signUpJsonObject.put("InstagramLink",InstagramLink );
         signUpJsonObject.put("Coiffure",Coiffure );
@@ -369,13 +369,13 @@ public void SignUp(){
 
         signUpErrorText.setVisibility(View.VISIBLE);
         retryButton.setVisibility(View.VISIBLE);
-        Toast.makeText(this, "Not Successful", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Not SuccessfulSignIn", Toast.LENGTH_LONG).show();
     }
     void Successful(){
         signUpWasNotSuccessful=false;
         progressBar.setVisibility(View.GONE);
         signUpSuccessfulText.setVisibility(View.VISIBLE);
-        goToStoreHomePageButton.setVisibility(View.VISIBLE);
+        goToShopHomePageButton.setVisibility(View.VISIBLE);
 
     }
 }
