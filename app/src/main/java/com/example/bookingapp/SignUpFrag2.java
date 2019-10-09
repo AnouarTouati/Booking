@@ -92,8 +92,9 @@ if(!SomeThingWentWrong){
     //if we came here from facebook and email is not available we should send email address to SignUpActivity
     ((SignUpActivity)getActivity()).isEmployee=isEmployee;
     ((SignUpActivity)getActivity()).isBusinessOwner=isBusinessOwner;
-
-    ((SignUpActivity)getActivity()).SetCurrentItemViewPager(2);
+    ((SignUpActivity)getActivity()).TurnOnProgressBar();
+    SignUpActivity.SendToServerToCheckAndRegister(2);
+   // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(2);
 }
 
     }

@@ -1,24 +1,17 @@
 package com.example.bookingapp;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Looper;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -26,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -38,7 +32,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -48,17 +41,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    public String EmailAddress;
-    public String Password;
+    public static String EmailAddress;
+    public static String Password;
     public String FirstName;
     public String LastName;
-    public String PhoneNumber;
+    public static String PhoneNumber;
     public Boolean isEmployee=false;
     public Boolean isBusinessOwner=false;
     public String SalonName;
@@ -69,7 +61,7 @@ public class SignUpActivity extends AppCompatActivity {
     public Double ShopLongitude;
     public Boolean isMen=true;
     public Bitmap SelectedImage;
-    public String ShopPhoneNumber;
+    public static String ShopPhoneNumber;
     public String FacebookLink;
     public String InstagramLink;
     public Boolean Coiffure=false;
@@ -88,9 +80,9 @@ public class SignUpActivity extends AppCompatActivity {
     public String Thursday;
     public String Friday;
 
-    final String SignUpUrl="dztraintrack.tk";
+    static final String SignUpUrl="http://192.168.43.139:81/ThirdPage.php";
 
-    ViewPager viewPagerSignUP;
+    public  static ViewPager viewPagerSignUP;
     final int LOCATION_REQ=10;
     final int GPS_SETTING_REQ=5;
     Boolean ComingBackFromLocationSettings=false;
@@ -99,12 +91,58 @@ public class SignUpActivity extends AppCompatActivity {
     TextView signUpSuccessfulText;
     Button retryButton;
     Button goToShopHomePageButton;
-    ProgressBar progressBar;
+   public static ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
+
+    static Response.Listener<JSONObject> VolleyListener;
+    static Response.ErrorListener VolleyErrorListener;
+    static RequestQueue requestQueue;
+    static Context mContext;
+
+    String TokenReceived;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        mContext=this;
+
+        VolleyListener =new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.v("VolleyReceived","VolleyReceived in SignUpActivity "+response.toString());
+
+                if(response.has("SignUp")){
+                    try {
+                        if(response.getJSONObject("SignUp").getString("Successful").equals("true")){
+                            TokenReceived=response.getJSONObject("SignUp").getString("Token");
+                            Successful();
+                        }else{
+                            NotSuccessful();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(response.has("CheckAndRegister")){
+                    try {
+                        ServerResponseCheckAndRegister(response.getJSONObject("CheckAndRegister"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        };
+        VolleyErrorListener=new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.v("VolleyError","VolleyError in SignUpActivity "+error.toString());
+                error.printStackTrace();
+
+            }
+        };
+        requestQueue= Volley.newRequestQueue(this);
 
         progressBar=findViewById(R.id.progressBarSignUp);
         signUpErrorText=findViewById(R.id.signUpErrorText);
@@ -116,11 +154,13 @@ public class SignUpActivity extends AppCompatActivity {
                 SignUp();
             }
         });
- goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
- goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
+        goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
+        goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
      @Override
      public void onClick(View view) {
-         //something here
+         Intent GoToShopActivityIntent=new Intent(mContext,ShopActivity.class);
+         GoToShopActivityIntent.putExtra("Token", TokenReceived);
+         mContext.startActivity(GoToShopActivityIntent);
      }
  });
         fusedLocationProviderClient=new FusedLocationProviderClient(this);
@@ -285,78 +325,105 @@ public void SignUp(){
     signUpSuccessfulText.setVisibility(View.GONE);
     goToShopHomePageButton.setVisibility(View.GONE);
 
-   Response.Listener<JSONObject> volleyJSONObjectListener=new Response.Listener<JSONObject>() {
-        @Override
-        public void onResponse(JSONObject response) {
-            if(response.has("SignUpResult")){
-                try {
-                    if(response.getBoolean("SignUpResult")){
-                        Successful();
-                    }else{
-                     NotSuccessful();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
-   Response.ErrorListener volleyErrorListener=new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-           NotSuccessful();
-        }
-    };
-    JSONObject signUpJsonObject=new JSONObject();
-    try {
+    Map<String,Object> map=new HashMap<>();
+    
+        map.put("Request","SignUp");
+        map.put("EmailAddress", EmailAddress);
+        map.put("Password",Password );
+        map.put("FirstName",FirstName );
+        map.put("LastName",LastName );
+        map.put("PhoneNumber", PhoneNumber);
+        map.put("isBusinessOwner", isBusinessOwner);
+        map.put("ShopName",SalonName );
+        map.put("SelectedState", SelectedState);
+        map.put("SelectedCommune",SelectedCommune );
+        map.put("UseCoordinatesAKAaddMap",UseCoordinatesAKAaddMap );
+        map.put("ShopLatitude", ShopLatitude);
+        map.put("ShopLongitude", ShopLongitude);
+        map.put("isMen", isMen);
+        map.put("SelectedImage", ConvertBitmapToString(SelectedImage));//photo
+        map.put("ShopPhoneNumber", ShopPhoneNumber);
+        map.put("FacebookLink", FacebookLink);
+        map.put("InstagramLink",InstagramLink );
+        map.put("Coiffure",Coiffure );
+        map.put("MakeUp", MakeUp);
+        map.put("Meches", Meches);
+        map.put("Tinte",Tinte );
+        map.put("Pedcure", Pedcure);
+        map.put("Manage", Manage);
+        map.put("Manicure", Manicure);
+        map.put("Coupe",Coupe );
+        map.put("Saturday", Saturday);
+        map.put("Sunday",Sunday );
+        map.put("Monday", Monday);
+        map.put("Tuesday", Tuesday);
+        map.put("Wednesday", Wednesday);
+        map.put("Thursday", Thursday);
+        map.put("Friday", Friday);
 
-        signUpJsonObject.put("EmailAddress", EmailAddress);
-         signUpJsonObject.put("Password",Password );
-        signUpJsonObject.put("FirstName",FirstName );
-        signUpJsonObject.put("LastName",LastName );
-        signUpJsonObject.put("PhoneNumber", PhoneNumber);
-        signUpJsonObject.put("isBusinessOwner", isBusinessOwner);
-        signUpJsonObject.put("ShopName",SalonName );
-       signUpJsonObject.put("SelectedState", SelectedState);
-        signUpJsonObject.put("SelectedCommune",SelectedCommune );
-        signUpJsonObject.put("UseCoordinatesAKAaddMap",UseCoordinatesAKAaddMap );
-        signUpJsonObject.put("ShopLatitude", ShopLatitude);
-        signUpJsonObject.put("ShopLongitude", ShopLongitude);
-        signUpJsonObject.put("isMen", isMen);
-        signUpJsonObject.put("SelectedImage", ConvertBitmapToString(SelectedImage));//photo
-        signUpJsonObject.put("ShopPhoneNumber", ShopPhoneNumber);
-        signUpJsonObject.put("FacebookLink", FacebookLink);
-        signUpJsonObject.put("InstagramLink",InstagramLink );
-        signUpJsonObject.put("Coiffure",Coiffure );
-        signUpJsonObject.put("MakeUp", MakeUp);
-        signUpJsonObject.put("Meches", Meches);
-        signUpJsonObject.put("Tinte",Tinte );
-        signUpJsonObject.put("Pedcure", Pedcure);
-        signUpJsonObject.put("Manage", Manage);
-        signUpJsonObject.put("Manicure", Manicure);
-        signUpJsonObject.put("Coupe",Coupe );
-        signUpJsonObject.put("Saturday", Saturday);
-        signUpJsonObject.put("Sunday",Sunday );
-        signUpJsonObject.put("Monday", Monday);
-        signUpJsonObject.put("Tuesday", Tuesday);
-        signUpJsonObject.put("Wednesday", Wednesday);
-        signUpJsonObject.put("Thursday", Thursday);
-        signUpJsonObject.put("Friday", Friday);
+   
+    JSONObject Data=new JSONObject(map);
 
-    } catch (JSONException e) {
-        e.printStackTrace();
+    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SignUpUrl, Data,VolleyListener,VolleyErrorListener);
 
-    }
-
-
-    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SignUpUrl, signUpJsonObject,volleyJSONObjectListener,volleyErrorListener);
-    RequestQueue requestQueue= Volley.newRequestQueue(this);
     requestQueue.add(jsonObjectRequest);
 
-
-
-
 }
+
+
+    public static void SendToServerToCheckAndRegister(int NextIndexInPagerAdapter){
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("Request","CheckAndRegister");
+
+        if(NextIndexInPagerAdapter==1 && viewPagerSignUP.getCurrentItem()==0){
+        map.put("EmailAddress",EmailAddress);
+        map.put("Password",Password);
+        }
+            else if(NextIndexInPagerAdapter==2 && viewPagerSignUP.getCurrentItem()==1){
+                map.put("PhoneNumber",PhoneNumber);
+            }
+
+            else if(NextIndexInPagerAdapter==4 && viewPagerSignUP.getCurrentItem()==3){
+                map.put("ShopPhoneNumber", ShopPhoneNumber);
+        }
+        JSONObject Dara=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(SignUpUrl, Dara, VolleyListener, VolleyErrorListener);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    void ServerResponseCheckAndRegister(JSONObject response){
+        TurnOffProgressBar();
+
+      if(response.has("EmailAddress")&& response.has("Password")){
+          try {
+              if(response.getString("EmailAddress").equals("ok") && response.getString("Password").equals("ok") && viewPagerSignUP.getCurrentItem()==0){
+                SetCurrentItemViewPager(1);
+              }
+          } catch (JSONException e) {
+              e.printStackTrace();
+          }
+      }
+      if(response.has("PhoneNumber")){
+          try {
+              if(response.getString("PhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==1){
+                  SetCurrentItemViewPager(2);
+              }
+          } catch (JSONException e) {
+              e.printStackTrace();
+          }
+      }
+
+      if(response.has("ShopPhoneNumber")){
+          try {
+              if(response.getString("ShopPhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==3){
+                SetCurrentItemViewPager(4);
+              }
+          } catch (JSONException e) {
+              e.printStackTrace();
+          }
+      }
+    }
     String ConvertBitmapToString(Bitmap image){
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
@@ -377,5 +444,53 @@ public void SignUp(){
         signUpSuccessfulText.setVisibility(View.VISIBLE);
         goToShopHomePageButton.setVisibility(View.VISIBLE);
 
+    }
+    public void TurnOnProgressBar(){
+        progressBar.setVisibility(View.VISIBLE);
+        int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
+
+        if(CallingFragmentIndex==0){
+           findViewById(R.id.MainScrollView_Frag1).setVisibility(View.GONE);
+        }
+         else if(CallingFragmentIndex==1){
+            findViewById(R.id.MainScrollView_Frag2).setVisibility(View.GONE);
+        }
+        else if(CallingFragmentIndex==2){
+            findViewById(R.id.MainScrollView_Frag3).setVisibility(View.GONE);
+        }
+        else if(CallingFragmentIndex==3){
+            findViewById(R.id.MainScrollView_Frag4).setVisibility(View.GONE);
+        }
+        else if(CallingFragmentIndex==4){
+            findViewById(R.id.MainScrollView_Frag5).setVisibility(View.GONE);
+        }
+        else if(CallingFragmentIndex==5){
+            findViewById(R.id.MainScrollView_Frag6).setVisibility(View.GONE);
+        }
+
+    }
+    public void TurnOffProgressBar(){
+
+        progressBar.setVisibility(View.GONE);
+        int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
+
+        if(CallingFragmentIndex==0){
+            findViewById(R.id.MainScrollView_Frag1).setVisibility(View.VISIBLE);
+        }
+        else if(CallingFragmentIndex==1){
+            findViewById(R.id.MainScrollView_Frag2).setVisibility(View.VISIBLE);
+        }
+        else if(CallingFragmentIndex==2){
+            findViewById(R.id.MainScrollView_Frag3).setVisibility(View.VISIBLE);
+        }
+        else if(CallingFragmentIndex==3){
+            findViewById(R.id.MainScrollView_Frag4).setVisibility(View.VISIBLE);
+        }
+        else if(CallingFragmentIndex==4){
+            findViewById(R.id.MainScrollView_Frag5).setVisibility(View.VISIBLE);
+        }
+        else if(CallingFragmentIndex==5){
+            findViewById(R.id.MainScrollView_Frag6).setVisibility(View.VISIBLE);
+        }
     }
 }

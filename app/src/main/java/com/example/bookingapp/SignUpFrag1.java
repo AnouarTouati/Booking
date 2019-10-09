@@ -66,8 +66,9 @@ public class SignUpFrag1 extends Fragment {
         if(!SomethingWentWrong){
             ((SignUpActivity)getActivity()).EmailAddress=EmailAddress;
             ((SignUpActivity)getActivity()).Password=Password;
-
-            ((SignUpActivity)getActivity()).SetCurrentItemViewPager(1);
+            ((SignUpActivity)getActivity()).TurnOnProgressBar();
+           SignUpActivity.SendToServerToCheckAndRegister(1);
+        //    ((SignUpActivity)getActivity()).SetCurrentItemViewPager(1);
         }
 
     }
