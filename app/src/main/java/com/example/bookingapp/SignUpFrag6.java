@@ -111,7 +111,7 @@ public class SignUpFrag6 extends Fragment {
         ((SignUpActivity)getActivity()).Thursday=spinnerList.get(20).getSelectedItem().toString()+spinnerList.get(21).getSelectedItem().toString()+spinnerList.get(22).getSelectedItem().toString()+spinnerList.get(23).getSelectedItem().toString();
         ((SignUpActivity)getActivity()).Friday=spinnerList.get(24).getSelectedItem().toString()+spinnerList.get(25).getSelectedItem().toString()+spinnerList.get(26).getSelectedItem().toString()+spinnerList.get(27).getSelectedItem().toString();
 
-        Toast.makeText(getActivity(),((SignUpActivity)getActivity()).Friday , Toast.LENGTH_LONG).show();
+
        // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(6);
        ((SignUpActivity)getActivity()).SignUp();
     }

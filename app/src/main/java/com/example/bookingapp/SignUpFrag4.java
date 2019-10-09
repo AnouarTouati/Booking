@@ -100,8 +100,9 @@ public class SignUpFrag4 extends Fragment {
             ((SignUpActivity)getActivity()).ShopPhoneNumber=ShopPhoneNumber;
             ((SignUpActivity)getActivity()).FacebookLink=FacebookLink;
             ((SignUpActivity)getActivity()).InstagramLink=InstagramLink;
-
-            ((SignUpActivity)getActivity()).SetCurrentItemViewPager(4);
+            ((SignUpActivity)getActivity()).TurnOnProgressBar();
+            SignUpActivity.SendToServerToCheckAndRegister(4);
+         //   ((SignUpActivity)getActivity()).SetCurrentItemViewPager(4);
 
         }
     }

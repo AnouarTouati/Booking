@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final String URL = "http://www.dztraintrack.tk/index.php";
+    static final String URL = "http://192.168.43.139:81/ThirdPage.php";
     ArrayList<Image> ShopsMainImages = new ArrayList<>();
     ArrayList<String> ShopsNames = new ArrayList<>();
     ArrayList<String> ShopsAddresses = new ArrayList<>();
