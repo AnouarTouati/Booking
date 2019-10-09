@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add a Map To Your Store"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@id/textView8"
             app:layout_constraintHorizontal_bias=".8"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"
             android:text="Men"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@id/submit"
 
             app:layout_constraintLeft_toRightOf="@id/textView8"
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/checkboxcolor"
             android:text="Women"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@id/submit"
 
             app:layout_constraintLeft_toRightOf="@id/men"
@@ -73,7 +73,7 @@
             android:inputType="textPersonName"
             android:textAppearance="@style/edit_text_custom"
 
-            android:textSize="@dimen/_16ssp"
+            android:textSize="16sp"
 
             app:layout_constraintBottom_toTopOf="@id/stateSpinner"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -120,7 +120,7 @@
             android:gravity="center|left"
             android:text="For:"
             android:textColor="@android:color/primary_text_light_nodisable"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@id/submit"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -129,8 +129,8 @@
 
         <View
             android:id="@+id/divider9"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/salonName"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -140,8 +140,8 @@
 
         <View
             android:id="@+id/divider8"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/salonName"
             app:layout_constraintLeft_toRightOf="@id/divider9"

@@ -1,7 +1,6 @@
 package com.example.bookingapp;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,7 +16,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,11 +90,14 @@ public class SignUpActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
     TextView signUpErrorText;
     TextView signUpSuccessfulText;
+    CustomRecyclerViewAdapterSignUpErrors customRecyclerViewAdapterSignUpErrors;
+    RecyclerView ErrorMessagesRecyclerView;
+    ArrayList<String> ErrorsList=new ArrayList<>();
     Button retryButton;
     Button goToShopHomePageButton;
-   public static ProgressBar progressBar;
+    public static ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
-
+    static Boolean RequestWasSentToServer=false;
     static Response.Listener<JSONObject> VolleyListener;
     static Response.ErrorListener VolleyErrorListener;
     static RequestQueue requestQueue;
@@ -143,7 +147,10 @@ public class SignUpActivity extends AppCompatActivity {
             }
         };
         requestQueue= Volley.newRequestQueue(this);
-
+        customRecyclerViewAdapterSignUpErrors=new CustomRecyclerViewAdapterSignUpErrors(ErrorsList);//initialized empty so we can just swap the adapter later
+        ErrorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
+        ErrorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
+        ErrorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar=findViewById(R.id.progressBarSignUp);
         signUpErrorText=findViewById(R.id.signUpErrorText);
         signUpSuccessfulText=findViewById(R.id.signUpSuccessfulText);
@@ -300,21 +307,27 @@ public class SignUpActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        if(signUpWasNotSuccessful){
-            viewPagerSignUP.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-
-            signUpErrorText.setVisibility(View.GONE);
-            retryButton.setVisibility(View.GONE);
-            signUpSuccessfulText.setVisibility(View.GONE);
-            goToShopHomePageButton.setVisibility(View.GONE);
-            signUpWasNotSuccessful=false;
-        }
-        if(viewPagerSignUP.getCurrentItem()>0){
-            SetCurrentItemViewPager(viewPagerSignUP.getCurrentItem()-1);
+        if(RequestWasSentToServer){
+           //cancel the requests here
+            TurnOffProgressBar();
         }else{
-            super.onBackPressed();
+            if(signUpWasNotSuccessful){
+                viewPagerSignUP.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+
+                signUpErrorText.setVisibility(View.GONE);
+                retryButton.setVisibility(View.GONE);
+                signUpSuccessfulText.setVisibility(View.GONE);
+                goToShopHomePageButton.setVisibility(View.GONE);
+                signUpWasNotSuccessful=false;
+            }
+            if(viewPagerSignUP.getCurrentItem()>0){
+                SetCurrentItemViewPager(viewPagerSignUP.getCurrentItem()-1);
+            }else{
+                super.onBackPressed();
+            }
         }
+
     }
 public void SignUp(){
     viewPagerSignUP.setVisibility(View.GONE);
@@ -368,6 +381,7 @@ public void SignUp(){
 
     requestQueue.add(jsonObjectRequest);
 
+
 }
 
 
@@ -390,15 +404,23 @@ public void SignUp(){
         JSONObject Dara=new JSONObject(map);
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(SignUpUrl, Dara, VolleyListener, VolleyErrorListener);
         requestQueue.add(jsonObjectRequest);
+        RequestWasSentToServer=true;
     }
 
     void ServerResponseCheckAndRegister(JSONObject response){
         TurnOffProgressBar();
-
+       ErrorsList.clear();
       if(response.has("EmailAddress")&& response.has("Password")){
           try {
               if(response.getString("EmailAddress").equals("ok") && response.getString("Password").equals("ok") && viewPagerSignUP.getCurrentItem()==0){
                 SetCurrentItemViewPager(1);
+              }else {
+                  if(!response.getString("EmailAddress").equals("ok")){
+                      ErrorsList.add("-Please Choose Another Email Address");
+                  }
+                  if(!response.getString("Password").equals("ok")){
+                      ErrorsList.add("-The Password You Entered Doesn't Meet The Requirements");
+                  }
               }
           } catch (JSONException e) {
               e.printStackTrace();
@@ -408,6 +430,8 @@ public void SignUp(){
           try {
               if(response.getString("PhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==1){
                   SetCurrentItemViewPager(2);
+              }else{
+                  ErrorsList.add("-The Phone Number You Entered Is Already Used");
               }
           } catch (JSONException e) {
               e.printStackTrace();
@@ -419,9 +443,17 @@ public void SignUp(){
               if(response.getString("ShopPhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==3){
                 SetCurrentItemViewPager(4);
               }
+              else{
+                  ErrorsList.add("-The Shop Phone Number Is Already Used");
+              }
           } catch (JSONException e) {
               e.printStackTrace();
           }
+      }
+      if(ErrorsList.size()>0){//greater than zero meaning we have an error
+
+          ErrorMessagesRecyclerView.swapAdapter(new CustomRecyclerViewAdapterSignUpErrors(ErrorsList), true);
+          ErrorMessagesRecyclerView.setVisibility(View.VISIBLE);//will make it invisible in turn on progress bar
       }
     }
     String ConvertBitmapToString(Bitmap image){
@@ -446,6 +478,7 @@ public void SignUp(){
 
     }
     public void TurnOnProgressBar(){
+        ErrorMessagesRecyclerView.setVisibility(View.GONE);//SET VISIBLE IS IN SERVERRESPONSECHECKANDREGISTER
         progressBar.setVisibility(View.VISIBLE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
 
@@ -470,7 +503,7 @@ public void SignUp(){
 
     }
     public void TurnOffProgressBar(){
-
+        RequestWasSentToServer=false;
         progressBar.setVisibility(View.GONE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
 
