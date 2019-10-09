@@ -47,7 +47,7 @@
 
             android:textColor="#8B8888"
 
-            android:textSize="@dimen/_18ssp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/password"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -64,7 +64,7 @@
 
             android:textColor="#8B8888"
 
-            android:textSize="@dimen/_18ssp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/confirmPassword"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -80,7 +80,7 @@
             android:textAppearance="@style/edit_text_custom"
 
             android:textColor="#8B8888"
-            android:textSize="@dimen/_18ssp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/signUpFrag1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -101,7 +101,7 @@
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_27sdp"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:text="OR"
             android:textAppearance="@style/ortext"
@@ -114,8 +114,8 @@
 
         <View
             android:id="@+id/divider3"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/email"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -125,8 +125,8 @@
 
         <View
             android:id="@+id/divider5"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/email"
             app:layout_constraintLeft_toRightOf="@id/divider3"

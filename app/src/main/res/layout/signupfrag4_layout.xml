@@ -116,8 +116,8 @@
 
         <View
             android:id="@+id/divider10"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/imageViewFrag4"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -127,8 +127,8 @@
 
         <View
             android:id="@+id/divider11"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_10sdp"
+            android:layout_width="140dp"
+            android:layout_height="10dp"
             android:background="@drawable/divider_horizontal_gradient"
             app:layout_constraintBottom_toTopOf="@id/imageViewFrag4"
             app:layout_constraintLeft_toRightOf="@id/divider10"
