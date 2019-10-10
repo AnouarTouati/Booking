@@ -141,8 +141,37 @@ public class SignUpActivity extends AppCompatActivity {
         VolleyErrorListener=new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.v("VolleyError","VolleyError in SignUpActivity "+error.toString());
-                error.printStackTrace();
+
+                if(error.networkResponse==null){
+                    Log.v("VolleyError","VolleyError in SignUpActivity  Null error.networkResponse");
+                    signUpErrorText.setText("Couldn't Reach The Server Please Check Your Internet Connection");
+                    signUpErrorText.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                    retryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            TurnOnProgressBar();
+                            SendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
+                        }
+                    });
+                    retryButton.setVisibility(View.VISIBLE);
+                }
+               else{
+                    Log.v("VolleyError","VolleyError in SignUpActivity "+error.toString());
+
+                    signUpErrorText.setText("Connection Timed Out");
+                    signUpErrorText.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                    retryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            TurnOnProgressBar();
+                            SendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
+                        }
+                    });
+                    retryButton.setVisibility(View.VISIBLE);
+               }
+
 
             }
         };
@@ -478,6 +507,12 @@ public void SignUp(){
 
     }
     public void TurnOnProgressBar(){
+
+        //COMMON BETWEEN TURN ON/OFF PROGRESS BAR
+        signUpErrorText.setVisibility(View.GONE);
+        retryButton.setVisibility(View.GONE);
+        ////////////////////////////////////////
+
         ErrorMessagesRecyclerView.setVisibility(View.GONE);//SET VISIBLE IS IN SERVERRESPONSECHECKANDREGISTER
         progressBar.setVisibility(View.VISIBLE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
@@ -503,6 +538,12 @@ public void SignUp(){
 
     }
     public void TurnOffProgressBar(){
+
+        //COMMON BETWEEN TURN ON/OFF PROGRESS BAR
+        signUpErrorText.setVisibility(View.GONE);
+        retryButton.setVisibility(View.GONE);
+        ////////////////////////////////////////
+
         RequestWasSentToServer=false;
         progressBar.setVisibility(View.GONE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
