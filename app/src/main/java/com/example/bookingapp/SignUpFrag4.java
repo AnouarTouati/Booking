@@ -54,23 +54,31 @@ public class SignUpFrag4 extends Fragment {
     void SelectImage(){
         Intent selectImageIntent=new Intent();
         selectImageIntent.setType("image/*");
+        selectImageIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         selectImageIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(selectImageIntent, IMG_REQ);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+       super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==IMG_REQ && resultCode==getActivity().RESULT_OK && data!=null){
-            Uri path=data.getData();
-            try {
-                SelectedImage= MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), path);
-                ShowImage(SelectedImage);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(data.getClipData()==null){
+                Uri path=data.getData();
+                try {
+                    SelectedImage= MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), path);
+                    ShowImage(SelectedImage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+           else{
+               Toast.makeText(getContext(), "Please Choose Only One Photo For Your Shop", Toast.LENGTH_LONG).show();
             }
         }
-    }
+
+        }
+
     void DoneFillingFieldsGoNextFrag(){
         Boolean SomethingWentWrong=false;
 
