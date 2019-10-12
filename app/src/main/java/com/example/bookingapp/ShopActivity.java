@@ -140,7 +140,7 @@ public class ShopActivity extends AppCompatActivity {
         viewPager=findViewById(R.id.viewPagerShopMenu);
         customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
         customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(), "ShopMenuFrag1");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag3(), "dfedf");
+        customFragmentPagerAdapter.addFragment(new ShopMenuFrag2(), "ShopMenuFrag2");
         viewPager.setAdapter(customFragmentPagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
