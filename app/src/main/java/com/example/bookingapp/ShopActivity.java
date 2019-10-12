@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -47,7 +48,7 @@ public class ShopActivity extends AppCompatActivity {
     CustomFragmentPagerAdapter customFragmentPagerAdapter;
     ViewPager viewPager;
     TabLayout tabLayout;
-
+    TextView ErrorText;
 
 
 
@@ -105,6 +106,9 @@ public class ShopActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
               Log.v("VolleyReceived","Volley Received Shop Activity "+response.toString());
 
+                ErrorText.setText("");
+                ErrorText.setVisibility(View.GONE);
+
               if(response.has("RemovePersonFromPending")){
                   try {
                       RemovePersonFromPending(response.getString("RemovePersonFromPending"));
@@ -126,11 +130,13 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.v("VolleyError","Volley Error  Shop Activity "+error.toString());
+                ErrorText.setText("Connection To The Server Was Lost");
+                ErrorText.setVisibility(View.VISIBLE);
             }
         };
 
         requestQueue= Volley.newRequestQueue(this);
-
+        ErrorText=findViewById(R.id.ErrorTextView_ShopActivity);
         viewPager=findViewById(R.id.viewPagerShopMenu);
         customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
         customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(), "ShopMenuFrag1");
@@ -180,7 +186,7 @@ public class ShopActivity extends AppCompatActivity {
     public static void RemovePersonFromPending(String PersonNameToRemove){
         pendingList.remove(PersonNameToRemove);
        ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
-       Toast.makeText(mContext, "remove "+PersonNameToRemove, Toast.LENGTH_LONG).show();
+
     }
     public static void Server_RemovePersonFromPending(String PersonNameToRemove){
         Map<String,Object> map=new HashMap<>();
