@@ -18,7 +18,6 @@
         <activity android:name=".SignInActivity" />
         <activity android:name=".ShopActivity" />
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".ShopDetailsActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

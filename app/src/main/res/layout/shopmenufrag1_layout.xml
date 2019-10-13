@@ -9,7 +9,7 @@
         android:id="@+id/addPerson"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/add_person_button"
+        android:background="@drawable/button_type_02"
         android:text="Add Person"
         app:layout_constraintBottom_toTopOf="@id/peoplePendingRecyclerView"
         app:layout_constraintTop_toTopOf="parent"

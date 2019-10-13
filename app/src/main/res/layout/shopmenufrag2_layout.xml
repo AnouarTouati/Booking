@@ -6,18 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/AddPortfolioImagesButton_ShopMenuFrag2"
-    android:text="Portfolio Images"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintTop_toBottomOf="parent"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
+    <Button
+        android:id="@+id/AddPortfolioImagesButton_ShopMenuFrag2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_type_01"
+        android:text="Portfolio Images"
+        app:layout_constraintBottom_toTopOf="@id/Add_UpdateShopMap"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
 
-    >
 
-</Button>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"></Button>
+
+    <Button
+        android:id="@+id/Add_UpdateShopMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_type_01"
+        android:text="Add / Update Shop Map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/AddPortfolioImagesButton_ShopMenuFrag2">
+
+    </Button>
+
 
 </android.support.constraint.ConstraintLayout>

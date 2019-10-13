@@ -81,7 +81,7 @@ public class SignUpActivity extends AppCompatActivity {
     public String Thursday;
     public String Friday;
 
-    static final String SignUpUrl="http://192.168.43.139:81/ThirdPage.php";
+    static final String SignUpUrl="http://192.168.43.139:81/Business.php";
 
     public  static ViewPager viewPagerSignUP;
     final int LOCATION_REQ=10;

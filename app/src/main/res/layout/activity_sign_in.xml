@@ -66,7 +66,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
 
-            android:background="@drawable/edit_text_signin"
+            android:background="@drawable/edit_text_type_02"
 
             android:hint="E-mail Address"
             android:inputType="textEmailAddress"
@@ -83,7 +83,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
 
-            android:background="@drawable/edit_text_signin"
+            android:background="@drawable/edit_text_type_02"
 
             android:hint="Password"
             android:inputType="textPassword"
@@ -100,7 +100,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginBottom="80dp"
-            android:background="@drawable/signin_button"
+            android:background="@drawable/button_type_03"
             android:text="signIn"
             android:textAppearance="@style/signin_button"
             android:visibility="visible"
