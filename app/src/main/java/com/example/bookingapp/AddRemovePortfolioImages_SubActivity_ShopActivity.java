@@ -40,7 +40,7 @@ import java.util.zip.CRC32;
 
 public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompatActivity {
 
-    static final String URL="http://192.168.43.139:81/PortfolioImages.php";
+    static final String URL="http://192.168.43.139:81/PortfolioImages-Business.php";
     final int IMG_REQ=10;
     ArrayList<Bitmap> PortfolioImages =new ArrayList<>();
     ArrayList<String> PortfolioImagesAsStrings=new ArrayList<>();
@@ -138,8 +138,9 @@ void GetImages(){
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==IMG_REQ && resultCode==RESULT_OK && data!=null){
-            if(data.getClipData() != null) {
 
+            if(data.getClipData() != null) {
+                Log.v("VolleyReceived", "Up ToGet Images");
                 int count = data.getClipData().getItemCount();
                 for(int i = 0; i < count; i++) {
                     Uri imageUri = data.getClipData().getItemAt(i).getUri();
@@ -151,11 +152,11 @@ void GetImages(){
                     }
 
                 }
-                Log.v("VolleyReceived", "Up ToGet Images");
+
 
             }
         } else if(data.getData() != null) {
-
+            Log.v("VolleyReceived", "Up ToGet Images");
             String imagePath = data.getData().getPath();
 
             try {
@@ -164,7 +165,7 @@ void GetImages(){
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.v("VolleyReceived", "Up ToGet Images");
+
         }
 
     }
@@ -201,6 +202,7 @@ void GetImages(){
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, VolleyListener, VolleyErrorListener);
 
         RequestQueue.add(jsonObjectRequest);
+
     }
 
 

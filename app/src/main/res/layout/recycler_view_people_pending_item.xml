@@ -29,7 +29,7 @@
         app:layout_constraintLeft_toRightOf="@id/personNameText"
         app:layout_constraintRight_toRightOf="parent"
 
-        android:background="@drawable/delete_person_button"
+        android:background="@drawable/button_type_01"
         android:text="Done"
         />
 </android.support.constraint.ConstraintLayout>
