@@ -1,5 +1,5 @@
-package com.example.bookingapp;
 
+package com.example.bookingapp;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,6 +33,8 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import com.example.bookingapp.R;
+import com.example.bookingapp.SignUpActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -85,6 +87,7 @@ public class SignUpFrag3 extends Fragment {
                 if(action.equals("ComingFromSignUpActivity")){
                     UseCoordinatesAKAaddMap=intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
                  addMapToYourShopCheckBox.setChecked(UseCoordinatesAKAaddMap);
+                 Common_Methods.AddTheTwoNumbers();
                 }
             }
         };

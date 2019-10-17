@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.bookingapp.R;
+
 import java.io.IOException;
 
 public class SignUpFrag4 extends Fragment {
@@ -104,12 +106,12 @@ public class SignUpFrag4 extends Fragment {
 
         if(!SomethingWentWrong){
 
-            ((SignUpActivity)getActivity()).SelectedImage=SelectedImage;
-            ((SignUpActivity)getActivity()).ShopPhoneNumber=ShopPhoneNumber;
-            ((SignUpActivity)getActivity()).FacebookLink=FacebookLink;
-            ((SignUpActivity)getActivity()).InstagramLink=InstagramLink;
-            ((SignUpActivity)getActivity()).TurnOnProgressBar();
-            SignUpActivity.SendToServerToCheckAndRegister(4);
+            ((com.example.bookingapp.SignUpActivity)getActivity()).SelectedImage=SelectedImage;
+            ((com.example.bookingapp.SignUpActivity)getActivity()).ShopPhoneNumber=ShopPhoneNumber;
+            ((com.example.bookingapp.SignUpActivity)getActivity()).FacebookLink=FacebookLink;
+            ((com.example.bookingapp.SignUpActivity)getActivity()).InstagramLink=InstagramLink;
+            ((com.example.bookingapp.SignUpActivity)getActivity()).TurnOnProgressBar();
+             com.example.bookingapp.SignUpActivity.SendToServerToCheckAndRegister(4);
          //   ((SignUpActivity)getActivity()).SetCurrentItemViewPager(4);
 
         }

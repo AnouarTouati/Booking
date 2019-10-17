@@ -34,6 +34,14 @@ public class ShopMenuFrag2 extends Fragment {
              startActivity(GoToPortfolioImages_SubActivity);
             }
         });
+
+        Button Add_UpdateShopMap=view.findViewById(R.id.Add_UpdateShopMap);
+        Add_UpdateShopMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShopActivity.FindLocationUsingGPS();
+            }
+        });
         return view;
     }
 
