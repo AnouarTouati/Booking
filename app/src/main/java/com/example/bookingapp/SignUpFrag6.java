@@ -15,6 +15,9 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import com.example.bookingapp.R;
+import com.example.bookingapp.SignUpActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 

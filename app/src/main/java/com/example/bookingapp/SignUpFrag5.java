@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.example.bookingapp.R;
+import com.example.bookingapp.SignUpActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 

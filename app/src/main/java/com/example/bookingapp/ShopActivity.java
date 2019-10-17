@@ -1,11 +1,19 @@
 package com.example.bookingapp;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
+import android.os.Looper;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,18 +26,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,7 +100,13 @@ public class ShopActivity extends AppCompatActivity {
     public String Thursday;
     public String Friday;
 
-
+/////////////////////////////////////////////////
+////FRAG_2 STORE INFO///////////////////////////
+    static final int LOCATION_REQ=10;
+    final int GPS_SETTING_REQ=5;
+    static Boolean ComingBackFromLocationSettings=false;
+    static FusedLocationProviderClient fusedLocationProviderClient;
+///////////////////////////////////////////////////////////
 
 
     @Override
@@ -120,6 +140,15 @@ public class ShopActivity extends AppCompatActivity {
               if(response.has("AddPersonToPending")){
                   try {
                       AddPersonToPending(response.getString("AddPersonToPending"));
+                  } catch (JSONException e) {
+                      e.printStackTrace();
+                  }
+              }
+              if(response.has("Add_UpdateLocationMap")){
+                  try {
+                      if(response.getJSONObject("Add_UpdateLocationMap").getString("successful").equals("true")){
+                          Add_UpdateLocationMap(response.getJSONObject("Add_UpdateLocationMap").getDouble("Latitude"),response.getJSONObject("Add_UpdateLocationMap").getDouble("Longitude"));
+                      }
                   } catch (JSONException e) {
                       e.printStackTrace();
                   }
@@ -177,11 +206,101 @@ public class ShopActivity extends AppCompatActivity {
             }
         });
 
+        fusedLocationProviderClient=new FusedLocationProviderClient(this);
+
     }
 
 
+    public static void FindLocationUsingGPS(){
+
+        if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
+        }else{
 
 
+            LocationManager locationManager=(LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+            if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                AlertDialog.Builder alertBuilder=new AlertDialog.Builder(mContext);
+                alertBuilder.setMessage("In the Next Screen Allow this Application to Use Location Services");
+                alertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        mContext.startActivity(intent);
+                        ComingBackFromLocationSettings=true;
+                    }
+                });
+
+                alertBuilder.show();
+
+            }else{
+
+                Toast.makeText(mContext, "GRANTED", Toast.LENGTH_LONG).show();
+                LocationRequest locationRequest=new LocationRequest();
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                locationRequest.setExpirationDuration(40000);
+                locationRequest.setNumUpdates(1);
+
+                LocationCallback locationCallback=new LocationCallback(){
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+
+                        Server_Add_UpdateLocationMap(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
+
+                    }
+                };
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
+
+            }}
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        boolean granted = true;
+        if (requestCode == LOCATION_REQ) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    granted = false;
+                    break;
+                }
+            }
+        }
+        if (granted) {
+
+            FindLocationUsingGPS();
+        }
+    }
+   void Add_UpdateLocationMap(double Latitude, double Longitude){
+      ///i might show the map here or use gcoder to show the user where we put the point
+       Toast.makeText(this, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
+   }
+
+    static void Server_Add_UpdateLocationMap(double Latitude, double Longitude){
+        Map<String,Object> map=new HashMap<>();
+        map.put("Request","Add_UpdateLocationMap");
+        map.put("Latitude",Latitude);
+        map.put("Longitude",Longitude);
+
+        JSONObject Data=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, volleyListener, volleyErrorListener);
+        requestQueue.add(jsonObjectRequest);
+
+
+     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(ComingBackFromLocationSettings){
+            LocationManager locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
+            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                FindLocationUsingGPS();
+            }
+        }
+    }
 
     public static void RemovePersonFromPending(String PersonNameToRemove){
         pendingList.remove(PersonNameToRemove);
