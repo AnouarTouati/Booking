@@ -52,7 +52,7 @@ public class ShopActivity extends AppCompatActivity {
 
 
 
-    public static String URL="http://192.168.43.139:81/Business.php";
+    public static String URL="http://192.168.43.139:8888/Business.php";
     static RequestQueue requestQueue;
     static Response.Listener<JSONObject> volleyListener;
     static Response.ErrorListener volleyErrorListener;

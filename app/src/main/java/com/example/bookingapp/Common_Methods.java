@@ -15,7 +15,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
-public class Common_Methods {
+public  class Common_Methods {
 
     public static void AddTheTwoNumbers(){
 
