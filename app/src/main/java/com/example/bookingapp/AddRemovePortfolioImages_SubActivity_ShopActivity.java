@@ -40,7 +40,7 @@ import java.util.zip.CRC32;
 
 public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompatActivity {
 
-    static final String URL="http://192.168.43.139:81/PortfolioImages-Business.php";
+    static final String URL="http://192.168.43.139:8888/PortfolioImages-Business.php";
     final int IMG_REQ=10;
     ArrayList<Bitmap> PortfolioImages =new ArrayList<>();
     ArrayList<String> PortfolioImagesAsStrings=new ArrayList<>();
