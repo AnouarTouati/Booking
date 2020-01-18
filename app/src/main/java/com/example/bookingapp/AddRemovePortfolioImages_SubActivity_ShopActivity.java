@@ -40,19 +40,20 @@ import java.util.zip.CRC32;
 
 public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompatActivity {
 
-    static final String URL="http://192.168.43.139:8888/PortfolioImages-Business.php";
+    static final String URL="http://192.168.43.139:8888/PortfolioImages-Business.php";//dont change this without changing it in php code
     final int IMG_REQ=10;
     ArrayList<Bitmap> PortfolioImages =new ArrayList<>();
     ArrayList<String> PortfolioImagesAsStrings=new ArrayList<>();
     ArrayList<String> ImagesLinkFromServer=new ArrayList<>();
     static ArrayList<String> PortfolioImagesLinks=new ArrayList<>();
-
+    ArrayList<String> PortfolioImagesLinksToBeRequested=new ArrayList<>();
+     Integer IndexOfImageToReceiveNext=0;
     CustomRecyclerVAdapterPortfolioImages customRecyclerVAdapterPortfolioImages;
     RecyclerView PortfolioImagesRecyclerView;
 
     Button AddImages;
     static ArrayList<Bitmap> ImagesToBePushed=new ArrayList<>();
-    static ArrayList<Long> CRC32ofImagesToBePushed=new ArrayList<>();//only used to make it esier to find the index of the image to save
+    static ArrayList<Long> CRC32ofImagesToBePushed=new ArrayList<>();//only used to make it easier to find the index of the image to save
 
     static Response.Listener<JSONObject> VolleyListener;
     static Response.ErrorListener VolleyErrorListener;
@@ -348,8 +349,6 @@ void GetImages(){
 
                         for (int i = 0; i < ImagesLinkFromServer.size(); i++) {
 
-
-                            if (i < PortfolioImagesLinksLocal.size()) {
                                 Boolean LinkNotFound = true;
                                 for (int j = 0; j <PortfolioImagesLinksLocal.size(); j++) {
 
@@ -362,13 +361,13 @@ void GetImages(){
                                 }
                                 if (LinkNotFound) {
 
-                                    RequestImage(ImagesLinkFromServer.get(i));
+                                    PortfolioImagesLinksToBeRequested.add(ImagesLinkFromServer.get(i));
                                 }
 
-                            } else {
-                                RequestImage(ImagesLinkFromServer.get(i));
-                            }
 
+                        }
+                        if(PortfolioImagesLinksToBeRequested.size()>0){
+                            RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
                         }
                         ShopDataJSONObject.remove("PortfolioImagesAsStrings");
                         ShopDataJSONObject.remove("PortfolioImagesLinks");
@@ -421,8 +420,11 @@ void GetImages(){
                 PortfolioImages.add(response);
                 PortfolioImagesAsStrings.add(ConvertBitmapToString(response));
                 PortfolioImagesLinks.add(ImageLink);
-
                 SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                IndexOfImageToReceiveNext++;
+                if(IndexOfImageToReceiveNext<PortfolioImagesLinksToBeRequested.size()){
+                    RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));
+                }
 
             }
         }, 0, 0, ImageView.ScaleType.CENTER_CROP, null, new Response.ErrorListener() {
