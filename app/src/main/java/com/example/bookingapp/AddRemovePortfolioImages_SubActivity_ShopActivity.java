@@ -346,7 +346,8 @@ void GetImages(){
                         for ( int i=0;i<ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").length();i++){
                             PortfolioImagesAsStringsLocal.add(i, ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").getString(i));
                         }
-
+                        PortfolioImagesLinksToBeRequested.clear();
+                        IndexOfImageToReceiveNext=0;
                         for (int i = 0; i < ImagesLinkFromServer.size(); i++) {
 
                                 Boolean LinkNotFound = true;
@@ -383,10 +384,13 @@ void GetImages(){
 
 
                     } else{
-
-                        for(int i=0;i<ImagesLinkFromServer.size();i++){
+                        PortfolioImagesLinksToBeRequested.clear();
+                        IndexOfImageToReceiveNext=0;
+                           PortfolioImagesLinksToBeRequested.addAll(ImagesLinkFromServer);
+                        RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));
+                       /* for(int i=0;i<ImagesLinkFromServer.size();i++){
                             RequestImage(ImagesLinkFromServer.get(i));
-                        }
+                        }*/
                     }
 
                  /// if some images no longer exists in server the code above will remove them so we need to save the trimmed set of images
