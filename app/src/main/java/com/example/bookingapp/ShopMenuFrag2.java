@@ -1,21 +1,14 @@
 package com.example.bookingapp;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class ShopMenuFrag2 extends Fragment {
 
@@ -26,20 +19,20 @@ public class ShopMenuFrag2 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.shopmenufrag2_layout, container,false);
-        Button AddPortfolioImagesButton=view.findViewById(R.id.AddPortfolioImagesButton_ShopMenuFrag2);
-        AddPortfolioImagesButton.setOnClickListener(new View.OnClickListener() {
+        Button addPortfolioImagesButton=view.findViewById(R.id.AddPortfolioImagesButton_ShopMenuFrag2);
+        addPortfolioImagesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             Intent GoToPortfolioImages_SubActivity=new Intent(getContext(),AddRemovePortfolioImages_SubActivity_ShopActivity.class);
-             startActivity(GoToPortfolioImages_SubActivity);
+             Intent goToPortfolioImagesSubActivity=new Intent(getContext(),AddRemovePortfolioImages_SubActivity_ShopActivity.class);
+             startActivity(goToPortfolioImagesSubActivity);
             }
         });
 
-        Button Add_UpdateShopMap=view.findViewById(R.id.Add_UpdateShopMap);
-        Add_UpdateShopMap.setOnClickListener(new View.OnClickListener() {
+        Button addUpdateShopMap=view.findViewById(R.id.Add_UpdateShopMap);
+        addUpdateShopMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ShopActivity.FindLocationUsingGPS();
+                ShopActivity.findLocationUsingGPS();
             }
         });
         return view;

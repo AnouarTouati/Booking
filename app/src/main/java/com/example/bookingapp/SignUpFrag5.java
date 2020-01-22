@@ -10,9 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
-import com.example.bookingapp.R;
-import com.example.bookingapp.SignUpActivity;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,23 +37,23 @@ public class SignUpFrag5 extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DoneFillingFieldsGoNextFrag();
+                doneFillingFieldsGoNextFrag();
             }
         });
 
         return view;
     }
-    void DoneFillingFieldsGoNextFrag(){
+    void doneFillingFieldsGoNextFrag(){
 
-        ((SignUpActivity)getActivity()).Coiffure=checkBoxList.get(0).isChecked();
-        ((SignUpActivity)getActivity()).MakeUp=checkBoxList.get(1).isChecked();
-        ((SignUpActivity)getActivity()).Meches=checkBoxList.get(2).isChecked();
-        ((SignUpActivity)getActivity()).Tinte=checkBoxList.get(3).isChecked();
-        ((SignUpActivity)getActivity()).Pedcure=checkBoxList.get(4).isChecked();
-        ((SignUpActivity)getActivity()).Manage=checkBoxList.get(5).isChecked();
-        ((SignUpActivity)getActivity()).Manicure=checkBoxList.get(6).isChecked();
-        ((SignUpActivity)getActivity()).Coupe=checkBoxList.get(7).isChecked();
+        ((SignUpActivity)getActivity()).coiffure =checkBoxList.get(0).isChecked();
+        ((SignUpActivity)getActivity()).makeUp =checkBoxList.get(1).isChecked();
+        ((SignUpActivity)getActivity()).meches =checkBoxList.get(2).isChecked();
+        ((SignUpActivity)getActivity()).tinte =checkBoxList.get(3).isChecked();
+        ((SignUpActivity)getActivity()).pedcure =checkBoxList.get(4).isChecked();
+        ((SignUpActivity)getActivity()).manage =checkBoxList.get(5).isChecked();
+        ((SignUpActivity)getActivity()).manicure =checkBoxList.get(6).isChecked();
+        ((SignUpActivity)getActivity()).coupe =checkBoxList.get(7).isChecked();
 
-        ((SignUpActivity)getActivity()).SetCurrentItemViewPager(5);
+        ((SignUpActivity)getActivity()).setCurrentItemViewPager(5);
     }
 }

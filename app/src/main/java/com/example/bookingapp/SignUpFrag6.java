@@ -1,6 +1,5 @@
 package com.example.bookingapp;
 
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,15 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
-import android.widget.Toast;
-
-import com.example.bookingapp.R;
-import com.example.bookingapp.SignUpActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +31,7 @@ public class SignUpFrag6 extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DoneFillingFieldsGoNextFrag();
+                doneFillingFieldsGoNextFrag();
             }
         });
 
@@ -105,17 +98,17 @@ public class SignUpFrag6 extends Fragment {
         return view;
     }
 
-    private void DoneFillingFieldsGoNextFrag() {
-        ((SignUpActivity)getActivity()).Saturday=spinnerList.get(0).getSelectedItem().toString()+spinnerList.get(1).getSelectedItem().toString()+spinnerList.get(2).getSelectedItem().toString()+spinnerList.get(3).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Sunday=spinnerList.get(4).getSelectedItem().toString()+spinnerList.get(5).getSelectedItem().toString()+spinnerList.get(6).getSelectedItem().toString()+spinnerList.get(7).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Monday=spinnerList.get(8).getSelectedItem().toString()+spinnerList.get(9).getSelectedItem().toString()+spinnerList.get(10).getSelectedItem().toString()+spinnerList.get(11).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Tuesday=spinnerList.get(12).getSelectedItem().toString()+spinnerList.get(13).getSelectedItem().toString()+spinnerList.get(14).getSelectedItem().toString()+spinnerList.get(15).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Wednesday=spinnerList.get(16).getSelectedItem().toString()+spinnerList.get(17).getSelectedItem().toString()+spinnerList.get(18).getSelectedItem().toString()+spinnerList.get(19).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Thursday=spinnerList.get(20).getSelectedItem().toString()+spinnerList.get(21).getSelectedItem().toString()+spinnerList.get(22).getSelectedItem().toString()+spinnerList.get(23).getSelectedItem().toString();
-        ((SignUpActivity)getActivity()).Friday=spinnerList.get(24).getSelectedItem().toString()+spinnerList.get(25).getSelectedItem().toString()+spinnerList.get(26).getSelectedItem().toString()+spinnerList.get(27).getSelectedItem().toString();
+    private void doneFillingFieldsGoNextFrag() {
+        ((SignUpActivity)getActivity()).saturday =spinnerList.get(0).getSelectedItem().toString()+spinnerList.get(1).getSelectedItem().toString()+spinnerList.get(2).getSelectedItem().toString()+spinnerList.get(3).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).sunday =spinnerList.get(4).getSelectedItem().toString()+spinnerList.get(5).getSelectedItem().toString()+spinnerList.get(6).getSelectedItem().toString()+spinnerList.get(7).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).monday =spinnerList.get(8).getSelectedItem().toString()+spinnerList.get(9).getSelectedItem().toString()+spinnerList.get(10).getSelectedItem().toString()+spinnerList.get(11).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).tuesday =spinnerList.get(12).getSelectedItem().toString()+spinnerList.get(13).getSelectedItem().toString()+spinnerList.get(14).getSelectedItem().toString()+spinnerList.get(15).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).wednesday =spinnerList.get(16).getSelectedItem().toString()+spinnerList.get(17).getSelectedItem().toString()+spinnerList.get(18).getSelectedItem().toString()+spinnerList.get(19).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).thursday =spinnerList.get(20).getSelectedItem().toString()+spinnerList.get(21).getSelectedItem().toString()+spinnerList.get(22).getSelectedItem().toString()+spinnerList.get(23).getSelectedItem().toString();
+        ((SignUpActivity)getActivity()).friday =spinnerList.get(24).getSelectedItem().toString()+spinnerList.get(25).getSelectedItem().toString()+spinnerList.get(26).getSelectedItem().toString()+spinnerList.get(27).getSelectedItem().toString();
 
 
        // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(6);
-       ((SignUpActivity)getActivity()).SignUp();
+       ((SignUpActivity)getActivity()).signUp();
     }
 }

@@ -1,7 +1,6 @@
 package com.example.bookingapp;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,9 +12,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SignUpFrag1 extends Fragment {
-    public  String EmailAddress;
-    public  String Password;
-    public  String ConfirmPassword;
+    public  String emailAddress;
+    public  String password;
+    public  String confirmPassword;
     View view;
     @Nullable
     @Override
@@ -26,20 +25,20 @@ public class SignUpFrag1 extends Fragment {
         signUpFrag1Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DoneFillingFieldsGoNextFrag();
+                doneFillingFieldsGoNextFrag();
             }
         });
 
         return view;
     }
-    public void DoneFillingFieldsGoNextFrag(){
+    public void doneFillingFieldsGoNextFrag(){
 
         Boolean SomethingWentWrong=false;
 
         EditText emailEditText=view.findViewById(R.id.email);
-        EmailAddress=emailEditText.getText().toString();
-        if(EmailAddress.contains("@") && EmailAddress.contains(".")){
-            if(EmailAddress.indexOf("@")<EmailAddress.indexOf(".")){
+        emailAddress =emailEditText.getText().toString();
+        if(emailAddress.contains("@") && emailAddress.contains(".")){
+            if(emailAddress.indexOf("@")< emailAddress.indexOf(".")){
 
             }else{
                 Toast.makeText(getActivity(), "Bad Email", Toast.LENGTH_LONG).show();
@@ -52,22 +51,22 @@ public class SignUpFrag1 extends Fragment {
 
         EditText passwordEditText=view.findViewById(R.id.password);
         EditText confirmPasswordEditText=view.findViewById(R.id.confirmPassword);
-        Password=passwordEditText.getText().toString();
-        ConfirmPassword=confirmPasswordEditText.getText().toString();
-        if (Password.length()<8){
+        password =passwordEditText.getText().toString();
+        confirmPassword =confirmPasswordEditText.getText().toString();
+        if (password.length()<8){
             Toast.makeText(getActivity(), "Password Must Contain at Least 8 Characters ", Toast.LENGTH_LONG).show();
             SomethingWentWrong=true;
-        }else if(!Password.contentEquals(ConfirmPassword)){
+        }else if(!password.contentEquals(confirmPassword)){
             Toast.makeText(getActivity(), "Password Doesn't Match", Toast.LENGTH_LONG).show();
             SomethingWentWrong=true;
         }
 
 
         if(!SomethingWentWrong){
-            ((SignUpActivity)getActivity()).EmailAddress=EmailAddress;
-            ((SignUpActivity)getActivity()).Password=Password;
-            ((SignUpActivity)getActivity()).TurnOnProgressBar();
-           SignUpActivity.SendToServerToCheckAndRegister(1);
+            ((SignUpActivity)getActivity()).emailAddress = emailAddress;
+            ((SignUpActivity)getActivity()).password = password;
+            ((SignUpActivity)getActivity()).turnOnProgressBar();
+           SignUpActivity.sendToServerToCheckAndRegister(1);
         //    ((SignUpActivity)getActivity()).SetCurrentItemViewPager(1);
         }
 

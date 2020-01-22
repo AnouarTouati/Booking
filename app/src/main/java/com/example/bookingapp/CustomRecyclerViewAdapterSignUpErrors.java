@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class CustomRecyclerViewAdapterSignUpErrors extends RecyclerView.Adapter<CustomRecyclerViewAdapterSignUpErrors.ViewHolder> {
-    ArrayList<String> ErrorsMessagesList=new ArrayList<>();
+    ArrayList<String> errorsMessagesList =new ArrayList<>();
 
     public CustomRecyclerViewAdapterSignUpErrors(ArrayList<String> errorsMessagesList) {
-        ErrorsMessagesList = errorsMessagesList;
+        this.errorsMessagesList = errorsMessagesList;
     }
 
     @NonNull
@@ -27,20 +26,20 @@ public class CustomRecyclerViewAdapterSignUpErrors extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-     viewHolder.ErrorTextView.setText(ErrorsMessagesList.get(i));
+     viewHolder.errorTextView.setText(errorsMessagesList.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return ErrorsMessagesList.size();
+        return errorsMessagesList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView ErrorTextView;
+        TextView errorTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-          ErrorTextView=itemView.findViewById(R.id.ErrorTextView_SignUpActivity);
+          errorTextView =itemView.findViewById(R.id.ErrorTextView_SignUpActivity);
         }
     }
 }

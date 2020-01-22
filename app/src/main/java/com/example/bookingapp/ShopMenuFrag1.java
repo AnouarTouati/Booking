@@ -31,7 +31,7 @@ public class ShopMenuFrag1 extends Fragment {
         addPerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((ShopActivity)getActivity()).Server_AddPersonToPending();
+                ((ShopActivity)getActivity()).serverAddPersonToPending();
             }
         });
         peoplePendingRecyclerView=view.findViewById(R.id.peoplePendingRecyclerView);
@@ -49,8 +49,8 @@ public class ShopMenuFrag1 extends Fragment {
         return view;
     }
 
-    static void RemovePersonFromPending(String personNameToRemove){
-        ShopActivity.Server_RemovePersonFromPending(personNameToRemove);
+    static void removePersonFromPending(String personNameToRemove){
+        ShopActivity.serverRemovePersonFromPending(personNameToRemove);
 
     }
 

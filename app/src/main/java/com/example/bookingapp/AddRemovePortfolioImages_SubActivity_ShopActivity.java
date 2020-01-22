@@ -42,75 +42,75 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
 
     static final String URL="http://192.168.43.139:8888/PortfolioImages-Business.php";//dont change this without changing it in php code
     final int IMG_REQ=10;
-    ArrayList<Bitmap> PortfolioImages =new ArrayList<>();
-    ArrayList<String> PortfolioImagesAsStrings=new ArrayList<>();
-    ArrayList<String> ImagesLinkFromServer=new ArrayList<>();
-    static ArrayList<String> PortfolioImagesLinks=new ArrayList<>();
-    ArrayList<String> PortfolioImagesLinksToBeRequested=new ArrayList<>();
-     Integer IndexOfImageToReceiveNext=0;
+    ArrayList<Bitmap> portfolioImages =new ArrayList<>();
+    ArrayList<String> portfolioImagesAsStrings =new ArrayList<>();
+    ArrayList<String> imagesLinkFromServer =new ArrayList<>();
+    static ArrayList<String> portfolioImagesLinks =new ArrayList<>();
+    ArrayList<String> portfolioImagesLinksToBeRequested =new ArrayList<>();
+     Integer indexOfImageToReceiveNext =0;
     CustomRecyclerVAdapterPortfolioImages customRecyclerVAdapterPortfolioImages;
-    RecyclerView PortfolioImagesRecyclerView;
+    RecyclerView portfolioImagesRecyclerView;
 
-    Button AddImages;
-    static ArrayList<Bitmap> ImagesToBePushed=new ArrayList<>();
-    static ArrayList<Long> CRC32ofImagesToBePushed=new ArrayList<>();//only used to make it easier to find the index of the image to save
+    Button addImages;
+    static ArrayList<Bitmap> imagesToBePushed =new ArrayList<>();
+    static ArrayList<Long> cRC32ofImagesToBePushed =new ArrayList<>();//only used to make it easier to find the index of the image to save
 
-    static Response.Listener<JSONObject> VolleyListener;
-    static Response.ErrorListener VolleyErrorListener;
-    static RequestQueue RequestQueue;
+    static Response.Listener<JSONObject> volleyListener;
+    static Response.ErrorListener volleyErrorListener;
+    static RequestQueue requestQueue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_remove_portfolio_images__sub__shop);
-        customRecyclerVAdapterPortfolioImages=new CustomRecyclerVAdapterPortfolioImages(PortfolioImages, this);
-        PortfolioImagesRecyclerView=findViewById(R.id.RecyclerView_PortfolioImages);
-        PortfolioImagesRecyclerView.setAdapter(customRecyclerVAdapterPortfolioImages);
-        PortfolioImagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        AddImages=findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
-        AddImages.setOnClickListener(new View.OnClickListener() {
+        customRecyclerVAdapterPortfolioImages=new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this);
+        portfolioImagesRecyclerView =findViewById(R.id.RecyclerView_PortfolioImages);
+        portfolioImagesRecyclerView.setAdapter(customRecyclerVAdapterPortfolioImages);
+        portfolioImagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        addImages =findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
+        addImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GetImages();
+                getImages();
             }
         });
 
 
-        VolleyListener=new Response.Listener<JSONObject>() {
+        volleyListener =new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.v("VolleyReceived",response.toString());
                 if(response.has("PortfolioImagesLinks")){
 
                         try {
-                            ImagesLinkFromServer.clear();
+                            imagesLinkFromServer.clear();
                             for (int i=0;i<response.getJSONArray("PortfolioImagesLinks").length();i++){
-                                ImagesLinkFromServer.add(response.getJSONArray("PortfolioImagesLinks").getString(i));
+                                imagesLinkFromServer.add(response.getJSONArray("PortfolioImagesLinks").getString(i));
                             }
-                            LoadLocalData("Shop");
+                            loadLocalData("Shop");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
                 } else if(response.has("AddPortfolioImage")){
                     try {
-                        if(response.getJSONObject("AddPortfolioImage").getString("successful").equals("true")){
-                            int IndexOfTheSuccessfullyReceivedImage=CRC32ofImagesToBePushed.indexOf(response.getJSONObject("AddPortfolioImage").getLong("ImageCRC32"));
-                            PortfolioImages.add(ImagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage));
-                            PortfolioImagesAsStrings.add(ConvertBitmapToString(ImagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage)));
-                            PortfolioImagesLinks.add(response.getJSONObject("AddPortfolioImage").getString("ImageLink"));
-                            SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                        if(response.getJSONObject("AddPortfolioImage").getString("Successful").equals("True")){
+                            int IndexOfTheSuccessfullyReceivedImage= cRC32ofImagesToBePushed.indexOf(response.getJSONObject("AddPortfolioImage").getLong("ImageCRC32"));
+                            portfolioImages.add(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage));
+                            portfolioImagesAsStrings.add(convertBitmapToString(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage)));
+                            portfolioImagesLinks.add(response.getJSONObject("AddPortfolioImage").getString("ImageLink"));
+                            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else if(response.has("RemovePortfolioImage")){
                     try {
-                        if(response.getJSONObject("RemovePortfolioImage").getString("successful").equals("true")){
-                            int IndexOfImageRemoved=PortfolioImagesLinks.indexOf(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
-                            PortfolioImagesLinks.remove(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
-                            PortfolioImagesAsStrings.remove(IndexOfImageRemoved);
-                            PortfolioImages.remove(IndexOfImageRemoved);
-                            SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                        if(response.getJSONObject("RemovePortfolioImage").getString("Successful").equals("True")){
+                            int IndexOfImageRemoved= portfolioImagesLinks.indexOf(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
+                            portfolioImagesLinks.remove(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
+                            portfolioImagesAsStrings.remove(IndexOfImageRemoved);
+                            portfolioImages.remove(IndexOfImageRemoved);
+                            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -118,21 +118,21 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 }
             }
         };
-        VolleyErrorListener=new Response.ErrorListener() {
+        volleyErrorListener =new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.v("VolleyError","Error "+error.toString());
             }
         };
-        RequestQueue=Volley.newRequestQueue(this);
-        GetPortfolioImagesLinksFromServer();
+        requestQueue =Volley.newRequestQueue(this);
+        getPortfolioImagesLinksFromServer();
     }
-void GetImages(){
-    Intent GetImagesIntent=new Intent();
-    GetImagesIntent.setType("image/*");
-    GetImagesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-    GetImagesIntent.setAction(Intent.ACTION_GET_CONTENT);
-    startActivityForResult(GetImagesIntent, IMG_REQ);
+void getImages(){
+    Intent getImagesIntent=new Intent();
+    getImagesIntent.setType("image/*");
+    getImagesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+    getImagesIntent.setAction(Intent.ACTION_GET_CONTENT);
+    startActivityForResult(getImagesIntent, IMG_REQ);
 
 }
     @Override
@@ -146,7 +146,7 @@ void GetImages(){
                 for(int i = 0; i < count; i++) {
                     Uri imageUri = data.getClipData().getItemAt(i).getUri();
                     try {
-                       PushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri));
+                       pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri));
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -161,7 +161,7 @@ void GetImages(){
             String imagePath = data.getData().getPath();
 
             try {
-                PushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imagePath)));
+                pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imagePath)));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -170,51 +170,51 @@ void GetImages(){
         }
 
     }
-    void UpdateTheRecyclerView(){
-        customRecyclerVAdapterPortfolioImages=new CustomRecyclerVAdapterPortfolioImages(PortfolioImages, this);
-        PortfolioImagesRecyclerView.swapAdapter(customRecyclerVAdapterPortfolioImages, true);
+    void updateTheRecyclerView(){
+        customRecyclerVAdapterPortfolioImages=new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this);
+        portfolioImagesRecyclerView.swapAdapter(customRecyclerVAdapterPortfolioImages, true);
     }
-    public static void RemoveImageFromServer(int Index){
+    public static void removeImageFromServer(int Index){
         Map<String,Object> map=new HashMap<>();
         map.put("Request","RemovePortfolioImage");
-        map.put("ImageLink",PortfolioImagesLinks.get(Index));
-        JSONObject Data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, VolleyListener, VolleyErrorListener);
-        RequestQueue.add(jsonObjectRequest);
+        map.put("ImageLink", portfolioImagesLinks.get(Index));
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, data, volleyListener, volleyErrorListener);
+        requestQueue.add(jsonObjectRequest);
     }
 
-    public static void PushImageToServer(Bitmap ImageToBePushed){
-        String ImageToBePushedAsString=ConvertBitmapToString(ImageToBePushed);
+    public static void pushImageToServer(Bitmap ImageToBePushed){
+        String imageToBePushedAsString= convertBitmapToString(ImageToBePushed);
 
         Map<String,Object> map=new HashMap<>();
         map.put("Request","AddPortfolioImage");
-        map.put("ImageAsString",ImageToBePushedAsString);
+        map.put("ImageAsString",imageToBePushedAsString);
 
         CRC32 crc32=new CRC32();
-        crc32.update(ImageToBePushedAsString.getBytes());
+        crc32.update(imageToBePushedAsString.getBytes());
 
         map.put("ImageCRC32", crc32.getValue());
 
-        CRC32ofImagesToBePushed.add(crc32.getValue());
-        ImagesToBePushed.add(ImageToBePushed);
+        cRC32ofImagesToBePushed.add(crc32.getValue());
+        imagesToBePushed.add(ImageToBePushed);
 
 
-        JSONObject Data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, VolleyListener, VolleyErrorListener);
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, data, volleyListener, volleyErrorListener);
 
-        RequestQueue.add(jsonObjectRequest);
+        requestQueue.add(jsonObjectRequest);
 
     }
 
 
 
-   static String ConvertBitmapToString(Bitmap image){
+   static String convertBitmapToString(Bitmap image){
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
         return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
     }
-    public Bitmap ConvertStringToBitmap(String image) {
+    public Bitmap convertStringToBitmap(String image) {
 
         byte[] bytes;
         bytes = Base64.decode(image, Base64.DEFAULT);
@@ -233,7 +233,7 @@ void GetImages(){
 
 
 
-    public String LoadJSONFile(String jsonFileName) {
+    public String loadJSONFile(String jsonFileName) {
         String[] mFileList = fileList();
         Boolean fileExists = false;
 
@@ -286,11 +286,11 @@ void GetImages(){
 
 
     }
-    public void WriteNewShopDataToLocalMemory(JSONObject NewShopDataJSON) {
+    public void writeNewShopDataToLocalMemory(JSONObject NewShopDataJSON) {
         try {
 
 
-            String localMemoryJsonAsString = LoadJSONFile("Data.txt");
+            String localMemoryJsonAsString = loadJSONFile("Data.txt");
             if (localMemoryJsonAsString != null) {
 
                 JSONObject localMemoryJsonObject = new JSONObject(localMemoryJsonAsString);
@@ -314,10 +314,10 @@ void GetImages(){
         }
 
     }
-    public void LoadLocalData(String ShopName) {
+    public void loadLocalData(String ShopName) {
         try {
 
-            String jsonAsString = LoadJSONFile("Data.txt");
+            String jsonAsString = loadJSONFile("Data.txt");
 
             if (jsonAsString != null ) {
 
@@ -346,14 +346,14 @@ void GetImages(){
                         for ( int i=0;i<ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").length();i++){
                             PortfolioImagesAsStringsLocal.add(i, ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").getString(i));
                         }
-                        PortfolioImagesLinksToBeRequested.clear();
-                        IndexOfImageToReceiveNext=0;
-                        for (int i = 0; i < ImagesLinkFromServer.size(); i++) {
+                        portfolioImagesLinksToBeRequested.clear();
+                        indexOfImageToReceiveNext =0;
+                        for (int i = 0; i < imagesLinkFromServer.size(); i++) {
 
                                 Boolean LinkNotFound = true;
                                 for (int j = 0; j <PortfolioImagesLinksLocal.size(); j++) {
 
-                                    if (PortfolioImagesLinksLocal.get(j).equals(ImagesLinkFromServer.get(i))) {
+                                    if (PortfolioImagesLinksLocal.get(j).equals(imagesLinkFromServer.get(i))) {
                                         LinkNotFound = false;
                                         IndexOfTheImageThatDidNotChange.add(j);
                                         ListOfImagesThatDidNotChange.add(PortfolioImagesAsStringsLocal.get(j));
@@ -362,72 +362,72 @@ void GetImages(){
                                 }
                                 if (LinkNotFound) {
 
-                                    PortfolioImagesLinksToBeRequested.add(ImagesLinkFromServer.get(i));
+                                    portfolioImagesLinksToBeRequested.add(imagesLinkFromServer.get(i));
                                 }
 
 
                         }
-                        if(PortfolioImagesLinksToBeRequested.size()>0){
-                            RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
+                        if(portfolioImagesLinksToBeRequested.size()>0){
+                            requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
                         }
                         ShopDataJSONObject.remove("PortfolioImagesAsStrings");
                         ShopDataJSONObject.remove("PortfolioImagesLinks");
-                        PortfolioImagesAsStrings.clear();
-                        PortfolioImagesAsStrings=ListOfImagesThatDidNotChange;
-                        PortfolioImagesLinks.clear();
-                        PortfolioImagesLinks=ListOfImagesLinksThatDidNotChange;
+                        portfolioImagesAsStrings.clear();
+                        portfolioImagesAsStrings =ListOfImagesThatDidNotChange;
+                        portfolioImagesLinks.clear();
+                        portfolioImagesLinks =ListOfImagesLinksThatDidNotChange;
 
-                        PortfolioImages.clear();
+                        portfolioImages.clear();
                         for (int i=0;i<PortfolioImagesAsStringsLocal.size();i++){
-                            PortfolioImages.add(ConvertStringToBitmap(PortfolioImagesAsStringsLocal.get(i)));
+                            portfolioImages.add(convertStringToBitmap(PortfolioImagesAsStringsLocal.get(i)));
                         }
 
 
                     } else{
-                        PortfolioImagesLinksToBeRequested.clear();
-                        IndexOfImageToReceiveNext=0;
-                           PortfolioImagesLinksToBeRequested.addAll(ImagesLinkFromServer);
-                        RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));
+                        portfolioImagesLinksToBeRequested.clear();
+                        indexOfImageToReceiveNext =0;
+                           portfolioImagesLinksToBeRequested.addAll(imagesLinkFromServer);
+                        requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));
                        /* for(int i=0;i<ImagesLinkFromServer.size();i++){
-                            RequestImage(ImagesLinkFromServer.get(i));
+                            requestImage(ImagesLinkFromServer.get(i));
                         }*/
                     }
 
                  /// if some images no longer exists in server the code above will remove them so we need to save the trimmed set of images
-                  SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                  saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
 
 
                 } else {
-                   ///when we call request and receive an image it will call  SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView() to save it and hance create Data file
+                   ///when we call request and receive an image it will call  saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView() to save it and hance create Data file
 
-                    for(int i=0;i<ImagesLinkFromServer.size();i++){
-                        RequestImage(ImagesLinkFromServer.get(i));
+                    for(int i = 0; i< imagesLinkFromServer.size(); i++){
+                        requestImage(imagesLinkFromServer.get(i));
                     }
 
                 }
             } else {
-                //null is handled in the calling function LoadJSONFile()
+                //null is handled in the calling function loadJSONFile()
             }
 
 
         } catch (JSONException e) {
-            Log.v("LoadFromCache","Error parsing JSON in ShopDetailsActivity LoadLocalData function");
+            Log.v("LoadFromCache","Error parsing JSON in ShopDetailsActivity loadLocalData function");
             e.printStackTrace();
         }
     }
-    void RequestImage(final String ImageLink) {
+    void requestImage(final String ImageLink) {
         Log.v("VolleyReceived", "We Are Up Untill here ");
         ImageRequest imageRequest = new ImageRequest(ImageLink, new Response.Listener<Bitmap>() {
             @Override
             public void onResponse(Bitmap response) {
 
-                PortfolioImages.add(response);
-                PortfolioImagesAsStrings.add(ConvertBitmapToString(response));
-                PortfolioImagesLinks.add(ImageLink);
-                SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-                IndexOfImageToReceiveNext++;
-                if(IndexOfImageToReceiveNext<PortfolioImagesLinksToBeRequested.size()){
-                    RequestImage(PortfolioImagesLinksToBeRequested.get(IndexOfImageToReceiveNext));
+                portfolioImages.add(response);
+                portfolioImagesAsStrings.add(convertBitmapToString(response));
+                portfolioImagesLinks.add(ImageLink);
+                saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                indexOfImageToReceiveNext++;
+                if(indexOfImageToReceiveNext < portfolioImagesLinksToBeRequested.size()){
+                    requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));
                 }
 
             }
@@ -437,24 +437,24 @@ void GetImages(){
                 Log.v("VolleyErrors", "onErrorResponse: IN SHOPDETAILS ACTIVITY IMAGES ImagesForPortfolio" + error.toString());
             }
         });
-        RequestQueue.add(imageRequest);
+        requestQueue.add(imageRequest);
     }
-    void GetPortfolioImagesLinksFromServer(){
+    void getPortfolioImagesLinksFromServer(){
    Map<String,Object> map=new HashMap<>();
    map.put("Request", "PortfolioImagesLinks");
    map.put("Token","The Token");//or shop name
    JSONObject Data=new JSONObject(map);
-   JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, VolleyListener, VolleyErrorListener);
-   RequestQueue.add(jsonObjectRequest);
+   JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, volleyListener, volleyErrorListener);
+   requestQueue.add(jsonObjectRequest);
     }
-    void SaveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView(){
+    void saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView(){
         Map<String,Object> map=new HashMap<>();
-        map.put("PortfolioImagesAsStrings",PortfolioImagesAsStrings);
-        map.put("PortfolioImagesLinks", PortfolioImagesLinks);
+        map.put("PortfolioImagesAsStrings", portfolioImagesAsStrings);
+        map.put("PortfolioImagesLinks", portfolioImagesLinks);
 
         JSONObject Data=new JSONObject(map);
-        WriteNewShopDataToLocalMemory(Data);
-        UpdateTheRecyclerView();
+        writeNewShopDataToLocalMemory(Data);
+        updateTheRecyclerView();
 
     }
 }

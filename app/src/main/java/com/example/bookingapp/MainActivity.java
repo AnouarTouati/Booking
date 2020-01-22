@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        Button SignUpButton=findViewById(R.id.signUp);
-        Button SignInButton=findViewById(R.id.signIn);
-        SignUpButton.setOnClickListener(new View.OnClickListener() {
+        Button signUpButton=findViewById(R.id.signUp);
+        Button signInButton=findViewById(R.id.signIn);
+        signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent goToSignUpActivity=new Intent(MainActivity.this,SignUpActivity.class);
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        SignInButton.setOnClickListener(new View.OnClickListener() {
+        signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent goToSignInActivity=new Intent(MainActivity.this, SignInActivity.class);
@@ -70,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void SelectAnImage() {
-        Intent ChooseImageIntent = new Intent();
-        ChooseImageIntent.setType("image/*");
-        ChooseImageIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(ChooseImageIntent, IMG_REQ);
+    public void selectAnImage() {
+        Intent chooseImageIntent = new Intent();
+        chooseImageIntent.setType("image/*");
+        chooseImageIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(chooseImageIntent, IMG_REQ);
     }
 
     @Override

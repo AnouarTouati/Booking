@@ -14,10 +14,10 @@ import java.util.ArrayList;
 
 public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<CustomRecyclerVAdapterPortfolioImages.ViewHolder> {
 
-    ArrayList<Bitmap> PortfolioImages=new ArrayList<>();
+    ArrayList<Bitmap> portfolioImages =new ArrayList<>();
     Context mContext;
     public CustomRecyclerVAdapterPortfolioImages(ArrayList<Bitmap> portfolioImages, Context mContext) {
-        this.PortfolioImages = portfolioImages;
+        this.portfolioImages = portfolioImages;
         this.mContext=mContext;
     }
 
@@ -31,27 +31,27 @@ public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-            viewHolder.imageView.setImageBitmap(PortfolioImages.get(i));
-            viewHolder.DeletePortfolioImageButton.setOnClickListener(new View.OnClickListener() {
+            viewHolder.imageView.setImageBitmap(portfolioImages.get(i));
+            viewHolder.deletePortfolioImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AddRemovePortfolioImages_SubActivity_ShopActivity.RemoveImageFromServer(i);
+                    AddRemovePortfolioImages_SubActivity_ShopActivity.removeImageFromServer(i);
                 }
             });
     }
 
     @Override
     public int getItemCount() {
-        return PortfolioImages.size();
+        return portfolioImages.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        Button DeletePortfolioImageButton;
+        Button deletePortfolioImageButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView=itemView.findViewById(R.id.PortfolioImageImageView_Item);
-            DeletePortfolioImageButton=itemView.findViewById(R.id.DeletePortfolioImage);
+            deletePortfolioImageButton =itemView.findViewById(R.id.DeletePortfolioImage);
         }
     }
 }

@@ -2,7 +2,6 @@ package com.example.bookingapp;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -43,7 +41,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,55 +53,55 @@ public class ShopActivity extends AppCompatActivity {
     static RequestQueue requestQueue;
     static Response.Listener<JSONObject> volleyListener;
     static Response.ErrorListener volleyErrorListener;
-    String TokenToUseComingFromSigninActivity;
+    String tokenToUseComingFromSignInActivity;
     static Context mContext;
     static ArrayList<String> pendingList=new ArrayList<>();
     CustomFragmentPagerAdapter customFragmentPagerAdapter;
     ViewPager viewPager;
     TabLayout tabLayout;
-    TextView ErrorText;
+    TextView errorText;
 
 
 
-    public String EmailAddress;
-    public String Password;
-    public String FirstName;
-    public String LastName;
-    public String PhoneNumber;
+    public String emailAddress;
+    public String password;
+    public String firstName;
+    public String lastName;
+    public String phoneNumber;
     public Boolean isEmployee=false;
     public Boolean isBusinessOwner=false;
-    public static String ShopName;
-    public String SelectedState;
-    public String SelectedCommune;
-    public Boolean UseCoordinatesAKAaddMap=false;
-    public Double ShopLatitude;
-    public Double ShopLongitude;
+    public static String shopName;
+    public String selectedState;
+    public String selectedCommune;
+    public Boolean useCoordinatesAKAaddMap =false;
+    public Double shopLatitude;
+    public Double shopLongitude;
     public Boolean isMen=true;
-    public Bitmap SelectedImage;
-    public String ShopPhoneNumber;
-    public String FacebookLink;
-    public String InstagramLink;
-    public Boolean Coiffure=false;
-    public Boolean MakeUp=false;
-    public Boolean Meches=false;
-    public Boolean Tinte=false;
-    public Boolean Pedcure=false;
-    public Boolean Manage=false;
-    public Boolean Manicure=false;
-    public Boolean Coupe=false;
-    public String Saturday;
-    public String Sunday;
-    public String Monday;
-    public String Tuesday;
-    public String Wednesday;
-    public String Thursday;
-    public String Friday;
+    public Bitmap selectedImage;
+    public String shopPhoneNumber;
+    public String facebookLink;
+    public String instagramLink;
+    public Boolean coiffure =false;
+    public Boolean makeUp =false;
+    public Boolean meches =false;
+    public Boolean tinte =false;
+    public Boolean pedcure =false;
+    public Boolean manage =false;
+    public Boolean manicure =false;
+    public Boolean coupe =false;
+    public String saturday;
+    public String sunday;
+    public String monday;
+    public String tuesday;
+    public String wednesday;
+    public String thursday;
+    public String friday;
 
 /////////////////////////////////////////////////
 ////FRAG_2 STORE INFO///////////////////////////
     static final int LOCATION_REQ=10;
     final int GPS_SETTING_REQ=5;
-    static Boolean ComingBackFromLocationSettings=false;
+    static Boolean comingBackFromLocationSettings =false;
     static FusedLocationProviderClient fusedLocationProviderClient;
 ///////////////////////////////////////////////////////////
 
@@ -115,8 +112,8 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         mContext=this;
 
-        TokenToUseComingFromSigninActivity=getIntent().getStringExtra("Token");
-        if(TokenToUseComingFromSigninActivity==""){
+        tokenToUseComingFromSignInActivity =getIntent().getStringExtra("Token");
+        if(tokenToUseComingFromSignInActivity ==""){
             Intent goBACKtoSignInActivity=new Intent(this,SignInActivity.class);
             startActivity(goBACKtoSignInActivity);
         }
@@ -126,12 +123,12 @@ public class ShopActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
               Log.v("VolleyReceived","Volley Received Shop Activity "+response.toString());
 
-                ErrorText.setText("");
-                ErrorText.setVisibility(View.GONE);
+                errorText.setText("");
+                errorText.setVisibility(View.GONE);
 
               if(response.has("RemovePersonFromPending")){
                   try {
-                      RemovePersonFromPending(response.getString("RemovePersonFromPending"));
+                      removePersonFromPending(response.getString("RemovePersonFromPending"));
                   } catch (JSONException e) {
                       e.printStackTrace();
                   }
@@ -139,15 +136,15 @@ public class ShopActivity extends AppCompatActivity {
 
               if(response.has("AddPersonToPending")){
                   try {
-                      AddPersonToPending(response.getString("AddPersonToPending"));
+                      addPersonToPending(response.getString("AddPersonToPending"));
                   } catch (JSONException e) {
                       e.printStackTrace();
                   }
               }
               if(response.has("Add_UpdateLocationMap")){
                   try {
-                      if(response.getJSONObject("Add_UpdateLocationMap").getString("successful").equals("true")){
-                          Add_UpdateLocationMap(response.getJSONObject("Add_UpdateLocationMap").getDouble("Latitude"),response.getJSONObject("Add_UpdateLocationMap").getDouble("Longitude"));
+                      if(response.getJSONObject("Add_UpdateLocationMap").getString("Successful").equals("True")){
+                          addUpdateLocationMap(response.getJSONObject("Add_UpdateLocationMap").getDouble("Latitude"),response.getJSONObject("Add_UpdateLocationMap").getDouble("Longitude"));
                       }
                   } catch (JSONException e) {
                       e.printStackTrace();
@@ -159,13 +156,13 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.v("VolleyError","Volley Error  Shop Activity "+error.toString());
-                ErrorText.setText("Connection To The Server Was Lost");
-                ErrorText.setVisibility(View.VISIBLE);
+                errorText.setText("Connection To The Server Was Lost");
+                errorText.setVisibility(View.VISIBLE);
             }
         };
 
         requestQueue= Volley.newRequestQueue(this);
-        ErrorText=findViewById(R.id.ErrorTextView_ShopActivity);
+        errorText =findViewById(R.id.ErrorTextView_ShopActivity);
         viewPager=findViewById(R.id.viewPagerShopMenu);
         customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
         customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(), "ShopMenuFrag1");
@@ -211,7 +208,7 @@ public class ShopActivity extends AppCompatActivity {
     }
 
 
-    public static void FindLocationUsingGPS(){
+    public static void findLocationUsingGPS(){
 
         if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
@@ -227,7 +224,7 @@ public class ShopActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         mContext.startActivity(intent);
-                        ComingBackFromLocationSettings=true;
+                        comingBackFromLocationSettings =true;
                     }
                 });
 
@@ -245,7 +242,7 @@ public class ShopActivity extends AppCompatActivity {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
 
-                        Server_Add_UpdateLocationMap(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
+                        serverAddUpdateLocationMap(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
 
                     }
                 };
@@ -270,22 +267,22 @@ public class ShopActivity extends AppCompatActivity {
         }
         if (granted) {
 
-            FindLocationUsingGPS();
+            findLocationUsingGPS();
         }
     }
-   void Add_UpdateLocationMap(double Latitude, double Longitude){
+   void addUpdateLocationMap(double Latitude, double Longitude){
       ///i might show the map here or use gcoder to show the user where we put the point
        Toast.makeText(this, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
    }
 
-    static void Server_Add_UpdateLocationMap(double Latitude, double Longitude){
+    static void serverAddUpdateLocationMap(double Latitude, double Longitude){
         Map<String,Object> map=new HashMap<>();
         map.put("Request","Add_UpdateLocationMap");
         map.put("Latitude",Latitude);
         map.put("Longitude",Longitude);
 
-        JSONObject Data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, Data, volleyListener, volleyErrorListener);
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, data, volleyListener, volleyErrorListener);
         requestQueue.add(jsonObjectRequest);
 
 
@@ -294,33 +291,33 @@ public class ShopActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(ComingBackFromLocationSettings){
+        if(comingBackFromLocationSettings){
             LocationManager locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                FindLocationUsingGPS();
+                findLocationUsingGPS();
             }
         }
     }
 
-    public static void RemovePersonFromPending(String PersonNameToRemove){
+    public static void removePersonFromPending(String PersonNameToRemove){
         pendingList.remove(PersonNameToRemove);
        ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
 
     }
-    public static void Server_RemovePersonFromPending(String PersonNameToRemove){
+    public static void serverRemovePersonFromPending(String PersonNameToRemove){
         Map<String,Object> map=new HashMap<>();
         map.put("Request", "RemovePersonFromPending");
         map.put("PersonName",PersonNameToRemove);
-        map.put("ShopName",ShopName);
-        JSONObject Data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(URL, Data, volleyListener, volleyErrorListener);
+        map.put("ShopName", shopName);
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(URL, data, volleyListener, volleyErrorListener);
         requestQueue.add(jsonObjectRequest);
     }
-    public void AddPersonToPending(String PersonName){
+    public void addPersonToPending(String PersonName){
         pendingList.add(PersonName);
         ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
     }
-    public void Server_AddPersonToPending(){
+    public void serverAddPersonToPending(){
         final AlertDialog.Builder alertBuilder=new AlertDialog.Builder(this);
         LayoutInflater inflater=getLayoutInflater();
         final View dialogView=inflater.inflate(R.layout.addperson_alerdialog_layout, null);
@@ -334,7 +331,7 @@ public class ShopActivity extends AppCompatActivity {
                 Map<String,Object> map=new HashMap<>();
                 map.put("Request","AddPersonToPending");
                 map.put("PersonName", PersonName);
-                map.put("ShopName", ShopName);//this could be removed cause will have to send a token
+                map.put("ShopName", shopName);//this could be removed cause will have to send a token
                 JSONObject Data=new JSONObject(map);
                 JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(URL, Data, volleyListener, volleyErrorListener);
                 requestQueue.add(jsonObjectRequest);
@@ -346,47 +343,47 @@ public class ShopActivity extends AppCompatActivity {
 
     }
    
-    void UpdateShopInfo(){
+    void updateShopInfo(){
 
             Map<String,Object> map=new HashMap<>();
            
-            map.put("EmailAddress", EmailAddress);
-            map.put("Password",Password );
-            map.put("FirstName",FirstName );
-            map.put("LastName",LastName );
-            map.put("PhoneNumber", PhoneNumber);
-            map.put("isBusinessOwner", isBusinessOwner);
-            map.put("ShopName", ShopName);
-            map.put("SelectedState", SelectedState);
-            map.put("SelectedCommune",SelectedCommune );
-            map.put("UseCoordinatesAKAaddMap",UseCoordinatesAKAaddMap );
-            map.put("ShopLatitude", ShopLatitude);
-            map.put("ShopLongitude", ShopLongitude);
-            map.put("isMen", isMen);
-            map.put("SelectedImage", ConvertBitmapToString(SelectedImage));//photo
-            map.put("ShopPhoneNumber", ShopPhoneNumber);
-            map.put("FacebookLink", FacebookLink);
-            map.put("InstagramLink",InstagramLink );
-            map.put("Coiffure",Coiffure );
-            map.put("MakeUp", MakeUp);
-            map.put("Meches", Meches);
-            map.put("Tinte",Tinte );
-            map.put("Pedcure", Pedcure);
-            map.put("Manage", Manage);
-            map.put("Manicure", Manicure);
-            map.put("Coupe",Coupe );
-            map.put("Saturday", Saturday);
-            map.put("Sunday",Sunday );
-            map.put("Monday", Monday);
-            map.put("Tuesday", Tuesday);
-            map.put("Wednesday", Wednesday);
-            map.put("Thursday", Thursday);
-            map.put("Friday", Friday);
+            map.put("EmailAddress", emailAddress);
+            map.put("Password", password);
+            map.put("FirstName", firstName);
+            map.put("LastName", lastName);
+            map.put("PhoneNumber", phoneNumber);
+            map.put("IsBusinessOwner", isBusinessOwner);
+            map.put("ShopName", shopName);
+            map.put("SelectedState", selectedState);
+            map.put("SelectedCommune", selectedCommune);
+            map.put("UseCoordinatesAKAaddMap", useCoordinatesAKAaddMap);
+            map.put("ShopLatitude", shopLatitude);
+            map.put("ShopLongitude", shopLongitude);
+            map.put("IsMen", isMen);
+            map.put("SelectedImage", convertBitmapToString(selectedImage));//photo
+            map.put("ShopPhoneNumber", shopPhoneNumber);
+            map.put("FacebookLink", facebookLink);
+            map.put("InstagramLink", instagramLink);
+            map.put("Coiffure", coiffure);
+            map.put("MakeUp", makeUp);
+            map.put("Meches", meches);
+            map.put("Tinte", tinte);
+            map.put("Pedcure", pedcure);
+            map.put("Manage", manage);
+            map.put("Manicure", manicure);
+            map.put("coupe", coupe);
+            map.put("Saturday", saturday);
+            map.put("Sunday", sunday);
+            map.put("Monday", monday);
+            map.put("Tuesday", tuesday);
+            map.put("Wednesday", wednesday);
+            map.put("Thursday", thursday);
+            map.put("Friday", friday);
 
-        JSONObject UpdatedShopData=new JSONObject(map);
+        JSONObject updatedShopData=new JSONObject(map);
 
     }
-    String ConvertBitmapToString(Bitmap image){
+    String convertBitmapToString(Bitmap image){
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
