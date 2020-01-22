@@ -47,81 +47,81 @@ import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    public static String EmailAddress;
-    public static String Password;
-    public String FirstName;
-    public String LastName;
-    public static String PhoneNumber;
+    public static String emailAddress;
+    public static String password;
+    public String firstName;
+    public String lastName;
+    public static String phoneNumber;
     public Boolean isEmployee=false;
     public Boolean isBusinessOwner=false;
-    public String SalonName;
-    public String SelectedState;
-    public String SelectedCommune;
-    public Boolean UseCoordinatesAKAaddMap=false;
-    public Double ShopLatitude;
-    public Double ShopLongitude;
+    public String salonName;
+    public String selectedState;
+    public String selectedCommune;
+    public Boolean useCoordinatesAKAaddMap =false;
+    public Double shopLatitude;
+    public Double shopLongitude;
     public Boolean isMen=true;
-    public Bitmap SelectedImage;
-    public static String ShopPhoneNumber;
-    public String FacebookLink;
-    public String InstagramLink;
-    public Boolean Coiffure=false;
-    public Boolean MakeUp=false;
-    public Boolean Meches=false;
-    public Boolean Tinte=false;
-    public Boolean Pedcure=false;
-    public Boolean Manage=false;
-    public Boolean Manicure=false;
-    public Boolean Coupe=false;
-    public String Saturday;
-    public String Sunday;
-    public String Monday;
-    public String Tuesday;
-    public String Wednesday;
-    public String Thursday;
-    public String Friday;
+    public Bitmap selectedImage;
+    public static String shopPhoneNumber;
+    public String facebookLink;
+    public String instagramLink;
+    public Boolean coiffure =false;
+    public Boolean makeUp =false;
+    public Boolean meches =false;
+    public Boolean tinte =false;
+    public Boolean pedcure =false;
+    public Boolean manage =false;
+    public Boolean manicure =false;
+    public Boolean coupe =false;
+    public String saturday;
+    public String sunday;
+    public String monday;
+    public String tuesday;
+    public String wednesday;
+    public String thursday;
+    public String friday;
 
-    static final String SignUpUrl="http://192.168.43.139:8888/Business.php";
+    static final String SIGN_UP_URL ="http://192.168.43.139:8888/Business.php";
 
     public  static ViewPager viewPagerSignUP;
     final int LOCATION_REQ=10;
     final int GPS_SETTING_REQ=5;
-    Boolean ComingBackFromLocationSettings=false;
+    Boolean comingBackFromLocationSettings =false;
     FusedLocationProviderClient fusedLocationProviderClient;
     TextView signUpErrorText;
     TextView signUpSuccessfulText;
     CustomRecyclerViewAdapterSignUpErrors customRecyclerViewAdapterSignUpErrors;
-    RecyclerView ErrorMessagesRecyclerView;
-    ArrayList<String> ErrorsList=new ArrayList<>();
+    RecyclerView errorMessagesRecyclerView;
+    ArrayList<String> errorsList =new ArrayList<>();
     Button retryButton;
     Button goToShopHomePageButton;
     public static ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
-    static Boolean RequestWasSentToServer=false;
-    static Response.Listener<JSONObject> VolleyListener;
-    static Response.ErrorListener VolleyErrorListener;
+    static Boolean requestWasSentToServer =false;
+    static Response.Listener<JSONObject> volleyListener;
+    static Response.ErrorListener volleyErrorListener;
     static RequestQueue requestQueue;
     static Context mContext;
 
-    String TokenReceived;
+    String tokenReceived;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         mContext=this;
 
-        VolleyListener =new Response.Listener<JSONObject>() {
+        volleyListener =new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.v("VolleyReceived","VolleyReceived in SignUpActivity "+response.toString());
 
                 if(response.has("SignUp")){
                     try {
-                        if(response.getJSONObject("SignUp").getString("Successful").equals("true")){
-                            TokenReceived=response.getJSONObject("SignUp").getString("Token");
-                            Successful();
+                        if(response.getJSONObject("SignUp").getString("Successful").equals("True")){
+                            tokenReceived =response.getJSONObject("SignUp").getString("Token");
+                            successful();
                         }else{
-                            NotSuccessful();
+                            notSuccessful();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -130,7 +130,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                 if(response.has("CheckAndRegister")){
                     try {
-                        ServerResponseCheckAndRegister(response.getJSONObject("CheckAndRegister"));
+                        serverResponseCheckAndRegister(response.getJSONObject("CheckAndRegister"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -138,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         };
-        VolleyErrorListener=new Response.ErrorListener() {
+        volleyErrorListener =new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
@@ -150,8 +150,8 @@ public class SignUpActivity extends AppCompatActivity {
                     retryButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            TurnOnProgressBar();
-                            SendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
+                            turnOnProgressBar();
+                            sendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
                         }
                     });
                     retryButton.setVisibility(View.VISIBLE);
@@ -165,8 +165,8 @@ public class SignUpActivity extends AppCompatActivity {
                     retryButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            TurnOnProgressBar();
-                            SendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
+                            turnOnProgressBar();
+                            sendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
                         }
                     });
                     retryButton.setVisibility(View.VISIBLE);
@@ -176,10 +176,10 @@ public class SignUpActivity extends AppCompatActivity {
             }
         };
         requestQueue= Volley.newRequestQueue(this);
-        customRecyclerViewAdapterSignUpErrors=new CustomRecyclerViewAdapterSignUpErrors(ErrorsList);//initialized empty so we can just swap the adapter later
-        ErrorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
-        ErrorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
-        ErrorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        customRecyclerViewAdapterSignUpErrors=new CustomRecyclerViewAdapterSignUpErrors(errorsList);//initialized empty so we can just swap the adapter later
+        errorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
+        errorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
+        errorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar=findViewById(R.id.progressBarSignUp);
         signUpErrorText=findViewById(R.id.signUpErrorText);
         signUpSuccessfulText=findViewById(R.id.signUpSuccessfulText);
@@ -187,7 +187,7 @@ public class SignUpActivity extends AppCompatActivity {
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SignUp();
+                signUp();
             }
         });
         goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
@@ -195,7 +195,7 @@ public class SignUpActivity extends AppCompatActivity {
      @Override
      public void onClick(View view) {
          Intent GoToShopActivityIntent=new Intent(mContext,ShopActivity.class);
-         GoToShopActivityIntent.putExtra("Token", TokenReceived);
+         GoToShopActivityIntent.putExtra("Token", tokenReceived);
          mContext.startActivity(GoToShopActivityIntent);
      }
  });
@@ -215,11 +215,11 @@ public class SignUpActivity extends AppCompatActivity {
         viewPagerSignUP.setAdapter(customFragmentPagerAdapter);
 
     }
-    public void SetCurrentItemViewPager(int FragmentIndex){
+    public void setCurrentItemViewPager(int FragmentIndex){
           viewPagerSignUP.setCurrentItem(FragmentIndex);
     }
 
-   public  void FindLocationUsingGPS(){
+   public  void findLocationUsingGPS(){
 
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
@@ -235,7 +235,7 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivity(intent);
-                        ComingBackFromLocationSettings=true;
+                        comingBackFromLocationSettings =true;
                     }
                 });
 
@@ -253,7 +253,7 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
 
-                        SaveTheCoordinatesAndFindAddress(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
+                        saveTheCoordinatesAndFindAddress(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
 
                     }
                 };
@@ -267,10 +267,10 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(ComingBackFromLocationSettings){
+        if(comingBackFromLocationSettings){
         LocationManager locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
         if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-           FindLocationUsingGPS();
+           findLocationUsingGPS();
         }else{
             AlertDialog.Builder alertDialog=new AlertDialog.Builder(this);
             alertDialog.setMessage("Can't Know Your Position without Location Services");
@@ -282,7 +282,7 @@ public class SignUpActivity extends AppCompatActivity {
             });
             alertDialog.show();
         }
-        ComingBackFromLocationSettings=false;
+        comingBackFromLocationSettings =false;
     }
     }
 
@@ -300,21 +300,21 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if (granted) {
 
-            FindLocationUsingGPS();
+            findLocationUsingGPS();
         }
     }
 
 
 
-    void SaveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
-        ShopLatitude=Latitude;
-        ShopLongitude=Longitude;
-        Toast.makeText(this, "Latitude"+ShopLatitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(this, "Longitude"+ShopLongitude, Toast.LENGTH_LONG).show();
-        UseCoordinatesAKAaddMap=true;
+    void saveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
+        shopLatitude =Latitude;
+        shopLongitude =Longitude;
+        Toast.makeText(this, "Latitude"+ shopLatitude, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Longitude"+ shopLongitude, Toast.LENGTH_LONG).show();
+        useCoordinatesAKAaddMap =true;
         Intent intent=new Intent();
         intent.setAction("ComingFromSignUpActivity");
-        intent.putExtra("FoundCoordinatesSuccessfully", UseCoordinatesAKAaddMap);
+        intent.putExtra("FoundCoordinatesSuccessfully", useCoordinatesAKAaddMap);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
       /*  Geocoder geocoder=new Geocoder(this, Locale.getDefault());
@@ -336,9 +336,9 @@ public class SignUpActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        if(RequestWasSentToServer){
+        if(requestWasSentToServer){
            //cancel the requests here
-            TurnOffProgressBar();
+            turnOffProgressBar();
         }else{
             if(signUpWasNotSuccessful){
                 viewPagerSignUP.setVisibility(View.VISIBLE);
@@ -351,14 +351,14 @@ public class SignUpActivity extends AppCompatActivity {
                 signUpWasNotSuccessful=false;
             }
             if(viewPagerSignUP.getCurrentItem()>0){
-                SetCurrentItemViewPager(viewPagerSignUP.getCurrentItem()-1);
+                setCurrentItemViewPager(viewPagerSignUP.getCurrentItem()-1);
             }else{
                 super.onBackPressed();
             }
         }
 
     }
-public void SignUp(){
+public void signUp(){
     viewPagerSignUP.setVisibility(View.GONE);
     progressBar.setVisibility(View.GONE);
 
@@ -370,43 +370,43 @@ public void SignUp(){
     Map<String,Object> map=new HashMap<>();
     
         map.put("Request","SignUp");
-        map.put("EmailAddress", EmailAddress);
-        map.put("Password",Password );
-        map.put("FirstName",FirstName );
-        map.put("LastName",LastName );
-        map.put("PhoneNumber", PhoneNumber);
-        map.put("isBusinessOwner", isBusinessOwner);
-        map.put("ShopName",SalonName );
-        map.put("SelectedState", SelectedState);
-        map.put("SelectedCommune",SelectedCommune );
-        map.put("UseCoordinatesAKAaddMap",UseCoordinatesAKAaddMap );
-        map.put("ShopLatitude", ShopLatitude);
-        map.put("ShopLongitude", ShopLongitude);
-        map.put("isMen", isMen);
-        map.put("SelectedImage", ConvertBitmapToString(SelectedImage));//photo
-        map.put("ShopPhoneNumber", ShopPhoneNumber);
-        map.put("FacebookLink", FacebookLink);
-        map.put("InstagramLink",InstagramLink );
-        map.put("Coiffure",Coiffure );
-        map.put("MakeUp", MakeUp);
-        map.put("Meches", Meches);
-        map.put("Tinte",Tinte );
-        map.put("Pedcure", Pedcure);
-        map.put("Manage", Manage);
-        map.put("Manicure", Manicure);
-        map.put("Coupe",Coupe );
-        map.put("Saturday", Saturday);
-        map.put("Sunday",Sunday );
-        map.put("Monday", Monday);
-        map.put("Tuesday", Tuesday);
-        map.put("Wednesday", Wednesday);
-        map.put("Thursday", Thursday);
-        map.put("Friday", Friday);
+        map.put("EmailAddress", emailAddress);
+        map.put("Password", password);
+        map.put("FirstName", firstName);
+        map.put("LastName", lastName);
+        map.put("PhoneNumber", phoneNumber);
+        map.put("IsBusinessOwner", isBusinessOwner);
+        map.put("ShopName", salonName);
+        map.put("SelectedState", selectedState);
+        map.put("SelectedCommune", selectedCommune);
+        map.put("UseCoordinatesAKAaddMap", useCoordinatesAKAaddMap);
+        map.put("ShopLatitude", shopLatitude);
+        map.put("ShopLongitude", shopLongitude);
+        map.put("IsMen", isMen);
+        map.put("SelectedImage", convertBitmapToString(selectedImage));//photo
+        map.put("ShopPhoneNumber", shopPhoneNumber);
+        map.put("FacebookLink", facebookLink);
+        map.put("InstagramLink", instagramLink);
+        map.put("Coiffure", coiffure);
+        map.put("MakeUp", makeUp);
+        map.put("Meches", meches);
+        map.put("Tinte", tinte);
+        map.put("Pedcure", pedcure);
+        map.put("Manage", manage);
+        map.put("Manicure", manicure);
+        map.put("Coupe", coupe);
+        map.put("Saturday", saturday);
+        map.put("Sunday", sunday);
+        map.put("Monday", monday);
+        map.put("Tuesday", tuesday);
+        map.put("Wednesday", wednesday);
+        map.put("Thursday", thursday);
+        map.put("Friday", friday);
 
    
-    JSONObject Data=new JSONObject(map);
+    JSONObject data=new JSONObject(map);
 
-    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SignUpUrl, Data,VolleyListener,VolleyErrorListener);
+    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SIGN_UP_URL, data, volleyListener, volleyErrorListener);
 
     requestQueue.add(jsonObjectRequest);
 
@@ -414,41 +414,41 @@ public void SignUp(){
 }
 
 
-    public static void SendToServerToCheckAndRegister(int NextIndexInPagerAdapter){
+    public static void sendToServerToCheckAndRegister(int nextIndexInPagerAdapter){
 
         Map<String,Object> map=new HashMap<>();
         map.put("Request","CheckAndRegister");
 
-        if(NextIndexInPagerAdapter==1 && viewPagerSignUP.getCurrentItem()==0){
-        map.put("EmailAddress",EmailAddress);
-        map.put("Password",Password);
+        if(nextIndexInPagerAdapter==1 && viewPagerSignUP.getCurrentItem()==0){
+        map.put("EmailAddress", emailAddress);
+        map.put("Password", password);
         }
-            else if(NextIndexInPagerAdapter==2 && viewPagerSignUP.getCurrentItem()==1){
-                map.put("PhoneNumber",PhoneNumber);
+            else if(nextIndexInPagerAdapter==2 && viewPagerSignUP.getCurrentItem()==1){
+                map.put("PhoneNumber", phoneNumber);
             }
 
-            else if(NextIndexInPagerAdapter==4 && viewPagerSignUP.getCurrentItem()==3){
-                map.put("ShopPhoneNumber", ShopPhoneNumber);
+            else if(nextIndexInPagerAdapter==4 && viewPagerSignUP.getCurrentItem()==3){
+                map.put("ShopPhoneNumber", shopPhoneNumber);
         }
-        JSONObject Dara=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(SignUpUrl, Dara, VolleyListener, VolleyErrorListener);
+        JSONObject data =new JSONObject(map);
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(SIGN_UP_URL, data, volleyListener, volleyErrorListener);
         requestQueue.add(jsonObjectRequest);
-        RequestWasSentToServer=true;
+        requestWasSentToServer =true;
     }
 
-    void ServerResponseCheckAndRegister(JSONObject response){
-        TurnOffProgressBar();
-       ErrorsList.clear();
+    void serverResponseCheckAndRegister(JSONObject response){
+        turnOffProgressBar();
+       errorsList.clear();
       if(response.has("EmailAddress")&& response.has("Password")){
           try {
-              if(response.getString("EmailAddress").equals("ok") && response.getString("Password").equals("ok") && viewPagerSignUP.getCurrentItem()==0){
-                SetCurrentItemViewPager(1);
+              if(response.getString("EmailAddress").equals("Ok") && response.getString("Password").equals("Ok") && viewPagerSignUP.getCurrentItem()==0){
+                setCurrentItemViewPager(1);
               }else {
-                  if(!response.getString("EmailAddress").equals("ok")){
-                      ErrorsList.add("-Please Choose Another Email Address");
+                  if(!response.getString("EmailAddress").equals("Ok")){
+                      errorsList.add("-Please Choose Another Email Address");
                   }
-                  if(!response.getString("Password").equals("ok")){
-                      ErrorsList.add("-The Password You Entered Doesn't Meet The Requirements");
+                  if(!response.getString("Password").equals("Ok")){
+                      errorsList.add("-The Password You Entered Doesn't Meet The Requirements");
                   }
               }
           } catch (JSONException e) {
@@ -457,10 +457,10 @@ public void SignUp(){
       }
       if(response.has("PhoneNumber")){
           try {
-              if(response.getString("PhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==1){
-                  SetCurrentItemViewPager(2);
+              if(response.getString("PhoneNumber").equals("Ok") && viewPagerSignUP.getCurrentItem()==1){
+                  setCurrentItemViewPager(2);
               }else{
-                  ErrorsList.add("-The Phone Number You Entered Is Already Used");
+                  errorsList.add("-The Phone Number You Entered Is Already Used");
               }
           } catch (JSONException e) {
               e.printStackTrace();
@@ -469,29 +469,29 @@ public void SignUp(){
 
       if(response.has("ShopPhoneNumber")){
           try {
-              if(response.getString("ShopPhoneNumber").equals("ok") && viewPagerSignUP.getCurrentItem()==3){
-                SetCurrentItemViewPager(4);
+              if(response.getString("ShopPhoneNumber").equals("Ok") && viewPagerSignUP.getCurrentItem()==3){
+                setCurrentItemViewPager(4);
               }
               else{
-                  ErrorsList.add("-The Shop Phone Number Is Already Used");
+                  errorsList.add("-The Shop Phone Number Is Already Used");
               }
           } catch (JSONException e) {
               e.printStackTrace();
           }
       }
-      if(ErrorsList.size()>0){//greater than zero meaning we have an error
+      if(errorsList.size()>0){//greater than zero meaning we have an error
 
-          ErrorMessagesRecyclerView.swapAdapter(new CustomRecyclerViewAdapterSignUpErrors(ErrorsList), true);
-          ErrorMessagesRecyclerView.setVisibility(View.VISIBLE);//will make it invisible in turn on progress bar
+          errorMessagesRecyclerView.swapAdapter(new CustomRecyclerViewAdapterSignUpErrors(errorsList), true);
+          errorMessagesRecyclerView.setVisibility(View.VISIBLE);//will make it invisible in turn on progress bar
       }
     }
-    String ConvertBitmapToString(Bitmap image){
+    String convertBitmapToString(Bitmap image){
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
         return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
     }
-    void NotSuccessful(){
+    void notSuccessful(){
         signUpWasNotSuccessful=true;
         progressBar.setVisibility(View.GONE);
 
@@ -499,21 +499,21 @@ public void SignUp(){
         retryButton.setVisibility(View.VISIBLE);
         Toast.makeText(this, "Not SuccessfulSignIn", Toast.LENGTH_LONG).show();
     }
-    void Successful(){
+    void successful(){
         signUpWasNotSuccessful=false;
         progressBar.setVisibility(View.GONE);
         signUpSuccessfulText.setVisibility(View.VISIBLE);
         goToShopHomePageButton.setVisibility(View.VISIBLE);
 
     }
-    public void TurnOnProgressBar(){
+    public void turnOnProgressBar(){
 
         //COMMON BETWEEN TURN ON/OFF PROGRESS BAR
         signUpErrorText.setVisibility(View.GONE);
         retryButton.setVisibility(View.GONE);
         ////////////////////////////////////////
 
-        ErrorMessagesRecyclerView.setVisibility(View.GONE);//SET VISIBLE IS IN SERVERRESPONSECHECKANDREGISTER
+        errorMessagesRecyclerView.setVisibility(View.GONE);//SET VISIBLE IS IN SERVERRESPONSECHECKANDREGISTER
         progressBar.setVisibility(View.VISIBLE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
 
@@ -537,14 +537,14 @@ public void SignUp(){
         }
 
     }
-    public void TurnOffProgressBar(){
+    public void turnOffProgressBar(){
 
         //COMMON BETWEEN TURN ON/OFF PROGRESS BAR
         signUpErrorText.setVisibility(View.GONE);
         retryButton.setVisibility(View.GONE);
         ////////////////////////////////////////
 
-        RequestWasSentToServer=false;
+        requestWasSentToServer =false;
         progressBar.setVisibility(View.GONE);
         int CallingFragmentIndex=viewPagerSignUP.getCurrentItem();
 

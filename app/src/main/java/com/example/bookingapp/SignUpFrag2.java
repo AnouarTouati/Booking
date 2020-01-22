@@ -13,10 +13,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SignUpFrag2 extends Fragment {
-    private String FirstName;
-    private String LastName;
-    private String PhoneNumber;
-    private String Email;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String email;
     private Boolean isEmployee=false;
     private Boolean isBusinessOwner=false;
     View view;
@@ -28,72 +28,72 @@ public class SignUpFrag2 extends Fragment {
         submitFrag2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DoneFillingFieldsGoNextFrag();
+                doneFillingFieldsGoNextFrag();
             }
         });
-        final CheckBox EmployeeCheckBox=view.findViewById(R.id.employeeFrag2);
-        final CheckBox BusinessOwnerCheckBox=view.findViewById(R.id.businessOwnerFrag2);
+        final CheckBox employeeCheckBox=view.findViewById(R.id.employeeFrag2);
+        final CheckBox businessOwnerCheckBox=view.findViewById(R.id.businessOwnerFrag2);
 
-        EmployeeCheckBox.setOnClickListener(new View.OnClickListener() {
+        employeeCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                BusinessOwnerCheckBox.setChecked(!EmployeeCheckBox.isChecked());
-                isEmployee=EmployeeCheckBox.isChecked();
-                isBusinessOwner=BusinessOwnerCheckBox.isChecked();
+                businessOwnerCheckBox.setChecked(!employeeCheckBox.isChecked());
+                isEmployee=employeeCheckBox.isChecked();
+                isBusinessOwner=businessOwnerCheckBox.isChecked();
 
 
             }
         });
 
-        BusinessOwnerCheckBox.setOnClickListener(new View.OnClickListener() {
+        businessOwnerCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EmployeeCheckBox .setChecked(!BusinessOwnerCheckBox.isChecked());
-                isEmployee=EmployeeCheckBox.isChecked();
-                isBusinessOwner=BusinessOwnerCheckBox.isChecked();
+                employeeCheckBox .setChecked(!businessOwnerCheckBox.isChecked());
+                isEmployee=employeeCheckBox.isChecked();
+                isBusinessOwner=businessOwnerCheckBox.isChecked();
             }
         });
 
         return  view;
     }
 
-    void DoneFillingFieldsGoNextFrag(){
-      Boolean SomeThingWentWrong=false;
-        EditText FirstNameEditText=view.findViewById(R.id.firstNameFrag2);
-        FirstName=FirstNameEditText.getText().toString();
-        if(FirstName==null || FirstName.length()==0){
-            SomeThingWentWrong=true;
+    void doneFillingFieldsGoNextFrag(){
+      Boolean someThingWentWrong=false;
+        EditText firstNameEditText=view.findViewById(R.id.firstNameFrag2);
+        firstName =firstNameEditText.getText().toString();
+        if(firstName ==null || firstName.length()==0){
+            someThingWentWrong=true;
             Toast.makeText(getActivity(), "Please Enter Your First Name", Toast.LENGTH_SHORT).show();
         }
 
-        EditText LastNameEditText=view.findViewById(R.id.lastNameFrag2);
-        LastName=LastNameEditText.getText().toString();
-        if(LastName==null || LastName.length()==0){
-            SomeThingWentWrong=true;
+        EditText lastNameEditText=view.findViewById(R.id.lastNameFrag2);
+        lastName =lastNameEditText.getText().toString();
+        if(lastName ==null || lastName.length()==0){
+            someThingWentWrong=true;
             Toast.makeText(getActivity(), "Please Enter Your Last Name", Toast.LENGTH_SHORT).show();
         }
-        EditText PhoneNumberEditText=view.findViewById(R.id.phoneNumberFrag2);
-        PhoneNumber=PhoneNumberEditText.getText().toString();
-if(!(PhoneNumber.indexOf("0")==0 && (PhoneNumber.indexOf("2")==1||PhoneNumber.indexOf("5")==1 || PhoneNumber.indexOf("6")==1 || PhoneNumber.indexOf("7")==1))){
-    SomeThingWentWrong=true;
+        EditText phoneNumberEditText=view.findViewById(R.id.phoneNumberFrag2);
+        phoneNumber =phoneNumberEditText.getText().toString();
+if(!(phoneNumber.indexOf("0")==0 && (phoneNumber.indexOf("2")==1|| phoneNumber.indexOf("5")==1 || phoneNumber.indexOf("6")==1 || phoneNumber.indexOf("7")==1))){
+    someThingWentWrong=true;
     Toast.makeText(getActivity(), "Incorrect Phone Number", Toast.LENGTH_SHORT).show();
 }
 if(!isEmployee &&!isBusinessOwner){
-    SomeThingWentWrong=true;
+    someThingWentWrong=true;
     Toast.makeText(getActivity(), "Please Check Employee/Business Owner", Toast.LENGTH_SHORT).show();
 }
 
 
-if(!SomeThingWentWrong){
-    ((SignUpActivity)getActivity()).FirstName=FirstName;
-    ((SignUpActivity)getActivity()).LastName=LastName;
-    ((SignUpActivity)getActivity()).PhoneNumber=PhoneNumber;
+if(!someThingWentWrong){
+    ((SignUpActivity)getActivity()).firstName = firstName;
+    ((SignUpActivity)getActivity()).lastName = lastName;
+    ((SignUpActivity)getActivity()).phoneNumber = phoneNumber;
     //if we came here from facebook and email is not available we should send email address to SignUpActivity
     ((SignUpActivity)getActivity()).isEmployee=isEmployee;
     ((SignUpActivity)getActivity()).isBusinessOwner=isBusinessOwner;
-    ((SignUpActivity)getActivity()).TurnOnProgressBar();
-    SignUpActivity.SendToServerToCheckAndRegister(2);
+    ((SignUpActivity)getActivity()).turnOnProgressBar();
+    SignUpActivity.sendToServerToCheckAndRegister(2);
    // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(2);
 }
 

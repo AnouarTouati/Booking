@@ -17,7 +17,7 @@ import com.google.android.gms.location.LocationResult;
 
 public  class Common_Methods {
 
-    public static void AddTheTwoNumbers(){
+    public static void addTheTwoNumbers(){
 
     }
 
