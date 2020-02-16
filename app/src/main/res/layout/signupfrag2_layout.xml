@@ -17,7 +17,7 @@
             android:layout_height="50dp"
             android:background="@drawable/button_type_04"
             android:text="Submit"
-            android:textAppearance="@style/signup_button"
+            android:textAppearance="@style/text_style_3"
             app:layout_constraintBottom_toBottomOf="parent"
 
             app:layout_constraintLeft_toLeftOf="parent"
@@ -29,7 +29,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="An Employee"
-            android:textAppearance="@style/signup_texts"
+            android:textAppearance="@style/text_style_7"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/businessOwnerFrag2"
             app:layout_constraintHorizontal_bias=".2"
@@ -42,7 +42,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="A Business Owner"
-            android:textAppearance="@style/signup_texts"
+            android:textAppearance="@style/text_style_7"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/submitFrag2"
             app:layout_constraintHorizontal_bias=".2"
@@ -58,7 +58,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="First Name "
             android:inputType="textPersonName"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             app:layout_constraintBottom_toTopOf="@id/lastNameFrag2"
 
@@ -73,7 +73,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="Last Name"
             android:inputType="textPersonName"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             app:layout_constraintBottom_toTopOf="@id/phoneNumberFrag2"
 
@@ -88,7 +88,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="Phone Number "
             android:inputType="phone"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             app:layout_constraintBottom_toTopOf="@id/textView4"
 
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:gravity="center|left"
             android:text="I am :"
-            android:textAppearance="@style/signup_texts"
+            android:textAppearance="@style/text_style_7"
             android:textColor="@android:color/primary_text_light_nodisable"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/employeeFrag2"

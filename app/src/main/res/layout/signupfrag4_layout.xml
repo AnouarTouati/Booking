@@ -17,7 +17,7 @@
             android:layout_height="50dp"
             android:background="@drawable/button_type_04"
             android:text="SUBMIT"
-            android:textAppearance="@style/signin_button"
+            android:textAppearance="@style/text_style_4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -30,7 +30,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="Shop Phone Number"
             android:inputType="phone"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
             app:layout_constraintBottom_toTopOf="@id/imageView7"
 
             app:layout_constraintLeft_toLeftOf="parent"
@@ -44,7 +44,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="facebook.com/"
             android:inputType="textPersonName"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             app:layout_constraintBottom_toTopOf="@id/instagramFrag4"
 
@@ -60,7 +60,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="instagram.com/"
             android:inputType="textPersonName"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             app:layout_constraintBottom_toTopOf="@id/submitFrag4"
             app:layout_constraintLeft_toRightOf="@id/imageView8"

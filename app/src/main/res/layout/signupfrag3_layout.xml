@@ -17,7 +17,7 @@
             android:layout_height="50dp"
             android:background="@drawable/button_type_04"
             android:text="SUBMIT"
-            android:textAppearance="@style/signup_button"
+            android:textAppearance="@style/text_style_3"
             app:layout_constraintBottom_toBottomOf="parent"
 
             app:layout_constraintLeft_toLeftOf="parent"
@@ -71,7 +71,7 @@
             android:background="@drawable/edit_text_type_01"
             android:hint="Salon Name"
             android:inputType="textPersonName"
-            android:textAppearance="@style/edit_text_custom"
+            android:textAppearance="@style/text_style_1"
 
             android:textSize="16sp"
 
