@@ -65,7 +65,7 @@ public class SignUpFrag3 extends Fragment {
                 if(action.equals("ComingFromSignUpActivity")){
                     useCoordinatesAKAaddMap =intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
                  addMapToYourShopCheckBox.setChecked(useCoordinatesAKAaddMap);
-                 Common_Methods.addTheTwoNumbers();
+
                 }
             }
         };
