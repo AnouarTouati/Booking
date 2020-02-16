@@ -52,7 +52,7 @@
             app:layout_constraintHorizontal_bias=".2"
             android:layout_marginBottom="80dp"
             android:text="Diamond"
-            android:textAppearance="@style/diamond"
+            android:textAppearance="@style/text_style_0"
             />
 
 
@@ -70,7 +70,7 @@
 
             android:hint="E-mail Address"
             android:inputType="textEmailAddress"
-            android:textAppearance="@style/edit_text_signin"
+            android:textAppearance="@style/text_style_2"
             android:visibility="visible"
             />
 
@@ -87,7 +87,7 @@
 
             android:hint="Password"
             android:inputType="textPassword"
-            android:textAppearance="@style/edit_text_signin"
+            android:textAppearance="@style/text_style_2"
             android:visibility="visible"
             />
 
@@ -102,7 +102,7 @@
             android:layout_marginBottom="80dp"
             android:background="@drawable/button_type_03"
             android:text="signIn"
-            android:textAppearance="@style/signin_button"
+            android:textAppearance="@style/text_style_4"
             android:visibility="visible"
             />
 
