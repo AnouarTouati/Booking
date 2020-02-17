@@ -1,6 +1,7 @@
 package com.example.bookingapp;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,10 +46,21 @@ public class SignInActivity extends AppCompatActivity {
 
     TextView errorText;
     ProgressBar progressBar;
+
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        mAuth=FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser=mAuth.getCurrentUser();
+        if(firebaseUser!=null){
+            successfulSignIn("Token Firebase");
+        }
+
+
+
+
         diamondImage =findViewById(R.id.diamondImageView);
         diamondText =findViewById(R.id.diamondTextView);
         errorText =findViewById(R.id.ErrorTextView_SignInActivity);
@@ -145,7 +162,17 @@ void turnOffProgressBar(){
         JSONObject data=new JSONObject(map);
 
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, SIGN_IN_URL, data, volleyListener, volleyErrorListener);
-        requestQueue.add(request);
+      //  requestQueue.add(request);
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    successfulSignIn("Token FireBase");
+                }else{
+                    notSuccessful();
+                }
+            }
+        });
         turnOnProgressBar();
     }
 
