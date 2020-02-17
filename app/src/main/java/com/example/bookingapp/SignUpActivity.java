@@ -9,15 +9,15 @@ import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.os.Looper;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -37,11 +37,16 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import org.json.JSONException;
@@ -197,7 +202,7 @@ public class SignUpActivity extends AppCompatActivity {
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signUp();
+                createAccount();
             }
         });
         goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
@@ -418,31 +423,53 @@ public void signUp(){
 
     JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SIGN_UP_URL, data, volleyListener, volleyErrorListener);
 
- /*   FirebaseFirestore db=FirebaseFirestore.getInstance();
-db.collection("Shops").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-    @Override
-    public void onSuccess(DocumentReference documentReference) {
-          Toast.makeText(getApplicationContext(),""+documentReference.getId(),Toast.LENGTH_LONG).show();
+   FirebaseFirestore db=FirebaseFirestore.getInstance();
 
-    }
-});
-*/
+
   //  requestQueue.add(jsonObjectRequest);
+
+    FirebaseUser firebaseUser=mAuth.getCurrentUser();
+
+    db.collection("Shops").document(firebaseUser.getUid()).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        @Override
+        public void onSuccess(Void aVoid) {
+            successful();
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            notSuccessful();
+        }
+    });
+
+    db.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        @Override
+        public void onSuccess(DocumentSnapshot documentSnapshot) {
+           Log.v("VolleyReceived",documentSnapshot.getData().toString());
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            Toast.makeText(getApplicationContext(),"Failed TOget data back",Toast.LENGTH_LONG).show();
+        }
+    });
+}
+
+public void createAccount(){
+
+
     mAuth.createUserWithEmailAndPassword(emailAddress,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
             if(task.isSuccessful()){
-                FirebaseUser firebaseUser=mAuth.getCurrentUser();
-                 successful();
+             signUp();
             }
             else{
-           notSuccessful();
+                notSuccessful();
             }
         }
     });
-
 }
-
 
     public static void sendToServerToCheckAndRegister(int nextIndexInPagerAdapter){
 
