@@ -8,7 +8,7 @@
     >
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/background_signin_frag1"
@@ -118,7 +118,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </ScrollView>
