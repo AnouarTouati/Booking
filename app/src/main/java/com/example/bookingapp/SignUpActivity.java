@@ -36,6 +36,13 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,11 +111,14 @@ public class SignUpActivity extends AppCompatActivity {
     static Context mContext;
 
     String tokenReceived;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         mContext=this;
+
+        mAuth=FirebaseAuth.getInstance();
 
         volleyListener =new Response.Listener<JSONObject>() {
             @Override
@@ -408,8 +418,28 @@ public void signUp(){
 
     JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SIGN_UP_URL, data, volleyListener, volleyErrorListener);
 
-    requestQueue.add(jsonObjectRequest);
+ /*   FirebaseFirestore db=FirebaseFirestore.getInstance();
+db.collection("Shops").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+    @Override
+    public void onSuccess(DocumentReference documentReference) {
+          Toast.makeText(getApplicationContext(),""+documentReference.getId(),Toast.LENGTH_LONG).show();
 
+    }
+});
+*/
+  //  requestQueue.add(jsonObjectRequest);
+    mAuth.createUserWithEmailAndPassword(emailAddress,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+            if(task.isSuccessful()){
+                FirebaseUser firebaseUser=mAuth.getCurrentUser();
+                 successful();
+            }
+            else{
+           notSuccessful();
+            }
+        }
+    });
 
 }
 
