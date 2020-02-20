@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,10 +22,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -135,6 +145,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == IMG_REQ && resultCode == RESULT_OK && data != null) {
 
             if (data.getClipData() != null) {
@@ -152,18 +163,16 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 }
 
 
+            } else if (data.getData() != null) {
+
+                try {
+                    pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData()));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-        } else if (data.getData() != null) {
-            Log.v("VolleyReceived", "Up ToGet Images");
-            String imagePath = data.getData().getPath();
-
-            try {
-                pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imagePath)));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         }
 
     }
@@ -183,6 +192,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     }
 
     public static void pushImageToServer(Bitmap ImageToBePushed) {
+
         String imageToBePushedAsString = CommonMethods.convertBitmapToString(ImageToBePushed);
 
         Map<String, Object> map = new HashMap<>();
@@ -201,7 +211,28 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
         JSONObject data = new JSONObject(map);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, data, volleyListener, volleyErrorListener);
 
-        requestQueue.add(jsonObjectRequest);
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        StorageReference storageReference=firebaseStorage.getReference();
+        StorageReference imagesRefrence=storageReference.child("images/"+firebaseUser.getUid()+"/image1");
+        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        ImageToBePushed.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+        byte[] imageByte =byteArrayOutputStream.toByteArray();
+
+        UploadTask uploadTask=imagesRefrence.putBytes(imageByte);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.v("MyFirebaseVerbose","successfully uploaded image");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v("MyFirebaseVerbose","failed  to upload image");
+            }
+        });
+
+    //    requestQueue.add(jsonObjectRequest);
 
     }
 
@@ -381,4 +412,5 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
         updateTheRecyclerView();
 
     }
+
 }

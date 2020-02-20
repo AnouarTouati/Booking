@@ -210,8 +210,11 @@ public class SignUpActivity extends AppCompatActivity {
      @Override
      public void onClick(View view) {
          Intent GoToShopActivityIntent=new Intent(mContext,ShopActivity.class);
-         GoToShopActivityIntent.putExtra("Token", tokenReceived);
+         ShopActivity.setFirebaseUser(mAuth.getCurrentUser());
          mContext.startActivity(GoToShopActivityIntent);
+         setResult(RESULT_OK,new Intent());//just to kill sign in activity
+         finish();//this to kill this sign up activity
+
      }
  });
         fusedLocationProviderClient=new FusedLocationProviderClient(this);
@@ -398,7 +401,7 @@ public void signUp(){
         map.put("ShopLatitude", shopLatitude);
         map.put("ShopLongitude", shopLongitude);
         map.put("IsMen", isMen);
-        map.put("SelectedImage", convertBitmapToString(selectedImage));//photo
+        map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
         map.put("ShopPhoneNumber", shopPhoneNumber);
         map.put("FacebookLink", facebookLink);
         map.put("InstagramLink", instagramLink);
@@ -445,12 +448,12 @@ public void signUp(){
     db.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
         @Override
         public void onSuccess(DocumentSnapshot documentSnapshot) {
-           Log.v("VolleyReceived",documentSnapshot.getData().toString());
+           Log.v("Firebase",documentSnapshot.getData().toString());
         }
     }).addOnFailureListener(new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
-            Toast.makeText(getApplicationContext(),"Failed TOget data back",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Failed To get data back",Toast.LENGTH_LONG).show();
         }
     });
 }
@@ -542,12 +545,7 @@ public void createAccount(){
           errorMessagesRecyclerView.setVisibility(View.VISIBLE);//will make it invisible in turn on progress bar
       }
     }
-    String convertBitmapToString(Bitmap image){
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
-        return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-    }
     void notSuccessful(){
         signUpWasNotSuccessful=true;
         progressBar.setVisibility(View.GONE);

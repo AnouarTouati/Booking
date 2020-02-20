@@ -1,7 +1,9 @@
 package com.example.bookingapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -26,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +47,7 @@ public class SignInActivity extends AppCompatActivity {
     EditText emailAddressEditText;
     EditText passwordEditText;
     Button signInButton;
+    TextView signUpQuestion;
 
     TextView errorText;
     ProgressBar progressBar;
@@ -55,9 +60,17 @@ public class SignInActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         FirebaseUser firebaseUser=mAuth.getCurrentUser();
         if(firebaseUser!=null){
-            successfulSignIn("Token Firebase");
+            successfulSignIn(firebaseUser);
         }
 
+        signUpQuestion=findViewById(R.id.signUpQuestion);
+        signUpQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent goToSignUpActivity=new Intent(SignInActivity.this,SignUpActivity.class);
+                startActivityForResult(goToSignUpActivity, CommonMethods.KILL_ACTIVITY_REQ);
+            }
+        });
 
 
 
@@ -78,7 +91,7 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 Log.v("VolleyReceived","Volley Received SignIn Activity "+response.toString());
-                if(response.has("SignIn")){
+           /*    if(response.has("SignIn")){
                     try {
                         if(response.getJSONObject("SignIn").getString("Successful").equals("True")){
                             successfulSignIn(response.getJSONObject("SignIn").getString("Token"));
@@ -89,7 +102,7 @@ public class SignInActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                }
+                }*/
             }
         };
         volleyErrorListener=new Response.ErrorListener() {
@@ -123,7 +136,20 @@ public class SignInActivity extends AppCompatActivity {
 
 
     }
-void turnOnProgressBar(){
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==CommonMethods.KILL_ACTIVITY_REQ){
+            if(resultCode==RESULT_OK){
+                finish();
+            }
+
+        }
+    }
+
+    void turnOnProgressBar(){
     progressBar.setVisibility(View.VISIBLE);
 
 
@@ -132,10 +158,11 @@ void turnOnProgressBar(){
     emailAddressEditText.setVisibility(View.GONE);
     passwordEditText.setVisibility(View.GONE);
     signInButton.setVisibility(View.GONE);
+    signUpQuestion.setVisibility(View.GONE);
     errorText.setVisibility(View.GONE);
 
 }
-void turnOffProgressBar(){
+    void turnOffProgressBar(){
 
     progressBar.setVisibility(View.GONE);
 
@@ -144,7 +171,7 @@ void turnOffProgressBar(){
     emailAddressEditText.setVisibility(View.VISIBLE);
     passwordEditText.setVisibility(View.VISIBLE);
     signInButton.setVisibility(View.VISIBLE);
-
+    signUpQuestion.setVisibility(View.VISIBLE);
 }
     void signIn(){
 
@@ -167,7 +194,7 @@ void turnOffProgressBar(){
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    successfulSignIn("Token FireBase");
+                    successfulSignIn(task.getResult().getUser());
                 }else{
                     notSuccessful();
                 }
@@ -176,11 +203,12 @@ void turnOffProgressBar(){
         turnOnProgressBar();
     }
 
-    void successfulSignIn(String TokenReceived){
+    void successfulSignIn(FirebaseUser firebaseUser){
 
         Intent goToShopActivityIntent=new Intent(this, ShopActivity.class);
-        goToShopActivityIntent.putExtra("Token", TokenReceived);
+        ShopActivity.setFirebaseUser(firebaseUser);
         startActivity(goToShopActivityIntent);
+        finish();
     }
     void notSuccessful(){
         turnOffProgressBar();

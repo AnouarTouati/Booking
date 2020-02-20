@@ -22,6 +22,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 public  class CommonMethods {
 
+
+
+    static final int KILL_ACTIVITY_REQ=12;
     static String convertBitmapToString(Bitmap image){
 
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();

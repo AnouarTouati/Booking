@@ -17,7 +17,6 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,11 +34,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class ShopActivity extends AppCompatActivity {
     static RequestQueue requestQueue;
     static Response.Listener<JSONObject> volleyListener;
     static Response.ErrorListener volleyErrorListener;
-    String tokenToUseComingFromSignInActivity;
+   private static FirebaseUser firebaseUser;
     static Context mContext;
     static ArrayList<String> pendingList=new ArrayList<>();
     CustomFragmentPagerAdapter customFragmentPagerAdapter;
@@ -112,8 +111,7 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         mContext=this;
 
-        tokenToUseComingFromSignInActivity =getIntent().getStringExtra("Token");
-        if(tokenToUseComingFromSignInActivity ==""){
+        if(firebaseUser ==null){
             Intent goBACKtoSignInActivity=new Intent(this,SignInActivity.class);
             startActivity(goBACKtoSignInActivity);
         }
@@ -207,7 +205,10 @@ public class ShopActivity extends AppCompatActivity {
 
     }
 
+    public static void setFirebaseUser(FirebaseUser fireBaseUser){
 
+        firebaseUser=fireBaseUser;
+   }
     public static void findLocationUsingGPS(){
 
         if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
@@ -360,7 +361,7 @@ public class ShopActivity extends AppCompatActivity {
             map.put("ShopLatitude", shopLatitude);
             map.put("ShopLongitude", shopLongitude);
             map.put("IsMen", isMen);
-            map.put("SelectedImage", convertBitmapToString(selectedImage));//photo
+            map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
             map.put("ShopPhoneNumber", shopPhoneNumber);
             map.put("FacebookLink", facebookLink);
             map.put("InstagramLink", instagramLink);
@@ -383,10 +384,10 @@ public class ShopActivity extends AppCompatActivity {
         JSONObject updatedShopData=new JSONObject(map);
 
     }
-    String convertBitmapToString(Bitmap image){
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
-        return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }
