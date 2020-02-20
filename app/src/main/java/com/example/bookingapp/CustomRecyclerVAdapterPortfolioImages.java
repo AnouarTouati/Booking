@@ -16,9 +16,11 @@ public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<
 
     ArrayList<Bitmap> portfolioImages =new ArrayList<>();
     Context mContext;
-    public CustomRecyclerVAdapterPortfolioImages(ArrayList<Bitmap> portfolioImages, Context mContext) {
+    AddRemovePortfolioImages_SubActivity_ShopActivity parentActivity;
+    public CustomRecyclerVAdapterPortfolioImages(ArrayList<Bitmap> portfolioImages, Context mContext,AddRemovePortfolioImages_SubActivity_ShopActivity parentActivity) {
         this.portfolioImages = portfolioImages;
         this.mContext=mContext;
+        this.parentActivity=parentActivity;
     }
 
     @NonNull
@@ -35,7 +37,8 @@ public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<
             viewHolder.deletePortfolioImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AddRemovePortfolioImages_SubActivity_ShopActivity.removeImageFromServer(i);
+                  //  AddRemovePortfolioImages_SubActivity_ShopActivity.removeImageFromServer(i);
+                    parentActivity.removeImageFromServer(i);
                 }
             });
     }

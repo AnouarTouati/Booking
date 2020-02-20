@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_signin_frag1"
+        android:background="@drawable/background_style_01"
         >
 
         <TextView
@@ -26,7 +26,10 @@
             app:layout_constraintBottom_toTopOf="@id/diamondImageView"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread"
+            app:layout_constraintVertical_bias="0"
+            />
 
         <ImageView
             android:id="@+id/diamondImageView"
@@ -36,7 +39,7 @@
             app:layout_constraintBottom_toTopOf="@id/diamondTextView"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintVertical_chainStyle="spread"
+
             app:layout_constraintHorizontal_bias=".2"
 
             app:srcCompat="@drawable/diamond" />
@@ -50,7 +53,6 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintHorizontal_bias=".2"
-            android:layout_marginBottom="80dp"
             android:text="Diamond"
             android:textAppearance="@style/text_style_0"
             />
@@ -65,13 +67,12 @@
             app:layout_constraintBottom_toTopOf="@id/signInPassword"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-
             android:background="@drawable/edit_text_type_02"
-
             android:hint="E-mail Address"
             android:inputType="textEmailAddress"
             android:textAppearance="@style/text_style_2"
             android:visibility="visible"
+            android:layout_marginBottom="8dp"
             />
 
         <EditText
@@ -82,13 +83,12 @@
             app:layout_constraintBottom_toTopOf="@id/signIn"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-
             android:background="@drawable/edit_text_type_02"
-
             android:hint="Password"
             android:inputType="textPassword"
             android:textAppearance="@style/text_style_2"
             android:visibility="visible"
+            android:layout_marginBottom="8dp"
             />
 
        <Button
@@ -99,11 +99,11 @@
             app:layout_constraintBottom_toTopOf="@id/signUpQuestion"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="80dp"
             android:background="@drawable/button_type_03"
             android:text="@string/SignIn"
             android:textAppearance="@style/text_style_4"
             android:visibility="visible"
+           android:layout_marginBottom="8dp"
             />
          <TextView
              android:id="@+id/signUpQuestion"
@@ -114,7 +114,6 @@
              app:layout_constraintBottom_toBottomOf="parent"
              app:layout_constraintLeft_toLeftOf="parent"
              app:layout_constraintRight_toRightOf="parent"
-             android:layout_marginBottom="80dp"
           />
         <ProgressBar
             android:id="@+id/progressBar_SignInActicity"
