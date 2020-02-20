@@ -30,8 +30,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        Button signUpButton=findViewById(R.id.signUp);
+
         Button signInButton=findViewById(R.id.signIn);
+        Button signUpButton=findViewById(R.id.signUp);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
