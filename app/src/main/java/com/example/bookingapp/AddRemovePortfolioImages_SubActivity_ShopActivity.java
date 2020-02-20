@@ -2,6 +2,7 @@ package com.example.bookingapp;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -13,19 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,7 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.CRC32;
+import java.util.UUID;
 
 public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompatActivity {
 
@@ -48,9 +50,9 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     final int IMG_REQ = 10;
     ArrayList<Bitmap> portfolioImages = new ArrayList<>();
     ArrayList<String> portfolioImagesAsStrings = new ArrayList<>();
-    ArrayList<String> imagesLinkFromServer = new ArrayList<>();
-    static ArrayList<String> portfolioImagesLinks = new ArrayList<>();
-    ArrayList<String> portfolioImagesLinksToBeRequested = new ArrayList<>();
+    ArrayList<String> imagesReferencesFromServer = new ArrayList<>();
+    static ArrayList<String> portfolioImagesReferences = new ArrayList<>();
+    ArrayList<String> portfolioImagesReferencesToBeRequested = new ArrayList<>();
     Integer indexOfImageToReceiveNext = 0;
     CustomRecyclerVAdapterPortfolioImages customRecyclerVAdapterPortfolioImages;
     RecyclerView portfolioImagesRecyclerView;
@@ -63,10 +65,19 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     static Response.ErrorListener volleyErrorListener;
     static RequestQueue requestQueue;
 
+   static FirebaseStorage firebaseStorage;
+   static FirebaseUser firebaseUser;
+   static FirebaseFirestore firebaseFirestore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_remove_portfolio_images__sub__shop);
+
+        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        firebaseFirestore=FirebaseFirestore.getInstance();
+
+
         customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this);
         portfolioImagesRecyclerView = findViewById(R.id.RecyclerView_PortfolioImages);
         portfolioImagesRecyclerView.setAdapter(customRecyclerVAdapterPortfolioImages);
@@ -87,9 +98,9 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 if (response.has("PortfolioImagesLinks")) {
 
                     try {
-                        imagesLinkFromServer.clear();
+                        imagesReferencesFromServer.clear();
                         for (int i = 0; i < response.getJSONArray("PortfolioImagesLinks").length(); i++) {
-                            imagesLinkFromServer.add(response.getJSONArray("PortfolioImagesLinks").getString(i));
+                            imagesReferencesFromServer.add(response.getJSONArray("PortfolioImagesLinks").getString(i));
                         }
                         loadLocalData("Shop");
                     } catch (JSONException e) {
@@ -102,7 +113,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                             int IndexOfTheSuccessfullyReceivedImage = cRC32ofImagesToBePushed.indexOf(response.getJSONObject("AddPortfolioImage").getLong("ImageCRC32"));
                             portfolioImages.add(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage));
                             portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage)));
-                            portfolioImagesLinks.add(response.getJSONObject("AddPortfolioImage").getString("ImageLink"));
+                            portfolioImagesReferences.add(response.getJSONObject("AddPortfolioImage").getString("ImageLink"));
                             saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
                         }
                     } catch (JSONException e) {
@@ -111,8 +122,8 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 } else if (response.has("RemovePortfolioImage")) {
                     try {
                         if (response.getJSONObject("RemovePortfolioImage").getString("Successful").equals("True")) {
-                            int IndexOfImageRemoved = portfolioImagesLinks.indexOf(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
-                            portfolioImagesLinks.remove(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
+                            int IndexOfImageRemoved = portfolioImagesReferences.indexOf(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
+                            portfolioImagesReferences.remove(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
                             portfolioImagesAsStrings.remove(IndexOfImageRemoved);
                             portfolioImages.remove(IndexOfImageRemoved);
                             saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
@@ -130,7 +141,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
             }
         };
         requestQueue = Volley.newRequestQueue(this);
-        getPortfolioImagesLinksFromServer();
+        getPortfolioImagesReferencesFromServer();
     }
 
     void getImages() {
@@ -154,7 +165,8 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 for (int i = 0; i < count; i++) {
                     Uri imageUri = data.getClipData().getItemAt(i).getUri();
                     try {
-                        pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri));
+                        pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri));//the .getPath here is passes into UUID constructor
+                                                                                                                                // so we are sure there is different names for images on storage
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -185,14 +197,14 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     public static void removeImageFromServer(int Index) {
         Map<String, Object> map = new HashMap<>();
         map.put("Request", "RemovePortfolioImage");
-        map.put("ImageLink", portfolioImagesLinks.get(Index));
+        map.put("ImageLink", portfolioImagesReferences.get(Index));
         JSONObject data = new JSONObject(map);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, data, volleyListener, volleyErrorListener);
         requestQueue.add(jsonObjectRequest);
     }
 
-    public static void pushImageToServer(Bitmap ImageToBePushed) {
-
+    public void pushImageToServer(Bitmap ImageToBePushed) {
+/*
         String imageToBePushedAsString = CommonMethods.convertBitmapToString(ImageToBePushed);
 
         Map<String, Object> map = new HashMap<>();
@@ -210,19 +222,26 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
 
         JSONObject data = new JSONObject(map);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, data, volleyListener, volleyErrorListener);
+        requestQueue.add(jsonObjectRequest);
+*/
 
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         StorageReference storageReference=firebaseStorage.getReference();
-        StorageReference imagesRefrence=storageReference.child("images/"+firebaseUser.getUid()+"/image1");
+        final StorageReference imageReference =storageReference.child("images/"+firebaseUser.getUid()+"/"+UUID.randomUUID());
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         ImageToBePushed.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
         byte[] imageByte =byteArrayOutputStream.toByteArray();
 
-        UploadTask uploadTask=imagesRefrence.putBytes(imageByte);
+        UploadTask uploadTask= imageReference.putBytes(imageByte);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+            firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("ImagesPathsInFireStorage", FieldValue.arrayUnion(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    getPortfolioImagesReferencesFromServer();
+                }
+            });
                 Log.v("MyFirebaseVerbose","successfully uploaded image");
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -232,13 +251,11 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
             }
         });
 
-    //    requestQueue.add(jsonObjectRequest);
 
     }
 
     public void writeNewShopDataToLocalMemory(JSONObject NewShopDataJSON) {
         try {
-
 
             String localMemoryJsonAsString = CommonMethods.loadJSONFile("Data.txt", getApplicationContext());
             if (localMemoryJsonAsString != null) {
@@ -246,7 +263,6 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 JSONObject localMemoryJsonObject = new JSONObject(localMemoryJsonAsString);
                 if (localMemoryJsonObject.has("Shop")) {
                     localMemoryJsonObject.remove("Shop");
-
                 }
                 localMemoryJsonObject.put("Shop", NewShopDataJSON);
 
@@ -283,12 +299,11 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                     if (ShopDataJSONObject.has("PortfolioImagesLinks")) {
                         ArrayList<String> ListOfImagesThatDidNotChange = new ArrayList<>();
                         ArrayList<Integer> IndexOfTheImageThatDidNotChange = new ArrayList<>();
-                        ArrayList<String> ListOfImagesLinksThatDidNotChange = new ArrayList<>();
+                        ArrayList<String> ListOfImagesReferencesThatDidNotChange = new ArrayList<>();
 
-                        // ArrayList<String> PortfolioImagesLinks= ParseJSONtoArrayListOfStrings(ShopDataJSONObject.get("PortfolioImagesLinks").toString());
-                        ArrayList<String> PortfolioImagesLinksLocal = new ArrayList<>();
+                        ArrayList<String> PortfolioImagesReferencesLocal = new ArrayList<>();
                         for (int i = 0; i < ShopDataJSONObject.getJSONArray("PortfolioImagesLinks").length(); i++) {
-                            PortfolioImagesLinksLocal.add(i, ShopDataJSONObject.getJSONArray("PortfolioImagesLinks").getString(i));
+                            PortfolioImagesReferencesLocal.add(i, ShopDataJSONObject.getJSONArray("PortfolioImagesLinks").getString(i));
                         }
 
 
@@ -296,36 +311,36 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                         for (int i = 0; i < ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").length(); i++) {
                             PortfolioImagesAsStringsLocal.add(i, ShopDataJSONObject.getJSONArray("PortfolioImagesAsStrings").getString(i));
                         }
-                        portfolioImagesLinksToBeRequested.clear();
+
+                        portfolioImagesReferencesToBeRequested.clear();
                         indexOfImageToReceiveNext = 0;
-                        for (int i = 0; i < imagesLinkFromServer.size(); i++) {
+
+                        for (int i = 0; i < imagesReferencesFromServer.size(); i++) {
 
                             Boolean LinkNotFound = true;
-                            for (int j = 0; j < PortfolioImagesLinksLocal.size(); j++) {
+                            for (int j = 0; j < PortfolioImagesReferencesLocal.size(); j++) {
 
-                                if (PortfolioImagesLinksLocal.get(j).equals(imagesLinkFromServer.get(i))) {
+                                if (PortfolioImagesReferencesLocal.get(j).equals(imagesReferencesFromServer.get(i))) {
                                     LinkNotFound = false;
                                     IndexOfTheImageThatDidNotChange.add(j);
                                     ListOfImagesThatDidNotChange.add(PortfolioImagesAsStringsLocal.get(j));
-                                    ListOfImagesLinksThatDidNotChange.add(PortfolioImagesLinksLocal.get(j));
+                                    ListOfImagesReferencesThatDidNotChange.add(PortfolioImagesReferencesLocal.get(j));
                                 }
                             }
                             if (LinkNotFound) {
 
-                                portfolioImagesLinksToBeRequested.add(imagesLinkFromServer.get(i));
+                                portfolioImagesReferencesToBeRequested.add(imagesReferencesFromServer.get(i));
                             }
 
 
                         }
-                        if (portfolioImagesLinksToBeRequested.size() > 0) {
-                            requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
-                        }
+
                         ShopDataJSONObject.remove("PortfolioImagesAsStrings");
                         ShopDataJSONObject.remove("PortfolioImagesLinks");
                         portfolioImagesAsStrings.clear();
                         portfolioImagesAsStrings = ListOfImagesThatDidNotChange;
-                        portfolioImagesLinks.clear();
-                        portfolioImagesLinks = ListOfImagesLinksThatDidNotChange;
+                        portfolioImagesReferences.clear();
+                        portfolioImagesReferences = ListOfImagesReferencesThatDidNotChange;
 
                         portfolioImages.clear();
                         for (int i = 0; i < PortfolioImagesAsStringsLocal.size(); i++) {
@@ -333,13 +348,12 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                         }
 
 
+
                     } else {
-                        portfolioImagesLinksToBeRequested.clear();
+                        portfolioImagesReferencesToBeRequested.clear();
                         indexOfImageToReceiveNext = 0;
-                        portfolioImagesLinksToBeRequested.addAll(imagesLinkFromServer);
-                        if (portfolioImagesLinksToBeRequested.size() > 0) {
-                            requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));
-                        }
+                        portfolioImagesReferencesToBeRequested.addAll(imagesReferencesFromServer);
+
                        /* for(int i=0;i<ImagesLinkFromServer.size();i++){
                             requestImage(ImagesLinkFromServer.get(i));
                         }*/
@@ -348,14 +362,17 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                     /// if some images no longer exists in server the code above will remove them so we need to save the trimmed set of images
                     saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
 
-
-                } else {
-                    ///when we call request and receive an image it will call  saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView() to save it and hance create Data file
-
-                    for (int i = 0; i < imagesLinkFromServer.size(); i++) {
-                        requestImage(imagesLinkFromServer.get(i));
+                    if (portfolioImagesReferencesToBeRequested.size() > 0) {
+                        requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
                     }
 
+                } else {
+                    portfolioImagesReferencesToBeRequested.clear();
+                    indexOfImageToReceiveNext = 0;
+                    portfolioImagesReferencesToBeRequested.addAll(imagesReferencesFromServer);
+                    if (portfolioImagesReferencesToBeRequested.size() > 0) {
+                        requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
+                    }
                 }
             } else {
                 //null is handled in the calling function loadJSONFile()
@@ -368,44 +385,56 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
         }
     }
 
-    void requestImage(final String ImageLink) {
-        Log.v("VolleyReceived", "We Are requesting images ");
-        ImageRequest imageRequest = new ImageRequest(ImageLink, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap response) {
-
-                portfolioImages.add(response);
-                portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(response));
-                portfolioImagesLinks.add(ImageLink);
-                saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-                indexOfImageToReceiveNext++;
-                if (indexOfImageToReceiveNext < portfolioImagesLinksToBeRequested.size()) {
-                    requestImage(portfolioImagesLinksToBeRequested.get(indexOfImageToReceiveNext));
-                }
-
+    void requestImage(final String ImageReference) {
+Log.v("MyFirebaseVerbose","Requesting image from server");
+    StorageReference imageReference =firebaseStorage.getReference(ImageReference);
+    final long FOUR_MEGA_BYTES=4 * 1024*1024;
+    imageReference.getBytes(FOUR_MEGA_BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        @Override
+        public void onSuccess(byte[] bytes) {
+            Bitmap response= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            portfolioImages.add(response);
+            portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(response));
+            portfolioImagesReferences.add(ImageReference);
+            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+            indexOfImageToReceiveNext++;
+            if (indexOfImageToReceiveNext < portfolioImagesReferencesToBeRequested.size()) {
+                requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));
             }
-        }, 0, 0, ImageView.ScaleType.CENTER_CROP, null, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.v("VolleyErrors", "onErrorResponse: IN SHOPDETAILS ACTIVITY IMAGES ImagesForPortfolio" + error.toString());
-            }
-        });
-        requestQueue.add(imageRequest);
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+
+        }
+    });
     }
 
-    void getPortfolioImagesLinksFromServer() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("Request", "PortfolioImagesLinks");
-        map.put("Token", "The Token");//or shop name
-        JSONObject Data = new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, Data, volleyListener, volleyErrorListener);
-        requestQueue.add(jsonObjectRequest);
+    void getPortfolioImagesReferencesFromServer() {
+
+    firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        @Override
+        public void onSuccess(DocumentSnapshot documentSnapshot) {
+            Log.v("MyFirebaseVerbose","got shop data with success");
+              final ArrayList<String> imagesPathsInFireStorage=(ArrayList<String>) documentSnapshot.get("ImagesPathsInFireStorage");
+            imagesReferencesFromServer.clear();
+            imagesReferencesFromServer=imagesPathsInFireStorage;
+            loadLocalData("Shop");
+
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            Log.v("MyFirebaseVerbose","FAILED TO get shop data");
+        }
+    });
+
     }
 
     void saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView() {
         Map<String, Object> map = new HashMap<>();
         map.put("PortfolioImagesAsStrings", portfolioImagesAsStrings);
-        map.put("PortfolioImagesLinks", portfolioImagesLinks);
+        map.put("PortfolioImagesLinks", portfolioImagesReferences);
 
         JSONObject Data = new JSONObject(map);
         writeNewShopDataToLocalMemory(Data);
