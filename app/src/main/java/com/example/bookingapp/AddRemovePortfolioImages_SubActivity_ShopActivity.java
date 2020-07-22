@@ -46,7 +46,6 @@ import java.util.UUID;
 
 public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompatActivity {
 
-    static final String URL = "http://192.168.43.139:8888/PortfolioImages-Business.php";//dont change this without changing it in php code
     final int IMG_REQ = 10;
     ArrayList<Bitmap> portfolioImages = new ArrayList<>();
     ArrayList<String> portfolioImagesAsStrings = new ArrayList<>();
@@ -58,12 +57,6 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     RecyclerView portfolioImagesRecyclerView;
 
     Button addImages;
-    static ArrayList<Bitmap> imagesToBePushed = new ArrayList<>();
-    static ArrayList<Long> cRC32ofImagesToBePushed = new ArrayList<>();//only used to make it easier to find the index of the image to save
-
-    static Response.Listener<JSONObject> volleyListener;
-    static Response.ErrorListener volleyErrorListener;
-    static RequestQueue requestQueue;
 
    static FirebaseStorage firebaseStorage;
    static FirebaseUser firebaseUser;
@@ -90,57 +83,6 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
             }
         });
 
-
-        volleyListener = new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.v("VolleyReceived", response.toString());
-                if (response.has("PortfolioImagesLinks")) {
-
-                    try {
-                        imagesReferencesFromServer.clear();
-                        for (int i = 0; i < response.getJSONArray("PortfolioImagesLinks").length(); i++) {
-                            imagesReferencesFromServer.add(response.getJSONArray("PortfolioImagesLinks").getString(i));
-                        }
-                        loadLocalData("Shop");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                } else if (response.has("AddPortfolioImage")) {
-                    try {
-                        if (response.getJSONObject("AddPortfolioImage").getString("Successful").equals("True")) {
-                            int IndexOfTheSuccessfullyReceivedImage = cRC32ofImagesToBePushed.indexOf(response.getJSONObject("AddPortfolioImage").getLong("ImageCRC32"));
-                            portfolioImages.add(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage));
-                            portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(imagesToBePushed.get(IndexOfTheSuccessfullyReceivedImage)));
-                            portfolioImagesReferences.add(response.getJSONObject("AddPortfolioImage").getString("ImageLink"));
-                            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else if (response.has("RemovePortfolioImage")) {
-                    try {
-                        if (response.getJSONObject("RemovePortfolioImage").getString("Successful").equals("True")) {
-                            int IndexOfImageRemoved = portfolioImagesReferences.indexOf(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
-                            portfolioImagesReferences.remove(response.getJSONObject("RemovePortfolioImage").getString("ImageLink"));
-                            portfolioImagesAsStrings.remove(IndexOfImageRemoved);
-                            portfolioImages.remove(IndexOfImageRemoved);
-                            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        volleyErrorListener = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.v("VolleyError", "Error " + error.toString());
-            }
-        };
-        requestQueue = Volley.newRequestQueue(this);
         getPortfolioImagesReferencesFromServer();
     }
 
@@ -213,7 +155,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     public void pushImageToServer(final Bitmap ImageToBePushed) {
 
         StorageReference storageReference=firebaseStorage.getReference();
-        final StorageReference imageReference =storageReference.child("images/"+firebaseUser.getUid()+"/"+UUID.randomUUID());
+        final StorageReference imageReference =storageReference.child("Photos/"+firebaseUser.getUid()+"/"+UUID.randomUUID()+".JPEG");
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
         ImageToBePushed.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
         byte[] imageByte =byteArrayOutputStream.toByteArray();
@@ -223,7 +165,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-            firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("ImagesPathsInFireStorage", FieldValue.arrayUnion(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
+            firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage", FieldValue.arrayUnion(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     portfolioImages.add(ImageToBePushed);
@@ -232,12 +174,12 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                     saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
                 }
             });
-                Log.v("MyFirebaseVerbose","successfully uploaded image");
+                Log.v("MyFirebase","successfully uploaded image");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.v("MyFirebaseVerbose","failed  to upload image");
+                Log.v("MyFirebase","failed  to upload image");
             }
         });
 
@@ -367,6 +309,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 } else {
                     portfolioImagesReferencesToBeRequested.clear();
                     indexOfImageToReceiveNext = 0;
+                    if(imagesReferencesFromServer!=null)
                     portfolioImagesReferencesToBeRequested.addAll(imagesReferencesFromServer);
                     if (portfolioImagesReferencesToBeRequested.size() > 0) {
                         requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
@@ -384,7 +327,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     }
 
     void requestImage(final String ImageReference) {
-Log.v("MyFirebaseVerbose","Requesting image from server");
+Log.v("MyFirebase","Requesting image from server");
     StorageReference imageReference =firebaseStorage.getReference(ImageReference);
     final long FOUR_MEGA_BYTES=4 * 1024*1024;
     imageReference.getBytes(FOUR_MEGA_BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -409,22 +352,22 @@ Log.v("MyFirebaseVerbose","Requesting image from server");
     }
 
     void getPortfolioImagesReferencesFromServer() {
-
+    //should get only the field PhotosPathsInFireStorage
     firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
         @Override
         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-              final ArrayList<String> imagesPathsInFireStorage=(ArrayList<String>) documentSnapshot.get("ImagesPathsInFireStorage");
+              final ArrayList<String> imagesPathsInFireStorage=(ArrayList<String>) documentSnapshot.get("PhotosPathsInFireStorage");
             imagesReferencesFromServer.clear();
             imagesReferencesFromServer=imagesPathsInFireStorage;
-            Log.v("MyFirebaseVerbose","got shop data with success "+imagesReferencesFromServer);
+            Log.v("MyFirebase","got shop data with success "+imagesReferencesFromServer);
             loadLocalData("Shop");
 
         }
     }).addOnFailureListener(new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
-            Log.v("MyFirebaseVerbose","FAILED TO get shop data");
+            Log.v("MyFirebase","FAILED TO get shop data");
         }
     });
 

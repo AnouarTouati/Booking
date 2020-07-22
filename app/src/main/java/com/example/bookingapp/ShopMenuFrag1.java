@@ -18,7 +18,11 @@ public class ShopMenuFrag1 extends Fragment {
     Button signInButton;
     RecyclerView peoplePendingRecyclerView;
     static CustomRecyclerViewAdapterShop customRecyclerViewAdapterShop;
+    ShopActivity shopActivityReference;
 
+   public ShopMenuFrag1(ShopActivity shopActivityReference){
+       this.shopActivityReference=shopActivityReference;
+   }
     View view;
     @Nullable
     @Override
@@ -35,12 +39,6 @@ public class ShopMenuFrag1 extends Fragment {
             }
         });
         peoplePendingRecyclerView=view.findViewById(R.id.peoplePendingRecyclerView);
-        ((ShopActivity)getActivity()).pendingList.clear();
-        ((ShopActivity)getActivity()).pendingList.add("Marouan Touati");
-        ((ShopActivity)getActivity()). pendingList.add("Anouar Touati");
-        ((ShopActivity)getActivity()). pendingList.add("Touati Mar");
-        ((ShopActivity)getActivity()). pendingList.add("Touati An");
-
 
         customRecyclerViewAdapterShop =new CustomRecyclerViewAdapterShop(getActivity(),  ((ShopActivity)getActivity()).pendingList);
         peoplePendingRecyclerView.setAdapter(customRecyclerViewAdapterShop);
@@ -49,8 +47,8 @@ public class ShopMenuFrag1 extends Fragment {
         return view;
     }
 
-    static void removePersonFromPending(String personNameToRemove){
-        ShopActivity.serverRemovePersonFromPending(personNameToRemove);
+    static void removePersonFromPending(ClientPending personToRemove){
+        ShopActivity.serverRemovePersonFromPending(personToRemove);
 
     }
 

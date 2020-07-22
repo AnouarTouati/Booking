@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Base64;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,12 +26,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -43,14 +37,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -93,7 +84,6 @@ public class SignUpActivity extends AppCompatActivity {
     public String thursday;
     public String friday;
 
-    static final String SIGN_UP_URL ="http://192.168.43.139:8888/Business.php";
 
     public  static ViewPager viewPagerSignUP;
     final int LOCATION_REQ=10;
@@ -110,13 +100,14 @@ public class SignUpActivity extends AppCompatActivity {
     public static ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
     static Boolean requestWasSentToServer =false;
-    static Response.Listener<JSONObject> volleyListener;
-    static Response.ErrorListener volleyErrorListener;
-    static RequestQueue requestQueue;
+
     static Context mContext;
 
-    String tokenReceived;
-    private FirebaseAuth mAuth;
+    private  FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseStorage firebaseStorage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,73 +115,9 @@ public class SignUpActivity extends AppCompatActivity {
         mContext=this;
 
         mAuth=FirebaseAuth.getInstance();
+        firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseStorage=FirebaseStorage.getInstance();
 
-        volleyListener =new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.v("VolleyReceived","VolleyReceived in SignUpActivity "+response.toString());
-
-                if(response.has("SignUp")){
-                    try {
-                        if(response.getJSONObject("SignUp").getString("Successful").equals("True")){
-                            tokenReceived =response.getJSONObject("SignUp").getString("Token");
-                            successful();
-                        }else{
-                            notSuccessful();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if(response.has("CheckAndRegister")){
-                    try {
-                        serverResponseCheckAndRegister(response.getJSONObject("CheckAndRegister"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-        };
-        volleyErrorListener =new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                if(error.networkResponse==null){
-                    Log.v("VolleyError","VolleyError in SignUpActivity  Null error.networkResponse");
-                    signUpErrorText.setText("Couldn't Reach The Server Please Check Your Internet Connection");
-                    signUpErrorText.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    retryButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            turnOnProgressBar();
-                            sendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
-                        }
-                    });
-                    retryButton.setVisibility(View.VISIBLE);
-                }
-               else{
-                    Log.v("VolleyError","VolleyError in SignUpActivity "+error.toString());
-
-                    signUpErrorText.setText("Connection Timed Out");
-                    signUpErrorText.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    retryButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            turnOnProgressBar();
-                            sendToServerToCheckAndRegister(viewPagerSignUP.getCurrentItem()+1);
-                        }
-                    });
-                    retryButton.setVisibility(View.VISIBLE);
-               }
-
-
-            }
-        };
-        requestQueue= Volley.newRequestQueue(this);
         customRecyclerViewAdapterSignUpErrors=new CustomRecyclerViewAdapterSignUpErrors(errorsList);//initialized empty so we can just swap the adapter later
         errorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
         errorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
@@ -202,7 +129,8 @@ public class SignUpActivity extends AppCompatActivity {
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createAccount();
+                //createAccount();
+                continueSignUp();
             }
         });
         goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
@@ -210,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity {
      @Override
      public void onClick(View view) {
          Intent GoToShopActivityIntent=new Intent(mContext,ShopActivity.class);
-         ShopActivity.setFirebaseUser(mAuth.getCurrentUser());
+         ShopActivity.setFirebaseUser(firebaseUser);
          mContext.startActivity(GoToShopActivityIntent);
          setResult(RESULT_OK,new Intent());//just to kill sign in activity
          finish();//this to kill this sign up activity
@@ -376,7 +304,8 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
     }
-public void signUp(){
+
+    public void continueSignUp(){
     viewPagerSignUP.setVisibility(View.GONE);
     progressBar.setVisibility(View.GONE);
 
@@ -385,9 +314,12 @@ public void signUp(){
     signUpSuccessfulText.setVisibility(View.GONE);
     goToShopHomePageButton.setVisibility(View.GONE);
 
-    Map<String,Object> map=new HashMap<>();
-    
-        map.put("Request","SignUp");
+    final Map<String,Object> map=new HashMap<>();
+
+    if(selectedImage!=null){
+        map.put("MainShopPhotoReferenceInStorage","Photos/"+firebaseUser.getUid()+"/MainShopPhoto"+".JPEG");
+    }
+
         map.put("EmailAddress", emailAddress);
         map.put("Password", password);
         map.put("FirstName", firstName);
@@ -401,7 +333,7 @@ public void signUp(){
         map.put("ShopLatitude", shopLatitude);
         map.put("ShopLongitude", shopLongitude);
         map.put("IsMen", isMen);
-        map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
+       // map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));
         map.put("ShopPhoneNumber", shopPhoneNumber);
         map.put("FacebookLink", facebookLink);
         map.put("InstagramLink", instagramLink);
@@ -421,138 +353,131 @@ public void signUp(){
         map.put("Thursday", thursday);
         map.put("Friday", friday);
 
-   
-    JSONObject data=new JSONObject(map);
-
-    JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, SIGN_UP_URL, data, volleyListener, volleyErrorListener);
-
-   FirebaseFirestore db=FirebaseFirestore.getInstance();
 
 
-  //  requestQueue.add(jsonObjectRequest);
 
-    FirebaseUser firebaseUser=mAuth.getCurrentUser();
-
-    db.collection("Shops").document(firebaseUser.getUid()).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+    firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
         @Override
         public void onSuccess(Void aVoid) {
-            successful();
+            if(map.containsKey("MainShopPhotoReferenceInStorage")){
+                pushPhotoToServer(map.get("MainShopPhotoReferenceInStorage").toString(),selectedImage);
+            }else{
+                successful();
+            }
+
         }
     }).addOnFailureListener(new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
-            notSuccessful();
+            notSuccessful("couldn't send shop data to cloud");
+            try {
+                throw e;
+            }
+            catch(Exception ee){
+                Log.v("MyFirebase", "Something went wrong continueSignUp()"  + ee.getMessage());
+            }
         }
     });
 
-    db.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-        @Override
-        public void onSuccess(DocumentSnapshot documentSnapshot) {
-           Log.v("Firebase",documentSnapshot.getData().toString());
-        }
-    }).addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-            Toast.makeText(getApplicationContext(),"Failed To get data back",Toast.LENGTH_LONG).show();
-        }
-    });
+
 }
 
-public void createAccount(){
+    private void pushPhotoToServer(final String imageReferenceInStorage, final Bitmap imageToPush) {
+        turnOnProgressBar();
+        StorageReference imageReference = firebaseStorage.getReference();
+        imageReference = imageReference.child(imageReferenceInStorage);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        imageToPush.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] imageInBytes = byteArrayOutputStream.toByteArray();
+        UploadTask uploadImageTask = imageReference.putBytes(imageInBytes);
+        uploadImageTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    turnOffProgressBar();
+                    Toast.makeText(getApplicationContext(), "Done Signing  up", Toast.LENGTH_LONG).show();
+                    Log.v("MyFirebase", "Done Uploading Profile image");
+                    successful();
+                } else {
 
+                    turnOffProgressBar();
+                    Toast.makeText(getApplicationContext(), "Something went wrong we couldn't sign you up", Toast.LENGTH_LONG).show();
+                    Log.v("MyFirebase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
+                    somethingWentWrongPleaseTryAgainImageProblem(imageReferenceInStorage,imageToPush);
 
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                turnOffProgressBar();
+                try {
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("MyFirebase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + ee.getMessage());
+                }
+            }
+        });
+
+    }
+    private void somethingWentWrongPleaseTryAgainImageProblem(final String imageReferenceInStorage, final Bitmap imageToPush){
+
+        AlertDialog.Builder alertDialogBuilder=  new AlertDialog.Builder(this).setTitle("Failed To Complete Sign UP")
+                .setMessage("Something went wrong and we couldn't sign you up, let's give it another go shall we")
+                .setPositiveButton("Retry", new DialogInterface.OnClickListener(){
+                    public void onClick( DialogInterface dialog,int id){
+                        pushPhotoToServer(imageReferenceInStorage,imageToPush);
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteProfileAndGoBackToSignUpActivity();
+                    }
+                });
+        alertDialogBuilder.create().show();
+    }
+
+    private void deleteProfileAndGoBackToSignUpActivity(){
+        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).delete();
+        firebaseUser.delete();
+        mAuth.signOut();
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        finish();
+    }
+
+      public void createAccount(){
     mAuth.createUserWithEmailAndPassword(emailAddress,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
             if(task.isSuccessful()){
-             signUp();
+            viewPagerSignUP.setCurrentItem(1);
+            firebaseUser=task.getResult().getUser();
             }
-            else{
-                notSuccessful();
+
+        }
+    }).addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            notSuccessful("couldn't create an account");
+            try {
+                throw e;
+            }
+            catch(Exception ee){
+                Log.v("MyFirebase", "Something went wrong createAccount()"  + ee.getMessage());
             }
         }
     });
 }
 
-    public static void sendToServerToCheckAndRegister(int nextIndexInPagerAdapter){
-
-        Map<String,Object> map=new HashMap<>();
-        map.put("Request","CheckAndRegister");
-
-        if(nextIndexInPagerAdapter==1 && viewPagerSignUP.getCurrentItem()==0){
-        map.put("EmailAddress", emailAddress);
-        map.put("Password", password);
-        }
-            else if(nextIndexInPagerAdapter==2 && viewPagerSignUP.getCurrentItem()==1){
-                map.put("PhoneNumber", phoneNumber);
-            }
-
-            else if(nextIndexInPagerAdapter==4 && viewPagerSignUP.getCurrentItem()==3){
-                map.put("ShopPhoneNumber", shopPhoneNumber);
-        }
-        JSONObject data =new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(SIGN_UP_URL, data, volleyListener, volleyErrorListener);
-        requestQueue.add(jsonObjectRequest);
-        requestWasSentToServer =true;
-    }
-
-    void serverResponseCheckAndRegister(JSONObject response){
-        turnOffProgressBar();
-       errorsList.clear();
-      if(response.has("EmailAddress")&& response.has("Password")){
-          try {
-              if(response.getString("EmailAddress").equals("Ok") && response.getString("Password").equals("Ok") && viewPagerSignUP.getCurrentItem()==0){
-                setCurrentItemViewPager(1);
-              }else {
-                  if(!response.getString("EmailAddress").equals("Ok")){
-                      errorsList.add("-Please Choose Another Email Address");
-                  }
-                  if(!response.getString("Password").equals("Ok")){
-                      errorsList.add("-The Password You Entered Doesn't Meet The Requirements");
-                  }
-              }
-          } catch (JSONException e) {
-              e.printStackTrace();
-          }
-      }
-      if(response.has("PhoneNumber")){
-          try {
-              if(response.getString("PhoneNumber").equals("Ok") && viewPagerSignUP.getCurrentItem()==1){
-                  setCurrentItemViewPager(2);
-              }else{
-                  errorsList.add("-The Phone Number You Entered Is Already Used");
-              }
-          } catch (JSONException e) {
-              e.printStackTrace();
-          }
-      }
-
-      if(response.has("ShopPhoneNumber")){
-          try {
-              if(response.getString("ShopPhoneNumber").equals("Ok") && viewPagerSignUP.getCurrentItem()==3){
-                setCurrentItemViewPager(4);
-              }
-              else{
-                  errorsList.add("-The Shop Phone Number Is Already Used");
-              }
-          } catch (JSONException e) {
-              e.printStackTrace();
-          }
-      }
-      if(errorsList.size()>0){//greater than zero meaning we have an error
-
-          errorMessagesRecyclerView.swapAdapter(new CustomRecyclerViewAdapterSignUpErrors(errorsList), true);
-          errorMessagesRecyclerView.setVisibility(View.VISIBLE);//will make it invisible in turn on progress bar
-      }
-    }
-
-    void notSuccessful(){
+    void notSuccessful(String message){
         signUpWasNotSuccessful=true;
         progressBar.setVisibility(View.GONE);
 
         signUpErrorText.setVisibility(View.VISIBLE);
+        signUpErrorText.setText(message);
         retryButton.setVisibility(View.VISIBLE);
-        Toast.makeText(this, "Not SuccessfulSignIn", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
     void successful(){
         signUpWasNotSuccessful=false;

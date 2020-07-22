@@ -66,8 +66,8 @@ public class SignUpFrag1 extends Fragment {
             ((SignUpActivity)getActivity()).emailAddress = emailAddress;
             ((SignUpActivity)getActivity()).password = password;
             ((SignUpActivity)getActivity()).turnOnProgressBar();
-           SignUpActivity.sendToServerToCheckAndRegister(1);
-        //    ((SignUpActivity)getActivity()).SetCurrentItemViewPager(1);
+
+          ((SignUpActivity)getActivity()).createAccount();
         }
 
     }

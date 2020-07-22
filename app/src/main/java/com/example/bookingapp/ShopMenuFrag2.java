@@ -13,8 +13,10 @@ import android.widget.Button;
 public class ShopMenuFrag2 extends Fragment {
 
     View view;
-
-
+    ShopActivity shopActivityReference;
+ public ShopMenuFrag2(ShopActivity shopActivityReference){
+     this.shopActivityReference=shopActivityReference;
+ }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class ShopMenuFrag2 extends Fragment {
         addUpdateShopMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ShopActivity.findLocationUsingGPS();
+               shopActivityReference.findLocationUsingGPS();
             }
         });
         return view;
