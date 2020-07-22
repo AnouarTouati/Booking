@@ -11,6 +11,10 @@ import android.location.LocationManager;
 import android.os.Looper;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -24,7 +28,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -35,32 +38,30 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 public class ShopActivity extends AppCompatActivity {
 
 
-
-
-    public static String URL="http://192.168.43.139:8888/Business.php";
-    static RequestQueue requestQueue;
-    static Response.Listener<JSONObject> volleyListener;
-    static Response.ErrorListener volleyErrorListener;
-   private static FirebaseUser firebaseUser;
     static Context mContext;
-    static ArrayList<String> pendingList=new ArrayList<>();
+    static ArrayList<ClientPending> pendingList=new ArrayList<>();
     CustomFragmentPagerAdapter customFragmentPagerAdapter;
     ViewPager viewPager;
     TabLayout tabLayout;
     TextView errorText;
-
-
 
     public String emailAddress;
     public String password;
@@ -104,6 +105,10 @@ public class ShopActivity extends AppCompatActivity {
     static FusedLocationProviderClient fusedLocationProviderClient;
 ///////////////////////////////////////////////////////////
 
+    private static FirebaseUser firebaseUser;
+    private static FirebaseFirestore firebaseFirestore;
+    private static FirebaseStorage firebaseStorage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,56 +120,14 @@ public class ShopActivity extends AppCompatActivity {
             Intent goBACKtoSignInActivity=new Intent(this,SignInActivity.class);
             startActivity(goBACKtoSignInActivity);
         }
+         firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseStorage=FirebaseStorage.getInstance();
 
-        volleyListener=new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-              Log.v("VolleyReceived","Volley Received Shop Activity "+response.toString());
-
-                errorText.setText("");
-                errorText.setVisibility(View.GONE);
-
-              if(response.has("RemovePersonFromPending")){
-                  try {
-                      removePersonFromPending(response.getString("RemovePersonFromPending"));
-                  } catch (JSONException e) {
-                      e.printStackTrace();
-                  }
-              }
-
-              if(response.has("AddPersonToPending")){
-                  try {
-                      addPersonToPending(response.getString("AddPersonToPending"));
-                  } catch (JSONException e) {
-                      e.printStackTrace();
-                  }
-              }
-              if(response.has("Add_UpdateLocationMap")){
-                  try {
-                      if(response.getJSONObject("Add_UpdateLocationMap").getString("Successful").equals("True")){
-                          addUpdateLocationMap(response.getJSONObject("Add_UpdateLocationMap").getDouble("Latitude"),response.getJSONObject("Add_UpdateLocationMap").getDouble("Longitude"));
-                      }
-                  } catch (JSONException e) {
-                      e.printStackTrace();
-                  }
-              }
-            }
-        };
-        volleyErrorListener=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.v("VolleyError","Volley Error  Shop Activity "+error.toString());
-                errorText.setText("Connection To The Server Was Lost");
-                errorText.setVisibility(View.VISIBLE);
-            }
-        };
-
-        requestQueue= Volley.newRequestQueue(this);
         errorText =findViewById(R.id.ErrorTextView_ShopActivity);
         viewPager=findViewById(R.id.viewPagerShopMenu);
         customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
-        customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(), "ShopMenuFrag1");
-        customFragmentPagerAdapter.addFragment(new ShopMenuFrag2(), "ShopMenuFrag2");
+        customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(this), "ShopMenuFrag1");
+        customFragmentPagerAdapter.addFragment(new ShopMenuFrag2(this), "ShopMenuFrag2");
         viewPager.setAdapter(customFragmentPagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -202,14 +165,14 @@ public class ShopActivity extends AppCompatActivity {
         });
 
         fusedLocationProviderClient=new FusedLocationProviderClient(this);
-
+        getPendingList();
     }
 
     public static void setFirebaseUser(FirebaseUser fireBaseUser){
 
         firebaseUser=fireBaseUser;
    }
-    public static void findLocationUsingGPS(){
+    public void findLocationUsingGPS(){
 
         if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
@@ -251,7 +214,6 @@ public class ShopActivity extends AppCompatActivity {
 
             }}
 
-
     }
 
     @Override
@@ -271,22 +233,29 @@ public class ShopActivity extends AppCompatActivity {
             findLocationUsingGPS();
         }
     }
-   void addUpdateLocationMap(double Latitude, double Longitude){
-      ///i might show the map here or use gcoder to show the user where we put the point
-       Toast.makeText(this, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
-   }
 
-    static void serverAddUpdateLocationMap(double Latitude, double Longitude){
+  static void addUpdateLocationMapSuccessful(Context mContext,double Latitude, double Longitude){
+      ///i might show the map here or use gcoder to show the user where we put the point
+       Toast.makeText(mContext, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
+   }
+   void serverAddUpdateLocationMap(final double Latitude, final double Longitude){
         Map<String,Object> map=new HashMap<>();
-        map.put("Request","Add_UpdateLocationMap");
         map.put("Latitude",Latitude);
         map.put("Longitude",Longitude);
 
-        JSONObject data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,URL, data, volleyListener, volleyErrorListener);
-        requestQueue.add(jsonObjectRequest);
-
-
+       firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+           @Override
+           public void onComplete(@NonNull Task<Void> task) {
+               if(task.isSuccessful()){
+                   addUpdateLocationMapSuccessful(mContext,Latitude,Longitude);
+               }
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception e) {
+            notSuccessful("Failed to update location info");
+           }
+       });
      }
 
     @Override
@@ -300,22 +269,34 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    public static void removePersonFromPending(String PersonNameToRemove){
-        pendingList.remove(PersonNameToRemove);
+    public static void removePersonFromPending(ClientPending personToRemove){
+        pendingList.remove(personToRemove);
        ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
 
     }
-    public static void serverRemovePersonFromPending(String PersonNameToRemove){
-        Map<String,Object> map=new HashMap<>();
-        map.put("Request", "RemovePersonFromPending");
-        map.put("PersonName",PersonNameToRemove);
-        map.put("ShopName", shopName);
-        JSONObject data=new JSONObject(map);
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(URL, data, volleyListener, volleyErrorListener);
-        requestQueue.add(jsonObjectRequest);
+    public static void serverRemovePersonFromPending(final ClientPending personToRemove){
+        String personToRemoveUidOnFirestore;
+        if(!personToRemove.getClientFirebaseUid().equals("null")){//means added from client phone(client app)
+            personToRemoveUidOnFirestore=personToRemove.getClientFirebaseUid();
+        }else{//means added from shop owner phone (business app)
+             personToRemoveUidOnFirestore=personToRemove.getClientFakeFirebaseUid();
+        }
+       firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").document(personToRemoveUidOnFirestore).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+           @Override
+           public void onComplete(@NonNull Task<Void> task) {
+               if(task.isSuccessful()){
+                   removePersonFromPending(personToRemove);
+               }
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception e) {
+               Log.v("MyFirebase","Could not delete person from pending");
+           }
+       });
     }
-    public void addPersonToPending(String PersonName){
-        pendingList.add(PersonName);
+    public void addPersonToPending(ClientPending personToAdd){
+        pendingList.add(personToAdd);
         ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
     }
     public void serverAddPersonToPending(){
@@ -328,14 +309,28 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 EditText personToAdd= dialogView.findViewById(R.id.editText);
-                String PersonName=personToAdd.getText().toString();
+                final String PersonName=personToAdd.getText().toString();
+                final String clientFakeFirebaseUid=UUID.randomUUID().toString();
                 Map<String,Object> map=new HashMap<>();
-                map.put("Request","AddPersonToPending");
+               //we may want to add want kind of service this client
                 map.put("PersonName", PersonName);
-                map.put("ShopName", shopName);//this could be removed cause will have to send a token
-                JSONObject Data=new JSONObject(map);
-                JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(URL, Data, volleyListener, volleyErrorListener);
-                requestQueue.add(jsonObjectRequest);
+                map.put("ClientFakeFirebaseUid",clientFakeFirebaseUid);
+                map.put("ClientFireBaseUid","null");
+                map.put("Services","null");
+
+                firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").document(clientFakeFirebaseUid).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            addPersonToPending(new ClientPending(PersonName,null,"N/A",clientFakeFirebaseUid));
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    notSuccessful("Couldn't add "+PersonName+" to the list of pending people");
+                    }
+                });
             }
         });
 
@@ -343,7 +338,26 @@ public class ShopActivity extends AppCompatActivity {
         alertDialog.show();
 
     }
-   
+   private void getPendingList(){
+        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    List<DocumentSnapshot> clientsPendingList=task.getResult().getDocuments();
+                    pendingList.clear();
+                    for(int i=0;i<clientsPendingList.size();i++){
+                        pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
+                    }
+                    ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                notSuccessful("Couldn't get clients pending");
+            }
+        });
+   }
     void updateShopInfo(){
 
             Map<String,Object> map=new HashMap<>();
@@ -389,5 +403,9 @@ public class ShopActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+    }
+    private void notSuccessful(String message){
+        errorText.setText(message);
+        errorText.setVisibility(View.VISIBLE);
     }
 }

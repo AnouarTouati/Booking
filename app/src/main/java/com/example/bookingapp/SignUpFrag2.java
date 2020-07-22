@@ -93,8 +93,8 @@ if(!someThingWentWrong){
     ((SignUpActivity)getActivity()).isEmployee=isEmployee;
     ((SignUpActivity)getActivity()).isBusinessOwner=isBusinessOwner;
     ((SignUpActivity)getActivity()).turnOnProgressBar();
-    SignUpActivity.sendToServerToCheckAndRegister(2);
-   // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(2);
+
+    ((SignUpActivity)getActivity()).setCurrentItemViewPager(2);
 }
 
     }

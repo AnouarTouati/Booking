@@ -1,12 +1,16 @@
 package com.example.bookingapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.util.Base64;
+
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
 
@@ -19,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public  class CommonMethods {
 
@@ -90,5 +95,14 @@ public  class CommonMethods {
 
             return emptyJSONObject.toString();
         }
+    }
+
+   public static void successfulSignIn(Context mContext, FirebaseUser firebaseUser, AppCompatActivity callingClass){
+
+        Intent goToShopActivityIntent=new Intent(mContext,ShopActivity.class);
+        goToShopActivityIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        ShopActivity.setFirebaseUser(firebaseUser);
+        mContext.startActivity(goToShopActivityIntent);
+        callingClass.finish();
     }
 }

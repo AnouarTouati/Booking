@@ -109,8 +109,8 @@ public class SignUpFrag4 extends Fragment {
             ((com.example.bookingapp.SignUpActivity)getActivity()).facebookLink = facebookLink;
             ((com.example.bookingapp.SignUpActivity)getActivity()).instagramLink = instagramLink;
             ((com.example.bookingapp.SignUpActivity)getActivity()).turnOnProgressBar();
-             com.example.bookingapp.SignUpActivity.sendToServerToCheckAndRegister(4);
-         //   ((SignUpActivity)getActivity()).SetCurrentItemViewPager(4);
+
+            ((SignUpActivity)getActivity()).setCurrentItemViewPager(4);
 
         }
     }

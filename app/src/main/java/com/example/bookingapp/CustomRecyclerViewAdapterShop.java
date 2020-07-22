@@ -15,10 +15,10 @@ import java.util.ArrayList;
 
 public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRecyclerViewAdapterShop.ViewHolder> {
 
-    ArrayList<String> peoplePending =new ArrayList<>();
+    ArrayList<ClientPending> peoplePending =new ArrayList<>();
     Context mContext;
 
-    public CustomRecyclerViewAdapterShop(Context context, ArrayList<String> PeoplePending) {
+    public CustomRecyclerViewAdapterShop(Context context, ArrayList<ClientPending> PeoplePending) {
         this.peoplePending =PeoplePending;
         this.mContext=context;
     }
@@ -34,7 +34,7 @@ public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRe
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         final int t=i;
-           viewHolder.personNameTextView.setText(peoplePending.get(i));
+           viewHolder.personNameTextView.setText(peoplePending.get(i).getClientName());
            viewHolder.deletePersonButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {

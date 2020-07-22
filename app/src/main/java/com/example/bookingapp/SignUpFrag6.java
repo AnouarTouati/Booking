@@ -108,7 +108,6 @@ public class SignUpFrag6 extends Fragment {
         ((SignUpActivity)getActivity()).friday =spinnerList.get(24).getSelectedItem().toString()+spinnerList.get(25).getSelectedItem().toString()+spinnerList.get(26).getSelectedItem().toString()+spinnerList.get(27).getSelectedItem().toString();
 
 
-       // ((SignUpActivity)getActivity()).SetCurrentItemViewPager(6);
-       ((SignUpActivity)getActivity()).createAccount();
+       ((SignUpActivity)getActivity()).continueSignUp();
     }
 }

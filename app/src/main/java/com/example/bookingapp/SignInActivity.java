@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,10 +23,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,13 +38,9 @@ import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity {
-
-    RequestQueue requestQueue;
-    Response.Listener<JSONObject> volleyListener;
-    Response.ErrorListener volleyErrorListener;
-    final String SIGN_IN_URL ="http://192.168.43.139:8888/Business.php";
 
     TextView diamondText;
     ImageView diamondImage;
@@ -52,17 +53,11 @@ public class SignInActivity extends AppCompatActivity {
     TextView errorText;
     ProgressBar progressBar;
 
-    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        mAuth=FirebaseAuth.getInstance();
-        FirebaseUser firebaseUser=mAuth.getCurrentUser();
-        if(firebaseUser!=null){
-            successfulSignIn(firebaseUser);
-        }
-
         signUpQuestion=findViewById(R.id.signUpQuestion);
         signUpQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +66,6 @@ public class SignInActivity extends AppCompatActivity {
                 startActivityForResult(goToSignUpActivity, CommonMethods.KILL_ACTIVITY_REQ);
             }
         });
-
 
 
         diamondImage =findViewById(R.id.diamondImageView);
@@ -87,50 +81,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        volleyListener=new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.v("VolleyReceived","Volley Received SignIn Activity "+response.toString());
-           /*    if(response.has("SignIn")){
-                    try {
-                        if(response.getJSONObject("SignIn").getString("Successful").equals("True")){
-                            successfulSignIn(response.getJSONObject("SignIn").getString("Token"));
-                        }else if(response.getJSONObject("SignIn").getString("Successful").equals("False")){
-                            notSuccessful();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
-                }*/
-            }
-        };
-        volleyErrorListener=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.v("VolleyError","Volley Error  SignIn Activity "+error.toString());
-
-
-                if(error.networkResponse==null){
-
-                    errorText.setText("Couldn't Reach The Server Please Check Your Internet Connection");
-                    errorText.setVisibility(View.VISIBLE);
-
-
-                }
-                else{
-                    Log.v("VolleyError","VolleyError in SignUpActivity "+error.toString());
-
-                    errorText.setText("Connection Timed Out");
-                    errorText.setVisibility(View.VISIBLE);
-
-
-                }
-
-                turnOffProgressBar();
-            }
-        };
-        requestQueue= Volley.newRequestQueue(this);
         emailAddressEditText=findViewById(R.id.signInEmail);
         passwordEditText=findViewById(R.id.signInPassword);
 
@@ -181,38 +132,48 @@ public class SignInActivity extends AppCompatActivity {
         password=passwordEditText.getText().toString();
 
 
-        Map<String,Object> map=new HashMap<>();
-        map.put("Request","SignIn");
-        map.put("EmailAddress", email);
-        map.put("Password",password);
-
-        JSONObject data=new JSONObject(map);
-
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, SIGN_IN_URL, data, volleyListener, volleyErrorListener);
-      //  requestQueue.add(request);
-        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    successfulSignIn(task.getResult().getUser());
-                }else{
-                    notSuccessful();
+                   CommonMethods.successfulSignIn(getApplicationContext(),task.getResult().getUser(),SignInActivity.this);
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw Objects.requireNonNull(e);
+
+                }
+                catch (FirebaseAuthException ee){
+
+                    switch (ee.getErrorCode()){
+
+                        case  "ERROR_USER_DISABLED"  : Toast.makeText(getApplicationContext(),"Your account has been disabled",Toast.LENGTH_LONG).show(); notSuccessful("Your account has been disabled");break;
+                        case  "ERROR_USER_NOT_FOUND" : Toast.makeText(getApplicationContext(),"This account doesn't exist",Toast.LENGTH_LONG).show();notSuccessful("This account doesn't exist");break;
+                        case  "ERROR_WRONG_PASSWORD" : Toast.makeText(getApplicationContext(),"Invalid Password",Toast.LENGTH_LONG).show();notSuccessful("Invalid Password");break;
+                        default: Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
+                            Log.v("MyFirebase",e.getMessage() +" the  cause is "+e.getCause() );notSuccessful("Something went wrong and we couldn't sign you in");break;
+
+                    }
+                }
+                catch (Exception ee) {
+
+                    Log.v("MyFirebase",ee.getMessage() +" the  cause is "+ee.getCause() );
+                    Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
+                    notSuccessful("Something went wrong and we couldn't sign you in");
+                }
+
             }
         });
         turnOnProgressBar();
     }
 
-    void successfulSignIn(FirebaseUser firebaseUser){
 
-        Intent goToShopActivityIntent=new Intent(this, ShopActivity.class);
-        ShopActivity.setFirebaseUser(firebaseUser);
-        startActivity(goToShopActivityIntent);
-        finish();
-    }
-    void notSuccessful(){
+    void notSuccessful(String message){
         turnOffProgressBar();
-        errorText.setText("Email Address or Password is Incorrect");
+        errorText.setText(message);
         errorText.setVisibility(View.VISIBLE);
 
     }
