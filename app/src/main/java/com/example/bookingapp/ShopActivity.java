@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class ShopActivity extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     TextView errorText;
+    ProgressBar progressBar;
 
     public String emailAddress;
     public String password;
@@ -109,12 +111,13 @@ public class ShopActivity extends AppCompatActivity {
     private static FirebaseFirestore firebaseFirestore;
     private static FirebaseStorage firebaseStorage;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
         mContext=this;
+
+        progressBar=findViewById(R.id.progressBarShopActivity);
 
         if(firebaseUser ==null){
             Intent goBACKtoSignInActivity=new Intent(this,SignInActivity.class);
@@ -165,7 +168,7 @@ public class ShopActivity extends AppCompatActivity {
         });
 
         fusedLocationProviderClient=new FusedLocationProviderClient(this);
-        getPendingList();
+
     }
 
     public static void setFirebaseUser(FirebaseUser fireBaseUser){
@@ -195,8 +198,7 @@ public class ShopActivity extends AppCompatActivity {
                 alertBuilder.show();
 
             }else{
-
-                Toast.makeText(mContext, "GRANTED", Toast.LENGTH_LONG).show();
+                
                 LocationRequest locationRequest=new LocationRequest();
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 locationRequest.setExpirationDuration(40000);
@@ -211,7 +213,7 @@ public class ShopActivity extends AppCompatActivity {
                     }
                 };
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
-
+                turnOnProgressBar();
             }}
 
     }
@@ -234,11 +236,13 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-  static void addUpdateLocationMapSuccessful(Context mContext,double Latitude, double Longitude){
+   void addUpdateLocationMapSuccessful(Context mContext,double Latitude, double Longitude){
       ///i might show the map here or use gcoder to show the user where we put the point
        Toast.makeText(mContext, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
+       turnOffProgressBar();
    }
    void serverAddUpdateLocationMap(final double Latitude, final double Longitude){
+       turnOnProgressBar();
         Map<String,Object> map=new HashMap<>();
         map.put("Latitude",Latitude);
         map.put("Longitude",Longitude);
@@ -269,12 +273,14 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    public static void removePersonFromPending(ClientPending personToRemove){
+    public  void removePersonFromPending(ClientPending personToRemove){
         pendingList.remove(personToRemove);
-       ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+        ((ShopMenuFrag1) customFragmentPagerAdapter.getItem(0)).customRecyclerViewAdapterShop.notifyDataSetChanged();
+       turnOffProgressBar();
 
     }
-    public static void serverRemovePersonFromPending(final ClientPending personToRemove){
+    public  void serverRemovePersonFromPending(final ClientPending personToRemove){
+        turnOnProgressBar();
         String personToRemoveUidOnFirestore;
         if(!personToRemove.getClientFirebaseUid().equals("null")){//means added from client phone(client app)
             personToRemoveUidOnFirestore=personToRemove.getClientFirebaseUid();
@@ -292,12 +298,14 @@ public class ShopActivity extends AppCompatActivity {
            @Override
            public void onFailure(@NonNull Exception e) {
                Log.v("MyFirebase","Could not delete person from pending");
+               notSuccessful("Could not delete person from pending");
            }
        });
     }
     public void addPersonToPending(ClientPending personToAdd){
         pendingList.add(personToAdd);
-        ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+        ((ShopMenuFrag1) customFragmentPagerAdapter.getItem(0)).customRecyclerViewAdapterShop.notifyDataSetChanged();
+       turnOffProgressBar();
     }
     public void serverAddPersonToPending(){
         final AlertDialog.Builder alertBuilder=new AlertDialog.Builder(this);
@@ -308,6 +316,7 @@ public class ShopActivity extends AppCompatActivity {
         alertBuilder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                turnOnProgressBar();
                 EditText personToAdd= dialogView.findViewById(R.id.editText);
                 final String PersonName=personToAdd.getText().toString();
                 final String clientFakeFirebaseUid=UUID.randomUUID().toString();
@@ -322,7 +331,7 @@ public class ShopActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            addPersonToPending(new ClientPending(PersonName,null,"N/A",clientFakeFirebaseUid));
+                            addPersonToPending(new ClientPending(PersonName,"null","N/A",clientFakeFirebaseUid));
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -338,7 +347,8 @@ public class ShopActivity extends AppCompatActivity {
         alertDialog.show();
 
     }
-   private void getPendingList(){
+   public void getPendingList(final ShopMenuFrag1 shopMenuFrag1){
+        turnOnProgressBar();
         firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -348,7 +358,8 @@ public class ShopActivity extends AppCompatActivity {
                     for(int i=0;i<clientsPendingList.size();i++){
                         pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
                     }
-                    ShopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+                    shopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+                    turnOffProgressBar();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -407,5 +418,16 @@ public class ShopActivity extends AppCompatActivity {
     private void notSuccessful(String message){
         errorText.setText(message);
         errorText.setVisibility(View.VISIBLE);
+        turnOffProgressBar();
+    }
+    void turnOnProgressBar(){
+        tabLayout.setVisibility(View.GONE);
+        viewPager.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+    void turnOffProgressBar(){
+        tabLayout.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
     }
 }
