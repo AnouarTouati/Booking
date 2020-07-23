@@ -17,10 +17,12 @@ public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRe
 
     ArrayList<ClientPending> peoplePending =new ArrayList<>();
     Context mContext;
+    ShopActivity shopActivityReference;
 
-    public CustomRecyclerViewAdapterShop(Context context, ArrayList<ClientPending> PeoplePending) {
+    public CustomRecyclerViewAdapterShop(Context context, ArrayList<ClientPending> PeoplePending,ShopActivity shopActivityReference) {
         this.peoplePending =PeoplePending;
         this.mContext=context;
+        this.shopActivityReference=shopActivityReference;
     }
 
     @NonNull
@@ -38,7 +40,7 @@ public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRe
            viewHolder.deletePersonButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
-             ShopMenuFrag1.removePersonFromPending(peoplePending.get(t));
+             shopActivityReference.serverRemovePersonFromPending(peoplePending.get(t));
                }
            });
     }

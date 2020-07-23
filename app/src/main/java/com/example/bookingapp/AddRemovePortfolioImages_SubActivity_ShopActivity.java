@@ -14,13 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,27 +51,32 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     CustomRecyclerVAdapterPortfolioImages customRecyclerVAdapterPortfolioImages;
     RecyclerView portfolioImagesRecyclerView;
 
-    Button addImages;
+    Button addImagesButton;
 
    static FirebaseStorage firebaseStorage;
    static FirebaseUser firebaseUser;
    static FirebaseFirestore firebaseFirestore;
+
+   ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_remove_portfolio_images__sub__shop);
 
+
         firebaseStorage = FirebaseStorage.getInstance();
         firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore=FirebaseFirestore.getInstance();
 
+        progressBar=findViewById(R.id.progressBarAddRemoveImageActivity);
 
         customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this,this);
         portfolioImagesRecyclerView = findViewById(R.id.RecyclerView_PortfolioImages);
         portfolioImagesRecyclerView.setAdapter(customRecyclerVAdapterPortfolioImages);
         portfolioImagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        addImages = findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
-        addImages.setOnClickListener(new View.OnClickListener() {
+        addImagesButton = findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
+        addImagesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getImages();
@@ -134,15 +134,16 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     void updateTheRecyclerView() {
         customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this,this);
         portfolioImagesRecyclerView.swapAdapter(customRecyclerVAdapterPortfolioImages, true);
+        turnOFFProgressBar();
     }
 
     public  void removeImageFromServer(int Index) {
-
+      turnOnProgressBar();
       final StorageReference imageReference=firebaseStorage.getReference(portfolioImagesReferences.get(Index));
       imageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
           @Override
           public void onSuccess(Void aVoid) {
-              firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("ImagesPathsInFireStorage",FieldValue.arrayRemove(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
+              firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage",FieldValue.arrayRemove(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
                   @Override
                   public void onSuccess(Void aVoid) {
                       getPortfolioImagesReferencesFromServer();
@@ -153,7 +154,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     }
 
     public void pushImageToServer(final Bitmap ImageToBePushed) {
-
+        turnOnProgressBar();
         StorageReference storageReference=firebaseStorage.getReference();
         final StorageReference imageReference =storageReference.child("Photos/"+firebaseUser.getUid()+"/"+UUID.randomUUID()+".JPEG");
         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
@@ -180,6 +181,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.v("MyFirebase","failed  to upload image");
+                turnOFFProgressBar();
             }
         });
 
@@ -323,6 +325,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
         } catch (JSONException e) {
             Log.v("LoadFromCache", "Error parsing JSON in ShopDetailsActivity loadLocalData function");
             e.printStackTrace();
+            turnOFFProgressBar();
         }
     }
 
@@ -352,6 +355,7 @@ Log.v("MyFirebase","Requesting image from server");
     }
 
     void getPortfolioImagesReferencesFromServer() {
+        turnOnProgressBar();
     //should get only the field PhotosPathsInFireStorage
     firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
         @Override
@@ -368,6 +372,7 @@ Log.v("MyFirebase","Requesting image from server");
         @Override
         public void onFailure(@NonNull Exception e) {
             Log.v("MyFirebase","FAILED TO get shop data");
+            turnOFFProgressBar();
         }
     });
 
@@ -382,6 +387,16 @@ Log.v("MyFirebase","Requesting image from server");
         writeNewShopDataToLocalMemory(Data);
         updateTheRecyclerView();
 
+    }
+    void turnOnProgressBar(){
+        addImagesButton.setVisibility(View.GONE);
+        portfolioImagesRecyclerView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+    void turnOFFProgressBar(){
+        addImagesButton.setVisibility(View.VISIBLE);
+        portfolioImagesRecyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
     }
 
 }

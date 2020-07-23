@@ -122,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
         errorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
         errorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
         errorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        progressBar=findViewById(R.id.progressBarSignUp);
+        progressBar=findViewById(R.id.progressBarSignUpActivity);
         signUpErrorText=findViewById(R.id.signUpErrorText);
         signUpSuccessfulText=findViewById(R.id.signUpSuccessfulText);
         retryButton=findViewById(R.id.retrySignUp);

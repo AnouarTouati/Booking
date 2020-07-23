@@ -17,7 +17,7 @@ public class ShopMenuFrag1 extends Fragment {
     EditText passwordEditText;
     Button signInButton;
     RecyclerView peoplePendingRecyclerView;
-    static CustomRecyclerViewAdapterShop customRecyclerViewAdapterShop;
+    public CustomRecyclerViewAdapterShop customRecyclerViewAdapterShop;
     ShopActivity shopActivityReference;
 
    public ShopMenuFrag1(ShopActivity shopActivityReference){
@@ -35,21 +35,19 @@ public class ShopMenuFrag1 extends Fragment {
         addPerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((ShopActivity)getActivity()).serverAddPersonToPending();
+              shopActivityReference.serverAddPersonToPending();
             }
         });
         peoplePendingRecyclerView=view.findViewById(R.id.peoplePendingRecyclerView);
 
-        customRecyclerViewAdapterShop =new CustomRecyclerViewAdapterShop(getActivity(),  ((ShopActivity)getActivity()).pendingList);
+        customRecyclerViewAdapterShop =new CustomRecyclerViewAdapterShop(getActivity(),  shopActivityReference.pendingList,shopActivityReference);
         peoplePendingRecyclerView.setAdapter(customRecyclerViewAdapterShop);
         peoplePendingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        shopActivityReference.getPendingList(this);
 
         return view;
     }
 
-    static void removePersonFromPending(ClientPending personToRemove){
-        ShopActivity.serverRemovePersonFromPending(personToRemove);
-
-    }
 
 }
