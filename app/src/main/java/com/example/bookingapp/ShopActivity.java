@@ -244,8 +244,8 @@ public class ShopActivity extends AppCompatActivity {
    void serverAddUpdateLocationMap(final double Latitude, final double Longitude){
        turnOnProgressBar();
         Map<String,Object> map=new HashMap<>();
-        map.put("Latitude",Latitude);
-        map.put("Longitude",Longitude);
+        map.put("ShopLatitude",Latitude);
+        map.put("ShopLongitude",Longitude);
 
        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
            @Override
@@ -357,7 +357,7 @@ public class ShopActivity extends AppCompatActivity {
                     pendingList.clear();
                     for(int i=0;i<clientsPendingList.size();i++){
                         pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
-                    }
+                }
                     shopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
                     turnOffProgressBar();
                 }
