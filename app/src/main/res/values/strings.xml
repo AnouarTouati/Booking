@@ -5,4 +5,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Dont_have_an_account_yet_Sign_up_here">Don\'t have an account yet? <u>Sign up here</u></string>
     <string name="SignIn">SignIn</string>
+    <string name="Hint_Service_Name_SignUp_Frag5">Service name</string>
+    <string name="Hint_Service_Duration_SignUp_Frag5">Service duration</string>
+    <string name="Hint_Service_Price_SignUp_Frag5">Service price in DZ</string>
+    <string name="Add">Add</string>
+    <string name="Finish">Finish</string>
+    <string name="Instructions_Frag5">Fill the fields for each service you provide and hit add, when you are done adding all your services hit Finish </string>
 </resources>

@@ -46,6 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -68,14 +69,9 @@ public class SignUpActivity extends AppCompatActivity {
     public static String shopPhoneNumber;
     public String facebookLink;
     public String instagramLink;
-    public Boolean coiffure =false;
-    public Boolean makeUp =false;
-    public Boolean meches =false;
-    public Boolean tinte =false;
-    public Boolean pedcure =false;
-    public Boolean manage =false;
-    public Boolean manicure =false;
-    public Boolean coupe =false;
+
+    public List<Service_Frag5> services=new ArrayList<>();
+
     public String saturday;
     public String sunday;
     public String monday;
@@ -190,6 +186,7 @@ public class SignUpActivity extends AppCompatActivity {
             }else{
 
                 Toast.makeText(this, "GRANTED", Toast.LENGTH_LONG).show();
+                turnOnProgressBar();
                 LocationRequest locationRequest=new LocationRequest();
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 locationRequest.setExpirationDuration(40000);
@@ -198,7 +195,7 @@ public class SignUpActivity extends AppCompatActivity {
                 LocationCallback locationCallback=new LocationCallback(){
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
-
+                         turnOffProgressBar();
                         saveTheCoordinatesAndFindAddress(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
 
                     }
@@ -320,6 +317,7 @@ public class SignUpActivity extends AppCompatActivity {
         map.put("MainShopPhotoReferenceInStorage","Photos/"+firebaseUser.getUid()+"/MainShopPhoto"+".JPEG");
     }
 
+        map.put("ShopUid", firebaseUser.getUid());
         map.put("EmailAddress", emailAddress);
         map.put("Password", password);
         map.put("FirstName", firstName);
@@ -335,16 +333,17 @@ public class SignUpActivity extends AppCompatActivity {
         map.put("IsMen", isMen);
        // map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));
         map.put("ShopPhoneNumber", shopPhoneNumber);
-        map.put("FacebookLink", facebookLink);
-        map.put("InstagramLink", instagramLink);
-        map.put("Coiffure", coiffure);
-        map.put("MakeUp", makeUp);
-        map.put("Meches", meches);
-        map.put("Tinte", tinte);
-        map.put("Pedcure", pedcure);
-        map.put("Manage", manage);
-        map.put("Manicure", manicure);
-        map.put("Coupe", coupe);
+       List<String> servicesName=new ArrayList<>();
+        List<String> servicesPrices=new  ArrayList<>();
+        List<String> servicesDurations=new ArrayList<>();
+        for(int i=0;i<services.size();i++){
+            servicesName.add(services.get(i).serviceName);
+            servicesPrices.add(services.get(i).servicePrice);
+            servicesDurations.add(services.get(i).serviceDuration);
+        }
+        map.put("ServicesHairCutsNames", servicesName);
+        map.put("ServicesHairCutsPrices", servicesPrices);
+        map.put("ServicesHairCutsDuration", servicesDurations);
         map.put("Saturday", saturday);
         map.put("Sunday", sunday);
         map.put("Monday", monday);
@@ -352,8 +351,6 @@ public class SignUpActivity extends AppCompatActivity {
         map.put("Wednesday", wednesday);
         map.put("Thursday", thursday);
         map.put("Friday", friday);
-
-
 
 
     firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -447,12 +444,14 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
       public void createAccount(){
+        turnOnProgressBar();
     mAuth.createUserWithEmailAndPassword(emailAddress,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
             if(task.isSuccessful()){
-            viewPagerSignUP.setCurrentItem(1);
-            firebaseUser=task.getResult().getUser();
+                turnOffProgressBar();
+                firebaseUser=task.getResult().getUser();
+                viewPagerSignUP.setCurrentItem(1);
             }
 
         }
@@ -510,7 +509,7 @@ public class SignUpActivity extends AppCompatActivity {
             findViewById(R.id.MainScrollView_Frag4).setVisibility(View.GONE);
         }
         else if(CallingFragmentIndex==4){
-            findViewById(R.id.MainScrollView_Frag5).setVisibility(View.GONE);
+            findViewById(R.id.MainConstraintLayout_Frag5).setVisibility(View.GONE);
         }
         else if(CallingFragmentIndex==5){
             findViewById(R.id.MainScrollView_Frag6).setVisibility(View.GONE);
@@ -541,7 +540,7 @@ public class SignUpActivity extends AppCompatActivity {
             findViewById(R.id.MainScrollView_Frag4).setVisibility(View.VISIBLE);
         }
         else if(CallingFragmentIndex==4){
-            findViewById(R.id.MainScrollView_Frag5).setVisibility(View.VISIBLE);
+            findViewById(R.id.MainConstraintLayout_Frag5).setVisibility(View.VISIBLE);
         }
         else if(CallingFragmentIndex==5){
             findViewById(R.id.MainScrollView_Frag6).setVisibility(View.VISIBLE);

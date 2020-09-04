@@ -90,11 +90,11 @@ public class SignUpFrag6 extends Fragment {
             spinnerIndexInMorningAdapterList++;
 
         }
-                for(int i=2;i<spinnerList.size();i=i+4){
-                    ArrayAdapter<String> spinnerAdapteer=new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item, eveningList);
-                    spinnerList.get(i).setAdapter(spinnerAdapteer);
-                    spinnerList.get(i+1).setAdapter(spinnerAdapteer);
-                }
+        for(int i=2;i<spinnerList.size();i=i+4){
+            ArrayAdapter<String> spinnerAdapteer=new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item, eveningList);
+            spinnerList.get(i).setAdapter(spinnerAdapteer);
+            spinnerList.get(i+1).setAdapter(spinnerAdapteer);
+        }
         return view;
     }
 

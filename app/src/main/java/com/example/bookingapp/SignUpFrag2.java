@@ -92,7 +92,6 @@ if(!someThingWentWrong){
     //if we came here from facebook and email is not available we should send email address to SignUpActivity
     ((SignUpActivity)getActivity()).isEmployee=isEmployee;
     ((SignUpActivity)getActivity()).isBusinessOwner=isBusinessOwner;
-    ((SignUpActivity)getActivity()).turnOnProgressBar();
 
     ((SignUpActivity)getActivity()).setCurrentItemViewPager(2);
 }

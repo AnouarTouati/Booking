@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,25 +17,38 @@ import java.util.List;
 public class SignUpFrag5 extends Fragment {
 
     View view;
-    List<CheckBox> checkBoxList=new ArrayList<>();
+    EditText serviceNameEditText,serviceDurationEditText,servicePriceEditText;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         view=inflater.inflate(R.layout.signupfrag5_layout, container,false);
 
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox1));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox1));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox2));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox3));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox4));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox5));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox6));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox7));
-        checkBoxList.add((CheckBox) view.findViewById(R.id.checkBox8));
+        serviceNameEditText=view.findViewById(R.id.serviceName_Frag5);
+        serviceDurationEditText=view.findViewById(R.id.serviceDuration);
+        servicePriceEditText=view.findViewById(R.id.servicePrice);
 
-        Button submit=view.findViewById(R.id.submitFrag5);
-        submit.setOnClickListener(new View.OnClickListener() {
+         Button addButton=view.findViewById(R.id.addButton_Frag5);
+         addButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+             if(!serviceNameEditText.getText().toString().equals("") &&
+                     !serviceDurationEditText.getText().toString().equals("") &&
+                     !servicePriceEditText.getText().toString().equals(""))
+             {
+                 Service_Frag5 service=new Service_Frag5(serviceNameEditText.getText().toString(),
+                         servicePriceEditText.getText().toString(),
+                         serviceDurationEditText.getText().toString());
+                 ((SignUpActivity)getActivity()).services.add(service);
+                 serviceNameEditText.getText().clear();
+                 serviceDurationEditText.getText().clear();
+                 servicePriceEditText.getText().clear();
+             }
+             }
+         });
+        Button finishButton=view.findViewById(R.id.finishButton_Frag5);
+        finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 doneFillingFieldsGoNextFrag();
@@ -44,16 +58,6 @@ public class SignUpFrag5 extends Fragment {
         return view;
     }
     void doneFillingFieldsGoNextFrag(){
-
-        ((SignUpActivity)getActivity()).coiffure =checkBoxList.get(0).isChecked();
-        ((SignUpActivity)getActivity()).makeUp =checkBoxList.get(1).isChecked();
-        ((SignUpActivity)getActivity()).meches =checkBoxList.get(2).isChecked();
-        ((SignUpActivity)getActivity()).tinte =checkBoxList.get(3).isChecked();
-        ((SignUpActivity)getActivity()).pedcure =checkBoxList.get(4).isChecked();
-        ((SignUpActivity)getActivity()).manage =checkBoxList.get(5).isChecked();
-        ((SignUpActivity)getActivity()).manicure =checkBoxList.get(6).isChecked();
-        ((SignUpActivity)getActivity()).coupe =checkBoxList.get(7).isChecked();
-
         ((SignUpActivity)getActivity()).setCurrentItemViewPager(5);
     }
 }
