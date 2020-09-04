@@ -65,7 +65,6 @@ public class SignUpFrag1 extends Fragment {
         if(!SomethingWentWrong){
             ((SignUpActivity)getActivity()).emailAddress = emailAddress;
             ((SignUpActivity)getActivity()).password = password;
-            ((SignUpActivity)getActivity()).turnOnProgressBar();
 
           ((SignUpActivity)getActivity()).createAccount();
         }

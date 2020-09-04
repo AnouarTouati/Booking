@@ -364,6 +364,7 @@ Log.v("MyFirebase","Requesting image from server");
               final ArrayList<String> imagesPathsInFireStorage=(ArrayList<String>) documentSnapshot.get("PhotosPathsInFireStorage");
             imagesReferencesFromServer.clear();
             imagesReferencesFromServer=imagesPathsInFireStorage;
+            turnOFFProgressBar();
             Log.v("MyFirebase","got shop data with success "+imagesReferencesFromServer);
             loadLocalData("Shop");
 
