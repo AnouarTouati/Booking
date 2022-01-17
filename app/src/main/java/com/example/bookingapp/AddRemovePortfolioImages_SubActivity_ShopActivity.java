@@ -8,9 +8,12 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -53,11 +56,11 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
 
     Button addImagesButton;
 
-   static FirebaseStorage firebaseStorage;
-   static FirebaseUser firebaseUser;
-   static FirebaseFirestore firebaseFirestore;
+    static FirebaseStorage firebaseStorage;
+    static FirebaseUser firebaseUser;
+    static FirebaseFirestore firebaseFirestore;
 
-   ProgressBar progressBar;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +69,12 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
 
 
         firebaseStorage = FirebaseStorage.getInstance();
-        firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
-        firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
-        progressBar=findViewById(R.id.progressBarAddRemoveImageActivity);
+        progressBar = findViewById(R.id.progressBarAddRemoveImageActivity);
 
-        customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this,this);
+        customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this, this);
         portfolioImagesRecyclerView = findViewById(R.id.RecyclerView_PortfolioImages);
         portfolioImagesRecyclerView.setAdapter(customRecyclerVAdapterPortfolioImages);
         portfolioImagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -108,7 +111,7 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                     Uri imageUri = data.getClipData().getItemAt(i).getUri();
                     try {
                         pushImageToServer(MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri));//the .getPath here is passes into UUID constructor
-                                                                                                                                // so we are sure there is different names for images on storage
+                        // so we are sure there is different names for images on storage
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -132,55 +135,55 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     }
 
     void updateTheRecyclerView() {
-        customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this,this);
+        customRecyclerVAdapterPortfolioImages = new CustomRecyclerVAdapterPortfolioImages(portfolioImages, this, this);
         portfolioImagesRecyclerView.swapAdapter(customRecyclerVAdapterPortfolioImages, true);
         turnOFFProgressBar();
     }
 
-    public  void removeImageFromServer(int Index) {
-      turnOnProgressBar();
-      final StorageReference imageReference=firebaseStorage.getReference(portfolioImagesReferences.get(Index));
-      imageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-          @Override
-          public void onSuccess(Void aVoid) {
-              firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage",FieldValue.arrayRemove(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
-                  @Override
-                  public void onSuccess(Void aVoid) {
-                      getPortfolioImagesReferencesFromServer();
-                  }
-              });
-          }
-      });
+    public void removeImageFromServer(int Index) {
+        turnOnProgressBar();
+        final StorageReference imageReference = firebaseStorage.getReference(portfolioImagesReferences.get(Index));
+        imageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage", FieldValue.arrayRemove(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        getPortfolioImagesReferencesFromServer();
+                    }
+                });
+            }
+        });
     }
 
     public void pushImageToServer(final Bitmap ImageToBePushed) {
         turnOnProgressBar();
-        StorageReference storageReference=firebaseStorage.getReference();
-        final StorageReference imageReference =storageReference.child("Photos/"+firebaseUser.getUid()+"/"+UUID.randomUUID()+".JPEG");
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        ImageToBePushed.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-        byte[] imageByte =byteArrayOutputStream.toByteArray();
+        StorageReference storageReference = firebaseStorage.getReference();
+        final StorageReference imageReference = storageReference.child("Photos/" + firebaseUser.getUid() + "/" + UUID.randomUUID() + ".JPEG");
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageToBePushed.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] imageByte = byteArrayOutputStream.toByteArray();
 
-        UploadTask uploadTask= imageReference.putBytes(imageByte);
+        UploadTask uploadTask = imageReference.putBytes(imageByte);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-            firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage", FieldValue.arrayUnion(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    portfolioImages.add(ImageToBePushed);
-                    portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(ImageToBePushed));
-                    portfolioImagesReferences.add(imageReference.getPath());
-                    saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-                }
-            });
-                Log.v("MyFirebase","successfully uploaded image");
+                firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update("PhotosPathsInFireStorage", FieldValue.arrayUnion(imageReference.getPath())).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        portfolioImages.add(ImageToBePushed);
+                        portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(ImageToBePushed));
+                        portfolioImagesReferences.add(imageReference.getPath());
+                        saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                    }
+                });
+                Log.v("MyFirebase", "successfully uploaded image");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.v("MyFirebase","failed  to upload image");
+                Log.v("MyFirebase", "failed  to upload image");
                 turnOFFProgressBar();
             }
         });
@@ -241,11 +244,11 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                         }
 
                         //find doublicate links and remove them
-                        for(int i =0;i<PortfolioImagesReferencesLocal.size();i++){
-                            for (int j=i+1;j<PortfolioImagesReferencesLocal.size();j++){
-                                if(PortfolioImagesReferencesLocal.get(i).equals(PortfolioImagesReferencesLocal.get(j))){
-                                  PortfolioImagesReferencesLocal.remove(PortfolioImagesReferencesLocal.get(j));
-                                  j--;
+                        for (int i = 0; i < PortfolioImagesReferencesLocal.size(); i++) {
+                            for (int j = i + 1; j < PortfolioImagesReferencesLocal.size(); j++) {
+                                if (PortfolioImagesReferencesLocal.get(i).equals(PortfolioImagesReferencesLocal.get(j))) {
+                                    PortfolioImagesReferencesLocal.remove(PortfolioImagesReferencesLocal.get(j));
+                                    j--;
                                 }
                             }
 
@@ -290,7 +293,6 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                         }
 
 
-
                     } else {
                         portfolioImagesReferencesToBeRequested.clear();
                         indexOfImageToReceiveNext = 0;
@@ -311,8 +313,8 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
                 } else {
                     portfolioImagesReferencesToBeRequested.clear();
                     indexOfImageToReceiveNext = 0;
-                    if(imagesReferencesFromServer!=null)
-                    portfolioImagesReferencesToBeRequested.addAll(imagesReferencesFromServer);
+                    if (imagesReferencesFromServer != null)
+                        portfolioImagesReferencesToBeRequested.addAll(imagesReferencesFromServer);
                     if (portfolioImagesReferencesToBeRequested.size() > 0) {
                         requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));//IndexOfImageToReceiveNext should equal zero at this stage
                     }
@@ -330,52 +332,52 @@ public class AddRemovePortfolioImages_SubActivity_ShopActivity extends AppCompat
     }
 
     void requestImage(final String ImageReference) {
-Log.v("MyFirebase","Requesting image from server");
-    StorageReference imageReference =firebaseStorage.getReference(ImageReference);
-    final long FOUR_MEGA_BYTES=4 * 1024*1024;
-    imageReference.getBytes(FOUR_MEGA_BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-        @Override
-        public void onSuccess(byte[] bytes) {
-            Bitmap response= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-            portfolioImages.add(response);
-            portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(response));
-            portfolioImagesReferences.add(ImageReference);
-            saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
-            indexOfImageToReceiveNext++;
-            if (indexOfImageToReceiveNext < portfolioImagesReferencesToBeRequested.size()) {
-                requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));
+        Log.v("MyFirebase", "Requesting image from server");
+        StorageReference imageReference = firebaseStorage.getReference(ImageReference);
+        final long FOUR_MEGA_BYTES = 4 * 1024 * 1024;
+        imageReference.getBytes(FOUR_MEGA_BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap response = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                portfolioImages.add(response);
+                portfolioImagesAsStrings.add(CommonMethods.convertBitmapToString(response));
+                portfolioImagesReferences.add(ImageReference);
+                saveUpdatedShopDataToMemoryAndNotifyPortfolioRecyclerView();
+                indexOfImageToReceiveNext++;
+                if (indexOfImageToReceiveNext < portfolioImagesReferencesToBeRequested.size()) {
+                    requestImage(portfolioImagesReferencesToBeRequested.get(indexOfImageToReceiveNext));
+                }
             }
-        }
-    }).addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
-        }
-    });
+            }
+        });
     }
 
     void getPortfolioImagesReferencesFromServer() {
         turnOnProgressBar();
-    //should get only the field PhotosPathsInFireStorage
-    firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-        @Override
-        public void onSuccess(DocumentSnapshot documentSnapshot) {
+        //should get only the field PhotosPathsInFireStorage
+        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-              final ArrayList<String> imagesPathsInFireStorage=(ArrayList<String>) documentSnapshot.get("PhotosPathsInFireStorage");
-            imagesReferencesFromServer.clear();
-            imagesReferencesFromServer=imagesPathsInFireStorage;
-            turnOFFProgressBar();
-            Log.v("MyFirebase","got shop data with success "+imagesReferencesFromServer);
-            loadLocalData("Shop");
+                final ArrayList<String> imagesPathsInFireStorage = (ArrayList<String>) documentSnapshot.get("PhotosPathsInFireStorage");
+                imagesReferencesFromServer.clear();
+                imagesReferencesFromServer = imagesPathsInFireStorage;
+                turnOFFProgressBar();
+                Log.v("MyFirebase", "got shop data with success " + imagesReferencesFromServer);
+                loadLocalData("Shop");
 
-        }
-    }).addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-            Log.v("MyFirebase","FAILED TO get shop data");
-            turnOFFProgressBar();
-        }
-    });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v("MyFirebase", "FAILED TO get shop data");
+                turnOFFProgressBar();
+            }
+        });
 
     }
 
@@ -389,12 +391,14 @@ Log.v("MyFirebase","Requesting image from server");
         updateTheRecyclerView();
 
     }
-    void turnOnProgressBar(){
+
+    void turnOnProgressBar() {
         addImagesButton.setVisibility(View.GONE);
         portfolioImagesRecyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
     }
-    void turnOFFProgressBar(){
+
+    void turnOFFProgressBar() {
         addImagesButton.setVisibility(View.VISIBLE);
         portfolioImagesRecyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
