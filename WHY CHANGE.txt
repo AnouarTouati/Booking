@@ -1,3 +1,0 @@
--add map to your store instead of using gps to find the address it self because
- the name we get are not exactly the same as the we use and we have to update the dropdowns
- then we have to find the ones that looks like each other(the names in the list of dropdown)
