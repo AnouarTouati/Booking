@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+
+import com.example.bookingapp.R;
 
 import java.util.ArrayList;
 import java.util.List;

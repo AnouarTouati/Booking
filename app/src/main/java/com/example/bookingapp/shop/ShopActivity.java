@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.shop;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,6 +12,10 @@ import android.os.Looper;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 
+import com.example.bookingapp.CommonMethods;
+import com.example.bookingapp.CustomFragmentPagerAdapter;
+import com.example.bookingapp.R;
+import com.example.bookingapp.SignInActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -29,11 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -44,14 +43,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class ShopActivity extends AppCompatActivity {
@@ -120,7 +117,7 @@ public class ShopActivity extends AppCompatActivity {
         progressBar=findViewById(R.id.progressBarShopActivity);
 
         if(firebaseUser ==null){
-            Intent goBACKtoSignInActivity=new Intent(this,SignInActivity.class);
+            Intent goBACKtoSignInActivity=new Intent(this, SignInActivity.class);
             startActivity(goBACKtoSignInActivity);
         }
          firebaseFirestore=FirebaseFirestore.getInstance();
@@ -221,6 +218,7 @@ public class ShopActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean granted = true;
         if (requestCode == LOCATION_REQ) {
             for (int i = 0; i < grantResults.length; i++) {
@@ -386,7 +384,7 @@ public class ShopActivity extends AppCompatActivity {
             map.put("ShopLatitude", shopLatitude);
             map.put("ShopLongitude", shopLongitude);
             map.put("IsMen", isMen);
-            map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
+          //  map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
             map.put("ShopPhoneNumber", shopPhoneNumber);
             map.put("FacebookLink", facebookLink);
             map.put("InstagramLink", instagramLink);

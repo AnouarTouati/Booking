@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.bookingapp.R;
 
 import java.io.IOException;
 
@@ -104,10 +106,10 @@ public class SignUpFrag4 extends Fragment {
 
         if(!somethingWentWrong){
 
-            ((com.example.bookingapp.SignUpActivity)getActivity()).selectedImage = selectedImage;
-            ((com.example.bookingapp.SignUpActivity)getActivity()).shopPhoneNumber = shopPhoneNumber;
-            ((com.example.bookingapp.SignUpActivity)getActivity()).facebookLink = facebookLink;
-            ((com.example.bookingapp.SignUpActivity)getActivity()).instagramLink = instagramLink;
+            ((SignUpActivity)getActivity()).selectedImage = selectedImage;
+            ((SignUpActivity)getActivity()).shopPhoneNumber = shopPhoneNumber;
+            ((SignUpActivity)getActivity()).facebookLink = facebookLink;
+            ((SignUpActivity)getActivity()).instagramLink = instagramLink;
 
             ((SignUpActivity)getActivity()).setCurrentItemViewPager(4);
 

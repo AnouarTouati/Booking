@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -8,11 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.bookingapp.R;
+import com.example.bookingapp.signup.Service_Frag5;
 
 public class SignUpFrag5 extends Fragment {
 

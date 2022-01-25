@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.shop;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.example.bookingapp.R;
+import com.example.bookingapp.shop.portfolio.Portfolio;
 
 public class ShopMenuFrag2 extends Fragment {
 
@@ -25,7 +28,7 @@ public class ShopMenuFrag2 extends Fragment {
         addPortfolioImagesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             Intent goToPortfolioImagesSubActivity=new Intent(getContext(),AddRemovePortfolioImages_SubActivity_ShopActivity.class);
+             Intent goToPortfolioImagesSubActivity=new Intent(getContext(), Portfolio.class);
              startActivity(goToPortfolioImagesSubActivity);
             }
         });

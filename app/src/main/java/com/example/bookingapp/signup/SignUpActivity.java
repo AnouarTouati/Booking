@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 
 import android.Manifest;
 import android.content.Context;
@@ -26,6 +26,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bookingapp.CustomFragmentPagerAdapter;
+import com.example.bookingapp.MainActivity;
+import com.example.bookingapp.R;
+import com.example.bookingapp.shop.ShopActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -88,7 +92,7 @@ public class SignUpActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
     TextView signUpErrorText;
     TextView signUpSuccessfulText;
-    CustomRecyclerViewAdapterSignUpErrors customRecyclerViewAdapterSignUpErrors;
+    CustomRecyclerAdapter customRecyclerAdapter;
     RecyclerView errorMessagesRecyclerView;
     ArrayList<String> errorsList =new ArrayList<>();
     Button retryButton;
@@ -114,9 +118,9 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
 
-        customRecyclerViewAdapterSignUpErrors=new CustomRecyclerViewAdapterSignUpErrors(errorsList);//initialized empty so we can just swap the adapter later
+        customRecyclerAdapter =new CustomRecyclerAdapter(errorsList);//initialized empty so we can just swap the adapter later
         errorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
-        errorMessagesRecyclerView.setAdapter(customRecyclerViewAdapterSignUpErrors);//
+        errorMessagesRecyclerView.setAdapter(customRecyclerAdapter);//
         errorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar=findViewById(R.id.progressBarSignUpActivity);
         signUpErrorText=findViewById(R.id.signUpErrorText);
@@ -133,7 +137,7 @@ public class SignUpActivity extends AppCompatActivity {
         goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
      @Override
      public void onClick(View view) {
-         Intent GoToShopActivityIntent=new Intent(mContext,ShopActivity.class);
+         Intent GoToShopActivityIntent=new Intent(mContext, ShopActivity.class);
          ShopActivity.setFirebaseUser(firebaseUser);
          mContext.startActivity(GoToShopActivityIntent);
          setResult(RESULT_OK,new Intent());//just to kill sign in activity
@@ -232,6 +236,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean granted = true;
         if (requestCode == LOCATION_REQ) {
             for (int i = 0; i < grantResults.length; i++) {
@@ -439,7 +444,7 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).delete();
         firebaseUser.delete();
         mAuth.signOut();
-        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
     }
 

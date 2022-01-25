@@ -25,10 +25,10 @@
         </activity>
 
         <activity android:name=".SignInActivity"/>
-        <activity android:name=".ShopActivity" />
-        <activity android:name=".SignUpActivity" />
+        <activity android:name=".shop.ShopActivity" />
+        <activity android:name=".signup.SignUpActivity" />
 
-        <activity android:name=".AddRemovePortfolioImages_SubActivity_ShopActivity"/>
+        <activity android:name=".shop.portfolio.Portfolio"/>
 
     </application>
 

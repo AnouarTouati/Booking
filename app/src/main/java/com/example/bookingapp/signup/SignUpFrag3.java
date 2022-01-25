@@ -1,5 +1,5 @@
 
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.example.bookingapp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

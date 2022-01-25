@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.signup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.bookingapp.R;
+
 import java.util.ArrayList;
 
-public class CustomRecyclerViewAdapterSignUpErrors extends RecyclerView.Adapter<CustomRecyclerViewAdapterSignUpErrors.ViewHolder> {
+public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder> {
     ArrayList<String> errorsMessagesList =new ArrayList<>();
 
-    public CustomRecyclerViewAdapterSignUpErrors(ArrayList<String> errorsMessagesList) {
+    public CustomRecyclerAdapter(ArrayList<String> errorsMessagesList) {
         this.errorsMessagesList = errorsMessagesList;
     }
 

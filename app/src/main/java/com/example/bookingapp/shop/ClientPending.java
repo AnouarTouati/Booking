@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.shop;
 
 class ClientPending {
     private String clientName;

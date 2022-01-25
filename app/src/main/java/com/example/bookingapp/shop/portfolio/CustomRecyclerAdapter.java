@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.bookingapp.shop.portfolio;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,14 +10,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.example.bookingapp.R;
+
 import java.util.ArrayList;
 
-public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<CustomRecyclerVAdapterPortfolioImages.ViewHolder> {
+public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder> {
 
     ArrayList<Bitmap> portfolioImages =new ArrayList<>();
     Context mContext;
-    AddRemovePortfolioImages_SubActivity_ShopActivity parentActivity;
-    public CustomRecyclerVAdapterPortfolioImages(ArrayList<Bitmap> portfolioImages, Context mContext,AddRemovePortfolioImages_SubActivity_ShopActivity parentActivity) {
+    Portfolio parentActivity;
+    public CustomRecyclerAdapter(ArrayList<Bitmap> portfolioImages, Context mContext, Portfolio parentActivity) {
         this.portfolioImages = portfolioImages;
         this.mContext=mContext;
         this.parentActivity=parentActivity;
@@ -37,7 +39,7 @@ public class CustomRecyclerVAdapterPortfolioImages extends RecyclerView.Adapter<
             viewHolder.deletePortfolioImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                  //  AddRemovePortfolioImages_SubActivity_ShopActivity.removeImageFromServer(i);
+                  //  Portfolio.removeImageFromServer(i);
                     parentActivity.removeImageFromServer(i);
                 }
             });

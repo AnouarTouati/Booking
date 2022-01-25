@@ -1,19 +1,14 @@
 package com.example.bookingapp;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
-import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.android.volley.Response;
+import com.example.bookingapp.signup.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
              signUpButton.setOnClickListener(new View.OnClickListener() {
                  @Override
                  public void onClick(View view) {
-                     Intent goToSignUpActivity=new Intent(MainActivity.this,SignUpActivity.class);
+                     Intent goToSignUpActivity=new Intent(MainActivity.this, SignUpActivity.class);
                      startActivity(goToSignUpActivity);
 
                  }
