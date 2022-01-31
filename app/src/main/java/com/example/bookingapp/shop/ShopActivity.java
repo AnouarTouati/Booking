@@ -1,6 +1,7 @@
 package com.example.bookingapp.shop;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.os.Looper;
 import android.provider.Settings;
+
 import androidx.annotation.NonNull;
 
 import com.example.bookingapp.CommonMethods;
@@ -20,10 +22,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +44,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -55,7 +63,7 @@ public class ShopActivity extends AppCompatActivity {
 
 
     static Context mContext;
-    static ArrayList<ClientPending> pendingList=new ArrayList<>();
+    ArrayList<ClientPending> pendingList = new ArrayList<>();
     CustomFragmentPagerAdapter customFragmentPagerAdapter;
     ViewPager viewPager;
     TabLayout tabLayout;
@@ -67,27 +75,27 @@ public class ShopActivity extends AppCompatActivity {
     public String firstName;
     public String lastName;
     public String phoneNumber;
-    public Boolean isEmployee=false;
-    public Boolean isBusinessOwner=false;
+    public Boolean isEmployee = false;
+    public Boolean isBusinessOwner = false;
     public static String shopName;
     public String selectedState;
     public String selectedCommune;
-    public Boolean useCoordinatesAKAaddMap =false;
+    public Boolean useCoordinatesAKAaddMap = false;
     public Double shopLatitude;
     public Double shopLongitude;
-    public Boolean isMen=true;
+    public Boolean isMen = true;
     public Bitmap selectedImage;
     public String shopPhoneNumber;
     public String facebookLink;
     public String instagramLink;
-    public Boolean coiffure =false;
-    public Boolean makeUp =false;
-    public Boolean meches =false;
-    public Boolean tinte =false;
-    public Boolean pedcure =false;
-    public Boolean manage =false;
-    public Boolean manicure =false;
-    public Boolean coupe =false;
+    public Boolean coiffure = false;
+    public Boolean makeUp = false;
+    public Boolean meches = false;
+    public Boolean tinte = false;
+    public Boolean pedcure = false;
+    public Boolean manage = false;
+    public Boolean manicure = false;
+    public Boolean coupe = false;
     public String saturday;
     public String sunday;
     public String monday;
@@ -96,14 +104,15 @@ public class ShopActivity extends AppCompatActivity {
     public String thursday;
     public String friday;
 
-/////////////////////////////////////////////////
+
 ////FRAG_2 STORE INFO///////////////////////////
-    static final int LOCATION_REQ=10;
-    final int GPS_SETTING_REQ=5;
-    static Boolean comingBackFromLocationSettings =false;
+
+    final int GPS_SETTING_REQ = 5;
+    static Boolean comingBackFromLocationSettings = false;
     static FusedLocationProviderClient fusedLocationProviderClient;
 ///////////////////////////////////////////////////////////
 
+    private ShopMenuFrag1 shopMenuFrag1;
     private static FirebaseUser firebaseUser;
     private static FirebaseFirestore firebaseFirestore;
     private static FirebaseStorage firebaseStorage;
@@ -112,21 +121,43 @@ public class ShopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
-        mContext=this;
+        mContext = this;
 
-        progressBar=findViewById(R.id.progressBarShopActivity);
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        FirebaseFirestoreSettings firestoreSettings= new FirebaseFirestoreSettings.Builder()
+                                                        .setPersistenceEnabled(false)
+                                                        .build();
 
-        if(firebaseUser ==null){
-            Intent goBACKtoSignInActivity=new Intent(this, SignInActivity.class);
+        firebaseFirestore.setFirestoreSettings(firestoreSettings);
+
+        if (isUserNotSignedIn()) {
+            Intent goBACKtoSignInActivity = new Intent(this, SignInActivity.class);
             startActivity(goBACKtoSignInActivity);
         }
-         firebaseFirestore=FirebaseFirestore.getInstance();
-        firebaseStorage=FirebaseStorage.getInstance();
 
-        errorText =findViewById(R.id.ErrorTextView_ShopActivity);
-        viewPager=findViewById(R.id.viewPagerShopMenu);
-        customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
-        customFragmentPagerAdapter.addFragment(new ShopMenuFrag1(this), "ShopMenuFrag1");
+        getViewsReferences();
+        setUpViews();
+        getPendingList();
+        fusedLocationProviderClient = new FusedLocationProviderClient(this);
+
+    }
+
+    private Boolean isUserNotSignedIn() {
+        return firebaseUser == null;
+    }
+
+    private void getViewsReferences() {
+        progressBar = findViewById(R.id.progressBarShopActivity);
+        errorText = findViewById(R.id.ErrorTextView_ShopActivity);
+        viewPager = findViewById(R.id.viewPagerShopMenu);
+        tabLayout = findViewById(R.id.tabLayoutShopMenu);
+    }
+
+    private void setUpViews() {
+        customFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager());
+        shopMenuFrag1=new ShopMenuFrag1(this);
+        customFragmentPagerAdapter.addFragment(shopMenuFrag1, "ShopMenuFrag1");
         customFragmentPagerAdapter.addFragment(new ShopMenuFrag2(this), "ShopMenuFrag2");
         viewPager.setAdapter(customFragmentPagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -137,7 +168,7 @@ public class ShopActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int i) {
-               tabLayout.getTabAt(i).select();
+                tabLayout.getTabAt(i).select();
             }
 
             @Override
@@ -145,7 +176,7 @@ public class ShopActivity extends AppCompatActivity {
 
             }
         });
-        tabLayout=findViewById(R.id.tabLayoutShopMenu);
+
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -163,64 +194,76 @@ public class ShopActivity extends AppCompatActivity {
 
             }
         });
-
-        fusedLocationProviderClient=new FusedLocationProviderClient(this);
-
     }
 
-    public static void setFirebaseUser(FirebaseUser fireBaseUser){
+    public static void setFirebaseUser(FirebaseUser fireBaseUser) {
 
-        firebaseUser=fireBaseUser;
-   }
-    public void findLocationUsingGPS(){
+        firebaseUser = fireBaseUser;
+    }
 
-        if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
-        }else{
+    @SuppressLint("MissingPermission")
+    public void findLocationUsingGPS() {
 
+        if (hasPermissionToAccessLocationData()) {
 
-            LocationManager locationManager=(LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-            if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                AlertDialog.Builder alertBuilder=new AlertDialog.Builder(mContext);
+            LocationManager locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(mContext);
                 alertBuilder.setMessage("In the Next Screen Allow this Application to Use Location Services");
                 alertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         mContext.startActivity(intent);
-                        comingBackFromLocationSettings =true;
+                        comingBackFromLocationSettings = true;
                     }
                 });
-
                 alertBuilder.show();
 
-            }else{
-                
-                LocationRequest locationRequest=new LocationRequest();
+            } else {
+
+                LocationRequest locationRequest = new LocationRequest();
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 locationRequest.setExpirationDuration(40000);
                 locationRequest.setNumUpdates(1);
 
-                LocationCallback locationCallback=new LocationCallback(){
+                LocationCallback locationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
 
-                        serverAddUpdateLocationMap(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
+                        serverAddUpdateLocationMap(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
 
                     }
                 };
-                fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
+
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
                 turnOnProgressBar();
-            }}
+            }
+        }
+        else {
+        askForPermissionToAccessLocationData();
+        }
 
     }
 
+    private Boolean hasPermissionToAccessLocationData(){
+        return (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                !=PackageManager.PERMISSION_GRANTED);
+    }
+    private void askForPermissionToAccessLocationData(){
+        ActivityCompat.requestPermissions(
+                (Activity) mContext,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET},CommonMethods.LOCATION_REQ);
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean granted = true;
-        if (requestCode == LOCATION_REQ) {
+        if (requestCode == CommonMethods.LOCATION_REQ) {
             for (int i = 0; i < grantResults.length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                     granted = false;
@@ -229,36 +272,35 @@ public class ShopActivity extends AppCompatActivity {
             }
         }
         if (granted) {
-
             findLocationUsingGPS();
         }
     }
-
-   void addUpdateLocationMapSuccessful(Context mContext,double Latitude, double Longitude){
-      ///i might show the map here or use gcoder to show the user where we put the point
-       Toast.makeText(mContext, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
-       turnOffProgressBar();
-   }
-   void serverAddUpdateLocationMap(final double Latitude, final double Longitude){
-       turnOnProgressBar();
+    void serverAddUpdateLocationMap(final double Latitude, final double Longitude){
+        turnOnProgressBar();
         Map<String,Object> map=new HashMap<>();
         map.put("ShopLatitude",Latitude);
         map.put("ShopLongitude",Longitude);
 
-       firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-           @Override
-           public void onComplete(@NonNull Task<Void> task) {
-               if(task.isSuccessful()){
-                   addUpdateLocationMapSuccessful(mContext,Latitude,Longitude);
-               }
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
-            notSuccessful("Failed to update location info");
-           }
-       });
-     }
+        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    addUpdateLocationMapSuccessful(mContext,Latitude,Longitude);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                notSuccessful("Failed to update location info");
+            }
+        });
+    }
+   void addUpdateLocationMapSuccessful(Context mContext,double Latitude, double Longitude){
+      ///i might show the map here or use gcoder to show the user where we put the point
+      // Toast.makeText(mContext, "Successfully Added the map to your shop at these coordinates Latitude: "+Latitude+"  Longitude: "+Longitude, Toast.LENGTH_LONG).show();
+       turnOffProgressBar();
+   }
+
 
     @Override
     protected void onResume() {
@@ -271,12 +313,7 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    public  void removePersonFromPending(ClientPending personToRemove){
-        pendingList.remove(personToRemove);
-        ((ShopMenuFrag1) customFragmentPagerAdapter.getItem(0)).customRecyclerViewAdapterShop.notifyDataSetChanged();
-       turnOffProgressBar();
 
-    }
     public  void serverRemovePersonFromPending(final ClientPending personToRemove){
         turnOnProgressBar();
         String personToRemoveUidOnFirestore;
@@ -289,7 +326,7 @@ public class ShopActivity extends AppCompatActivity {
            @Override
            public void onComplete(@NonNull Task<Void> task) {
                if(task.isSuccessful()){
-                   removePersonFromPending(personToRemove);
+                   turnOffProgressBar();
                }
            }
        }).addOnFailureListener(new OnFailureListener() {
@@ -300,11 +337,12 @@ public class ShopActivity extends AppCompatActivity {
            }
        });
     }
-    public void addPersonToPending(ClientPending personToAdd){
-        pendingList.add(personToAdd);
+    private void removePersonFromPending(ClientPending personToRemove){
+        pendingList.remove(personToRemove);
         ((ShopMenuFrag1) customFragmentPagerAdapter.getItem(0)).customRecyclerViewAdapterShop.notifyDataSetChanged();
-       turnOffProgressBar();
+        turnOffProgressBar();
     }
+
     public void serverAddPersonToPending(){
         final AlertDialog.Builder alertBuilder=new AlertDialog.Builder(this);
         LayoutInflater inflater=getLayoutInflater();
@@ -329,7 +367,8 @@ public class ShopActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            addPersonToPending(new ClientPending(PersonName,"null","N/A",clientFakeFirebaseUid));
+                           // addPersonToPending(new ClientPending(PersonName,"null","N/A",clientFakeFirebaseUid));
+                            turnOffProgressBar();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -345,27 +384,53 @@ public class ShopActivity extends AppCompatActivity {
         alertDialog.show();
 
     }
-   public void getPendingList(final ShopMenuFrag1 shopMenuFrag1){
+    private void addPersonToPending(ClientPending personToAdd){
+        pendingList.add(personToAdd);
+        ((ShopMenuFrag1) customFragmentPagerAdapter.getItem(0)).customRecyclerViewAdapterShop.notifyDataSetChanged();
+        turnOffProgressBar();
+    }
+   public void getPendingList(){
         turnOnProgressBar();
-        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+       /* firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
-                    List<DocumentSnapshot> clientsPendingList=task.getResult().getDocuments();
-                    pendingList.clear();
-                    for(int i=0;i<clientsPendingList.size();i++){
-                        pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
-                }
-                    shopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+                    extractPendingListFromServerResponse(task.getResult().getDocuments());
+                    dataChangedNotifyRecyclerView();
                     turnOffProgressBar();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                notSuccessful("Couldn't get clients pending");
+
             }
-        });
+        });*/
+
+       firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").addSnapshotListener(new EventListener<QuerySnapshot>() {
+           @Override
+           public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+               if(error!=null){
+                   notSuccessful("Couldn't get clients pending");
+                   return;
+               }
+               extractPendingListFromServerResponse(value.getDocuments());
+               dataChangedNotifyRecyclerView();
+               turnOffProgressBar();
+           }
+       });
+   }
+   private  void extractPendingListFromServerResponse(List<DocumentSnapshot> clientsPendingList){
+       pendingList.clear();
+       for(int i=0;i<clientsPendingList.size();i++){
+           pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
+       }
+   }
+   private void dataChangedNotifyRecyclerView(){
+        if(shopMenuFrag1.customRecyclerViewAdapterShop!=null){
+            shopMenuFrag1.customRecyclerViewAdapterShop.notifyDataSetChanged();
+        }
+
    }
     void updateShopInfo(){
 

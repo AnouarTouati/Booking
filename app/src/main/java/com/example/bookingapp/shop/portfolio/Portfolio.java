@@ -63,21 +63,28 @@ public class Portfolio extends AppCompatActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
-        progressBar = findViewById(R.id.progressBarAddRemoveImageActivity);
+        getViewsReferences();
+        setUpViews();
 
-        customRecyclerAdapter = new CustomRecyclerAdapter(portfolioImages, this, this);
+        getPortfolioImagesReferencesFromServer();
+    }
+    private void getViewsReferences(){
+        progressBar = findViewById(R.id.progressBarAddRemoveImageActivity);
         portfolioImagesRecyclerView = findViewById(R.id.RecyclerView_PortfolioImages);
+        addImagesButton = findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
+    }
+    private void setUpViews(){
+        customRecyclerAdapter = new CustomRecyclerAdapter(portfolioImages, this, this);
+
         portfolioImagesRecyclerView.setAdapter(customRecyclerAdapter);
         portfolioImagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        addImagesButton = findViewById(R.id.AddPortfolioImages_AddRemoveSubActivity);
+
         addImagesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 selectImagesFromPhoneToSendToServer();
             }
         });
-
-        getPortfolioImagesReferencesFromServer();
     }
     void getPortfolioImagesReferencesFromServer() {
         turnOnProgressBar();
@@ -91,7 +98,6 @@ public class Portfolio extends AppCompatActivity {
                 turnOFFProgressBar();
                 Log.v("MyFirebase", "got shop data with success " + imagesReferences);
                 getImagesFromServer();
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -119,7 +125,6 @@ public class Portfolio extends AppCompatActivity {
 
     }
 
-
     void requestImage(final String ImageReference) {
         Log.v("MyFirebase", "Requesting image from server");
         StorageReference imageReference = firebaseStorage.getReference(ImageReference);
@@ -140,8 +145,7 @@ public class Portfolio extends AppCompatActivity {
         });
     }
     void updateTheRecyclerView() {
-        customRecyclerAdapter = new CustomRecyclerAdapter(portfolioImages, this, this);
-        portfolioImagesRecyclerView.swapAdapter(customRecyclerAdapter, true);
+        customRecyclerAdapter.notifyDataSetChanged();
         turnOFFProgressBar();
     }
 
@@ -240,7 +244,6 @@ public class Portfolio extends AppCompatActivity {
         portfolioImagesRecyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
     }
-
 
 
 }

@@ -31,8 +31,7 @@ public class CustomRecyclerViewAdapterShop extends RecyclerView.Adapter<CustomRe
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
        View view= LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.recycler_view_people_pending_item, viewGroup,false);
-       ViewHolder viewHolder=new ViewHolder(view);
-       return  viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override

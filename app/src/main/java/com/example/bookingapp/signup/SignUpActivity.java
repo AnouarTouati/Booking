@@ -118,14 +118,31 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
 
-        customRecyclerAdapter =new CustomRecyclerAdapter(errorsList);//initialized empty so we can just swap the adapter later
+
+getViewsReferences();
+setUpViews();
+
+        fusedLocationProviderClient=new FusedLocationProviderClient(this);
+
+
+
+
+    }
+    private void getViewsReferences(){
         errorMessagesRecyclerView =findViewById(R.id.ErrorMessagesRecyclerView);
-        errorMessagesRecyclerView.setAdapter(customRecyclerAdapter);//
-        errorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar=findViewById(R.id.progressBarSignUpActivity);
         signUpErrorText=findViewById(R.id.signUpErrorText);
         signUpSuccessfulText=findViewById(R.id.signUpSuccessfulText);
         retryButton=findViewById(R.id.retrySignUp);
+        goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
+        viewPagerSignUP=findViewById(R.id.viewPagerSignUP);
+    }
+    private void setUpViews(){
+        customRecyclerAdapter =new CustomRecyclerAdapter(errorsList);//initialized empty so we can just swap the adapter later
+
+        errorMessagesRecyclerView.setAdapter(customRecyclerAdapter);//
+        errorMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,24 +150,20 @@ public class SignUpActivity extends AppCompatActivity {
                 continueSignUp();
             }
         });
-        goToShopHomePageButton=findViewById(R.id.goToShopHomePage);
+
         goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
-     @Override
-     public void onClick(View view) {
-         Intent GoToShopActivityIntent=new Intent(mContext, ShopActivity.class);
-         ShopActivity.setFirebaseUser(firebaseUser);
-         mContext.startActivity(GoToShopActivityIntent);
-         setResult(RESULT_OK,new Intent());//just to kill sign in activity
-         finish();//this to kill this sign up activity
+            @Override
+            public void onClick(View view) {
+                Intent GoToShopActivityIntent=new Intent(mContext, ShopActivity.class);
+                ShopActivity.setFirebaseUser(firebaseUser);
+                mContext.startActivity(GoToShopActivityIntent);
+                setResult(RESULT_OK,new Intent());//just to kill sign in activity
+                finish();//this to kill this sign up activity
 
-     }
- });
-        fusedLocationProviderClient=new FusedLocationProviderClient(this);
+            }
+        });
 
-        viewPagerSignUP=findViewById(R.id.viewPagerSignUP);
         CustomFragmentPagerAdapter customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
-
-
         customFragmentPagerAdapter.addFragment(new SignUpFrag1(), "SignUpFrag1");
         customFragmentPagerAdapter.addFragment(new SignUpFrag2(), "SignUpFrag2");
         customFragmentPagerAdapter.addFragment(new SignUpFrag3(), "SignUpFrag3");
@@ -159,7 +172,6 @@ public class SignUpActivity extends AppCompatActivity {
         customFragmentPagerAdapter.addFragment(new SignUpFrag6(), "SignUpFrag6");
 
         viewPagerSignUP.setAdapter(customFragmentPagerAdapter);
-
     }
     public void setCurrentItemViewPager(int FragmentIndex){
           viewPagerSignUP.setCurrentItem(FragmentIndex);
@@ -167,7 +179,7 @@ public class SignUpActivity extends AppCompatActivity {
 
    public  void findLocationUsingGPS(){
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED){
+        if(hasPermission()){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
         }else{
 
@@ -210,7 +222,11 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     }
-
+private Boolean hasPermission(){
+  return  ActivityCompat.checkSelfPermission(this,
+          Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+          && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED;
+}
     @Override
     protected void onResume() {
         super.onResume();

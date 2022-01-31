@@ -42,7 +42,23 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        getViewsReferences();
+        setUpViews();
+    }
+
+    private void getViewsReferences(){
         signUpQuestion=findViewById(R.id.signUpQuestion);
+        diamondImage =findViewById(R.id.diamondImageView);
+        diamondText =findViewById(R.id.diamondTextView);
+        errorText =findViewById(R.id.ErrorTextView_SignInActivity);
+        progressBar=findViewById(R.id.progressBar_SignInActicity);
+        signInButton =findViewById(R.id.signIn);
+        emailAddressEditText=findViewById(R.id.signInEmail);
+        passwordEditText=findViewById(R.id.signInPassword);
+    }
+
+    private void setUpViews(){
         signUpQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,27 +67,13 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-
-        diamondImage =findViewById(R.id.diamondImageView);
-        diamondText =findViewById(R.id.diamondTextView);
-        errorText =findViewById(R.id.ErrorTextView_SignInActivity);
-        progressBar=findViewById(R.id.progressBar_SignInActicity);
-        signInButton =findViewById(R.id.signIn);
-
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signIn();
             }
         });
-
-
-        emailAddressEditText=findViewById(R.id.signInEmail);
-        passwordEditText=findViewById(R.id.signInPassword);
-
-
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -80,41 +82,17 @@ public class SignInActivity extends AppCompatActivity {
             if(resultCode==RESULT_OK){
                 finish();
             }
-
         }
     }
 
-    void turnOnProgressBar(){
-    progressBar.setVisibility(View.VISIBLE);
-
-
-    diamondText.setVisibility(View.GONE);
-    diamondImage.setVisibility(View.GONE);
-    emailAddressEditText.setVisibility(View.GONE);
-    passwordEditText.setVisibility(View.GONE);
-    signInButton.setVisibility(View.GONE);
-    signUpQuestion.setVisibility(View.GONE);
-    errorText.setVisibility(View.GONE);
-
-}
-    void turnOffProgressBar(){
-
-    progressBar.setVisibility(View.GONE);
-
-    diamondText.setVisibility(View.VISIBLE);
-    diamondImage.setVisibility(View.VISIBLE);
-    emailAddressEditText.setVisibility(View.VISIBLE);
-    passwordEditText.setVisibility(View.VISIBLE);
-    signInButton.setVisibility(View.VISIBLE);
-    signUpQuestion.setVisibility(View.VISIBLE);
-}
     void signIn(){
+
+        turnOnProgressBar();
 
         String email;
         email=emailAddressEditText.getText().toString();
         String password;
         password=passwordEditText.getText().toString();
-
 
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -147,18 +125,40 @@ public class SignInActivity extends AppCompatActivity {
                     Log.v("MyFirebase",ee.getMessage() +" the  cause is "+ee.getCause() );
                     Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
                     notSuccessful("Something went wrong and we couldn't sign you in");
+                    turnOffProgressBar();
                 }
 
             }
         });
-        turnOnProgressBar();
     }
 
+    void turnOnProgressBar(){
+        progressBar.setVisibility(View.VISIBLE);
 
+
+        diamondText.setVisibility(View.GONE);
+        diamondImage.setVisibility(View.GONE);
+        emailAddressEditText.setVisibility(View.GONE);
+        passwordEditText.setVisibility(View.GONE);
+        signInButton.setVisibility(View.GONE);
+        signUpQuestion.setVisibility(View.GONE);
+        errorText.setVisibility(View.GONE);
+
+    }
     void notSuccessful(String message){
-        turnOffProgressBar();
         errorText.setText(message);
         errorText.setVisibility(View.VISIBLE);
 
     }
+    void turnOffProgressBar(){
+        progressBar.setVisibility(View.GONE);
+
+        diamondText.setVisibility(View.VISIBLE);
+        diamondImage.setVisibility(View.VISIBLE);
+        emailAddressEditText.setVisibility(View.VISIBLE);
+        passwordEditText.setVisibility(View.VISIBLE);
+        signInButton.setVisibility(View.VISIBLE);
+        signUpQuestion.setVisibility(View.VISIBLE);
+    }
+
 }
