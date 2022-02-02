@@ -18,12 +18,12 @@ import com.example.bookingapp.shop.portfolio.Portfolio;
 public class ShopMenuFrag2 extends Fragment {
 
     View view;
-    ShopActivity shopActivityReference;
-    Button addPortfolioImagesButton;
+    ShopActivity shopActivity;
+    Button addPortfolioImages;
     Button addUpdateShopMap;
 
-    public ShopMenuFrag2(ShopActivity shopActivityReference) {
-        this.shopActivityReference = shopActivityReference;
+    public ShopMenuFrag2(ShopActivity shopActivity) {
+        this.shopActivity = shopActivity;
     }
 
     @Nullable
@@ -38,12 +38,12 @@ public class ShopMenuFrag2 extends Fragment {
     }
 
     private void getViewsReferences() {
-        addPortfolioImagesButton = view.findViewById(R.id.AddPortfolioImagesButton_ShopMenuFrag2);
+        addPortfolioImages = view.findViewById(R.id.AddPortfolioImagesButton_ShopMenuFrag2);
         addUpdateShopMap = view.findViewById(R.id.Add_UpdateShopMap);
     }
 
     private void setUpViews() {
-        addPortfolioImagesButton.setOnClickListener(new View.OnClickListener() {
+        addPortfolioImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent goToPortfolioImagesSubActivity = new Intent(getContext(), Portfolio.class);
@@ -54,7 +54,8 @@ public class ShopMenuFrag2 extends Fragment {
         addUpdateShopMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shopActivityReference.findLocationUsingGPS();
+                shopActivity.turnOnProgressBar();
+                shopActivity.findLocationUsingGPS();
             }
         });
     }

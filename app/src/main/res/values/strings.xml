@@ -11,4 +11,9 @@
     <string name="Add">Add</string>
     <string name="Finish">Finish</string>
     <string name="Instructions_Frag5">Fill the fields for each service you provide and hit add, when you are done adding all your services hit Finish </string>
+    <string name="Could_not_get_pending_list">Could not get pending list</string>
+    <string name="Could_not_add_the_person_to_the_waiting_list">Could not add the person to the waiting list</string>
+    <string name="Could_not_delete_person_from_pending">Could not delete person from pending</string>
+    <string name="Failed_to_update_location_info">Failed to update location info</string>
+    <string name="Unexpected_error_occurred">Unexpected error occurred</string>
 </resources>

@@ -43,14 +43,14 @@ public class SignUpFrag3 extends Fragment {
     public String selectedCommune;
     public Boolean isMen=false;
     public Boolean isWomen=false;
-    public Boolean useCoordinatesAKAaddMap =false;
+    public Boolean hasLocation =false;
 
     View view;
 
 
     Spinner stateSpinner;
     Spinner communesSpinner;
-    CheckBox addMapToYourShopCheckBox;
+    public CheckBox addMapToYourShopCheckBox;
 
     ArrayAdapter<String> communesSpinnerArrayAdapter;
     @Nullable
@@ -65,8 +65,8 @@ public class SignUpFrag3 extends Fragment {
             public void onReceive(Context context, Intent intent) {
                String action=intent.getAction();
                 if(action.equals("ComingFromSignUpActivity")){
-                    useCoordinatesAKAaddMap =intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
-                 addMapToYourShopCheckBox.setChecked(useCoordinatesAKAaddMap);
+                    hasLocation =intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
+                 addMapToYourShopCheckBox.setChecked(hasLocation);
 
                 }
             }
@@ -134,14 +134,12 @@ public class SignUpFrag3 extends Fragment {
            @Override
            public void onClick(View view) {
                addMapToYourShopCheckBox.setChecked(false);
-               if(useCoordinatesAKAaddMap){
-                   useCoordinatesAKAaddMap =false;
+               if(hasLocation){
+                   hasLocation =false;
 
                }else{
                    ((SignUpActivity)getActivity()).findLocationUsingGPS();
                }
-
-
 
            }
 

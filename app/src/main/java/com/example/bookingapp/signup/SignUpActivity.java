@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Looper;
 import android.provider.Settings;
@@ -26,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bookingapp.ActivityWithLocation;
 import com.example.bookingapp.CustomFragmentPagerAdapter;
 import com.example.bookingapp.MainActivity;
 import com.example.bookingapp.R;
@@ -53,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends ActivityWithLocation {
 
     public static String emailAddress;
     public static String password;
@@ -108,6 +110,8 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
 
+    private SignUpFrag3 signUpFrag3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,11 +125,6 @@ public class SignUpActivity extends AppCompatActivity {
 
 getViewsReferences();
 setUpViews();
-
-        fusedLocationProviderClient=new FusedLocationProviderClient(this);
-
-
-
 
     }
     private void getViewsReferences(){
@@ -155,7 +154,6 @@ setUpViews();
             @Override
             public void onClick(View view) {
                 Intent GoToShopActivityIntent=new Intent(mContext, ShopActivity.class);
-                ShopActivity.setFirebaseUser(firebaseUser);
                 mContext.startActivity(GoToShopActivityIntent);
                 setResult(RESULT_OK,new Intent());//just to kill sign in activity
                 finish();//this to kill this sign up activity
@@ -166,7 +164,8 @@ setUpViews();
         CustomFragmentPagerAdapter customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
         customFragmentPagerAdapter.addFragment(new SignUpFrag1(), "SignUpFrag1");
         customFragmentPagerAdapter.addFragment(new SignUpFrag2(), "SignUpFrag2");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag3(), "SignUpFrag3");
+        signUpFrag3=new SignUpFrag3();
+        customFragmentPagerAdapter.addFragment(signUpFrag3, "SignUpFrag3");
         customFragmentPagerAdapter.addFragment(new SignUpFrag4(), "SignUpFrag4");
         customFragmentPagerAdapter.addFragment(new SignUpFrag5(), "SignUpFrag5");
         customFragmentPagerAdapter.addFragment(new SignUpFrag6(), "SignUpFrag6");
@@ -176,111 +175,17 @@ setUpViews();
     public void setCurrentItemViewPager(int FragmentIndex){
           viewPagerSignUP.setCurrentItem(FragmentIndex);
     }
-
-   public  void findLocationUsingGPS(){
-
-        if(hasPermission()){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},LOCATION_REQ);
-        }else{
-
-
-            LocationManager locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
-            if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                AlertDialog.Builder alertBuilder=new AlertDialog.Builder(this);
-                alertBuilder.setMessage("In the Next Screen Allow this Application to Use Location Services");
-                alertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(intent);
-                        comingBackFromLocationSettings =true;
-                    }
-                });
-
-                alertBuilder.show();
-
-            }else{
-
-                Toast.makeText(this, "GRANTED", Toast.LENGTH_LONG).show();
-                turnOnProgressBar();
-                LocationRequest locationRequest=new LocationRequest();
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                locationRequest.setExpirationDuration(40000);
-                locationRequest.setNumUpdates(1);
-
-                LocationCallback locationCallback=new LocationCallback(){
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                         turnOffProgressBar();
-                        saveTheCoordinatesAndFindAddress(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
-
-                    }
-                };
-                fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
-
-            }}
-
-
-    }
-private Boolean hasPermission(){
-  return  ActivityCompat.checkSelfPermission(this,
-          Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-          && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=PackageManager.PERMISSION_GRANTED;
-}
     @Override
-    protected void onResume() {
-        super.onResume();
-        if(comingBackFromLocationSettings){
-        LocationManager locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
-        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-           findLocationUsingGPS();
-        }else{
-            AlertDialog.Builder alertDialog=new AlertDialog.Builder(this);
-            alertDialog.setMessage("Can't Know Your Position without Location Services");
-            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                }
-            });
-            alertDialog.show();
-        }
-        comingBackFromLocationSettings =false;
-    }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        boolean granted = true;
-        if (requestCode == LOCATION_REQ) {
-            for (int i = 0; i < grantResults.length; i++) {
-                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    granted = false;
-                    break;
-                }
-            }
-        }
-        if (granted) {
-
-            findLocationUsingGPS();
-        }
-    }
-
-
-
-    void saveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
-        shopLatitude =Latitude;
-        shopLongitude =Longitude;
+    protected void onLocationResult(Location location) {
+        shopLatitude =location.getLatitude();
+        shopLongitude =location.getLongitude();
         Toast.makeText(this, "Latitude"+ shopLatitude, Toast.LENGTH_LONG).show();
         Toast.makeText(this, "Longitude"+ shopLongitude, Toast.LENGTH_LONG).show();
         useCoordinatesAKAaddMap =true;
-        Intent intent=new Intent();
-        intent.setAction("ComingFromSignUpActivity");
-        intent.putExtra("FoundCoordinatesSuccessfully", useCoordinatesAKAaddMap);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        signUpFrag3.addMapToYourShopCheckBox.setChecked(true);
+    }
 
+    void saveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
       /*  Geocoder geocoder=new Geocoder(this, Locale.getDefault());
         List<Address> addresses;
         try {
@@ -567,4 +472,6 @@ private Boolean hasPermission(){
             findViewById(R.id.MainScrollView_Frag6).setVisibility(View.VISIBLE);
         }
     }
+
+
 }
