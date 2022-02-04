@@ -34,6 +34,7 @@ public  class CommonMethods {
     public static final int KILL_ACTIVITY_REQ = 12;
     public static final int LOCATION_REQ = 10;
     public static final int GPS_ENABLE_REQ= 11;
+    public static final int IMG_REQ=1;
 
     public static void successfulSignIn(Context mContext, FirebaseUser firebaseUser, AppCompatActivity callingClass) {
 

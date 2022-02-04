@@ -44,39 +44,6 @@ public class ShopActivity extends ActivityWithLocation  {
     TextView errorText;
     ProgressBar progressBar;
 
-    public String emailAddress;
-    public String password;
-    public String firstName;
-    public String lastName;
-    public String phoneNumber;
-    public Boolean isBusinessOwner = false;
-    public static String shopName;
-    public String selectedState;
-    public String selectedCommune;
-    public Boolean hasLocation = false;
-    public Double shopLatitude;
-    public Double shopLongitude;
-    public Boolean isMen = true;
-    public String shopPhoneNumber;
-    public String facebookLink;
-    public String instagramLink;
-    public Boolean coiffure = false;
-    public Boolean makeUp = false;
-    public Boolean meches = false;
-    public Boolean tinte = false;
-    public Boolean pedcure = false;
-    public Boolean manage = false;
-    public Boolean manicure = false;
-    public Boolean coupe = false;
-    public String saturday;
-    public String sunday;
-    public String monday;
-    public String tuesday;
-    public String wednesday;
-    public String thursday;
-    public String friday;
-
-
     private ShopMenuFrag1 shopMenuFrag1;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore firebaseFirestore;
@@ -136,7 +103,7 @@ public class ShopActivity extends ActivityWithLocation  {
                 try{
                     tabLayout.getTabAt(i).select();
                 }catch (Exception e){
-                    Log.e("", getString(R.string.Unexpected_error_occurred)+" "+e);
+                    Log.e("AppFilter", getString(R.string.Unexpected_error_occurred)+" "+e);
                     notSuccessful(getString(R.string.Unexpected_error_occurred));
                 }
             }
@@ -177,7 +144,7 @@ public class ShopActivity extends ActivityWithLocation  {
                 addUpdateLocationMapSuccessful(location.getLatitude(),location.getLongitude());
             }
         }).addOnFailureListener(e -> {
-            Log.e("",getString(R.string.Failed_to_update_location_info)+" "+e);
+            Log.e("AppFilter",getString(R.string.Failed_to_update_location_info)+" "+e);
             notSuccessful(getString(R.string.Failed_to_update_location_info));
         });
     }
@@ -200,7 +167,7 @@ public class ShopActivity extends ActivityWithLocation  {
                turnOffProgressBar();
            }
        }).addOnFailureListener(e -> {
-           Log.e("",getString(R.string.Could_not_delete_person_from_pending)+" "+e);
+           Log.e("AppFilter",getString(R.string.Could_not_delete_person_from_pending)+" "+e);
            notSuccessful(getString(R.string.Could_not_delete_person_from_pending));
        });
     }
@@ -230,7 +197,7 @@ public class ShopActivity extends ActivityWithLocation  {
                         turnOffProgressBar();
                     }
                 }).addOnFailureListener(e -> {
-                    Log.e("", getString(R.string.Could_not_add_the_person_to_the_waiting_list) +" "+ e);
+                    Log.e("AppFilter", getString(R.string.Could_not_add_the_person_to_the_waiting_list) +" "+ e);
                 notSuccessful(getString(R.string.Could_not_add_the_person_to_the_waiting_list));
                 });
             }
@@ -245,7 +212,7 @@ public class ShopActivity extends ActivityWithLocation  {
         turnOnProgressBar();
        firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).collection("ClientsPending").addSnapshotListener((value, error) -> {
            if(error!=null) {
-               Log.e("", getString(R.string.Could_not_get_pending_list) +" "+ error);
+               Log.e("AppFilter", getString(R.string.Could_not_get_pending_list) +" "+ error);
                notSuccessful(getString(R.string.Could_not_get_pending_list));
                return;
            }
@@ -263,7 +230,7 @@ public class ShopActivity extends ActivityWithLocation  {
               pendingList.add(new ClientPending(clientsPendingList.get(i).get("PersonName").toString(),clientsPendingList.get(i).get("ClientFireBaseUid").toString(),clientsPendingList.get(i).get("Services").toString(),clientsPendingList.get(i).get("ClientFakeFirebaseUid").toString()));
           }
       }catch(Exception exception){
-         Log.e("", getString(R.string.Could_not_get_pending_list) +" "+ exception);
+         Log.e("AppFilter", getString(R.string.Could_not_get_pending_list) +" "+ exception);
          notSuccessful(getString(R.string.Could_not_get_pending_list));
       }
 
@@ -274,46 +241,6 @@ public class ShopActivity extends ActivityWithLocation  {
         }
 
    }
-    void updateShopInfo(){
-
-            Map<String,Object> map=new HashMap<>();
-           
-            map.put("EmailAddress", emailAddress);
-            map.put("Password", password);
-            map.put("FirstName", firstName);
-            map.put("LastName", lastName);
-            map.put("PhoneNumber", phoneNumber);
-            map.put("IsBusinessOwner", isBusinessOwner);
-            map.put("ShopName", shopName);
-            map.put("SelectedState", selectedState);
-            map.put("SelectedCommune", selectedCommune);
-            map.put("UseCoordinatesAKAaddMap", hasLocation);
-            map.put("ShopLatitude", shopLatitude);
-            map.put("ShopLongitude", shopLongitude);
-            map.put("IsMen", isMen);
-          //  map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));//photo
-            map.put("ShopPhoneNumber", shopPhoneNumber);
-            map.put("FacebookLink", facebookLink);
-            map.put("InstagramLink", instagramLink);
-            map.put("Coiffure", coiffure);
-            map.put("MakeUp", makeUp);
-            map.put("Meches", meches);
-            map.put("Tinte", tinte);
-            map.put("Pedcure", pedcure);
-            map.put("Manage", manage);
-            map.put("Manicure", manicure);
-            map.put("coupe", coupe);
-            map.put("Saturday", saturday);
-            map.put("Sunday", sunday);
-            map.put("Monday", monday);
-            map.put("Tuesday", tuesday);
-            map.put("Wednesday", wednesday);
-            map.put("Thursday", thursday);
-            map.put("Friday", friday);
-
-        JSONObject updatedShopData=new JSONObject(map);
-
-    }
 
     @Override
     public void onBackPressed() {

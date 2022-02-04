@@ -5,6 +5,29 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/drawable/background_style_01.xml" value="0.1275" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/drawable/button_type_01.xml" value="0.1275" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/drawable/button_type_02.xml" value="0.1275" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/drawable/edit_text_type_01.xml" value="0.1275" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/drawable/edit_text_type_02.xml" value="0.1275" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/activity_shop.xml" value="0.13632246376811594" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/activity_sign_in.xml" value="0.13632246376811594" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/activity_sign_up.xml" value="0.13632246376811594" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/addperson_alerdialog_layout.xml" value="0.13632246376811594" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/recycler_view_error_item.xml" value="0.20416666666666666" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/recycler_view_portfolio_images_item.xml" value="0.20416666666666666" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/signupfrag2_layout.xml" value="0.13632246376811594" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/signupfrag3_layout.xml" value="0.22" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/signupfrag4_layout.xml" value="0.22" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/signupfrag5_layout.xml" value="0.25" />
+        <entry key="..\:/Projects/AndroidAPPS/Booking/app/src/main/res/layout/signupfrag6_layout.xml" value="0.13632246376811594" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

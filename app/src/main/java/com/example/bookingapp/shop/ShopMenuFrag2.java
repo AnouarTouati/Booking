@@ -46,7 +46,7 @@ public class ShopMenuFrag2 extends Fragment {
         addPortfolioImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent goToPortfolioImagesSubActivity = new Intent(getContext(), Portfolio.class);
+                Intent goToPortfolioImagesSubActivity = new Intent(shopActivity, Portfolio.class);
                 startActivity(goToPortfolioImagesSubActivity);
             }
         });
@@ -59,6 +59,5 @@ public class ShopMenuFrag2 extends Fragment {
             }
         });
     }
-
 
 }

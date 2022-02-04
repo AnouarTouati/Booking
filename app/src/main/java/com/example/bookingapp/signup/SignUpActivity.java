@@ -1,25 +1,11 @@
 package com.example.bookingapp.signup;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.Looper;
-import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,15 +13,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import com.example.bookingapp.ActivityWithLocation;
 import com.example.bookingapp.CustomFragmentPagerAdapter;
 import com.example.bookingapp.MainActivity;
 import com.example.bookingapp.R;
 import com.example.bookingapp.shop.ShopActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,7 +36,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,41 +44,26 @@ import java.util.Map;
 
 public class SignUpActivity extends ActivityWithLocation {
 
-    public static String emailAddress;
-    public static String password;
+    public String emailAddress;
+    public String password;
     public String firstName;
     public String lastName;
-    public static String phoneNumber;
+    public String phoneNumber;
     public Boolean isEmployee=false;
     public Boolean isBusinessOwner=false;
     public String salonName;
     public String selectedState;
     public String selectedCommune;
-    public Boolean useCoordinatesAKAaddMap =false;
+    public Boolean hasLocation =false;
     public Double shopLatitude;
     public Double shopLongitude;
     public Boolean isMen=true;
     public Bitmap selectedImage;
-    public static String shopPhoneNumber;
-    public String facebookLink;
-    public String instagramLink;
-
+    public String shopPhoneNumber;
     public List<Service_Frag5> services=new ArrayList<>();
 
-    public String saturday;
-    public String sunday;
-    public String monday;
-    public String tuesday;
-    public String wednesday;
-    public String thursday;
-    public String friday;
+    public ViewPager viewPagerSignUP;
 
-
-    public  static ViewPager viewPagerSignUP;
-    final int LOCATION_REQ=10;
-    final int GPS_SETTING_REQ=5;
-    Boolean comingBackFromLocationSettings =false;
-    FusedLocationProviderClient fusedLocationProviderClient;
     TextView signUpErrorText;
     TextView signUpSuccessfulText;
     CustomRecyclerAdapter customRecyclerAdapter;
@@ -99,11 +71,11 @@ public class SignUpActivity extends ActivityWithLocation {
     ArrayList<String> errorsList =new ArrayList<>();
     Button retryButton;
     Button goToShopHomePageButton;
-    public static ProgressBar progressBar;
+    public ProgressBar progressBar;
     Boolean signUpWasNotSuccessful=false;
-    static Boolean requestWasSentToServer =false;
+    Boolean requestWasSentToServer =false;
 
-    static Context mContext;
+    Context context;
 
     private  FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
@@ -116,15 +88,14 @@ public class SignUpActivity extends ActivityWithLocation {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        mContext=this;
+        context =this;
 
         mAuth=FirebaseAuth.getInstance();
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
 
-
-getViewsReferences();
-setUpViews();
+        getViewsReferences();
+        setUpViews();
 
     }
     private void getViewsReferences(){
@@ -145,7 +116,6 @@ setUpViews();
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //createAccount();
                 continueSignUp();
             }
         });
@@ -153,8 +123,8 @@ setUpViews();
         goToShopHomePageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent GoToShopActivityIntent=new Intent(mContext, ShopActivity.class);
-                mContext.startActivity(GoToShopActivityIntent);
+                Intent GoToShopActivityIntent=new Intent(context, ShopActivity.class);
+                context.startActivity(GoToShopActivityIntent);
                 setResult(RESULT_OK,new Intent());//just to kill sign in activity
                 finish();//this to kill this sign up activity
 
@@ -162,13 +132,12 @@ setUpViews();
         });
 
         CustomFragmentPagerAdapter customFragmentPagerAdapter=new CustomFragmentPagerAdapter(getSupportFragmentManager());
-        customFragmentPagerAdapter.addFragment(new SignUpFrag1(), "SignUpFrag1");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag2(), "SignUpFrag2");
-        signUpFrag3=new SignUpFrag3();
+        customFragmentPagerAdapter.addFragment(new SignUpFrag1(this), "SignUpFrag1");
+        customFragmentPagerAdapter.addFragment(new SignUpFrag2(this), "SignUpFrag2");
+        signUpFrag3=new SignUpFrag3(this);
         customFragmentPagerAdapter.addFragment(signUpFrag3, "SignUpFrag3");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag4(), "SignUpFrag4");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag5(), "SignUpFrag5");
-        customFragmentPagerAdapter.addFragment(new SignUpFrag6(), "SignUpFrag6");
+        customFragmentPagerAdapter.addFragment(new SignUpFrag4(this), "SignUpFrag4");
+        customFragmentPagerAdapter.addFragment(new SignUpFrag5(this), "SignUpFrag5");
 
         viewPagerSignUP.setAdapter(customFragmentPagerAdapter);
     }
@@ -181,28 +150,13 @@ setUpViews();
         shopLongitude =location.getLongitude();
         Toast.makeText(this, "Latitude"+ shopLatitude, Toast.LENGTH_LONG).show();
         Toast.makeText(this, "Longitude"+ shopLongitude, Toast.LENGTH_LONG).show();
-        useCoordinatesAKAaddMap =true;
+        hasLocation =true;
         signUpFrag3.addMapToYourShopCheckBox.setChecked(true);
+        signUpFrag3.hasLocation=true;
+        signUpFrag3.getAddressFromLocation(location);
     }
 
-    void saveTheCoordinatesAndFindAddress(Double Latitude, Double Longitude){
-      /*  Geocoder geocoder=new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
-        try {
-            Toast.makeText(this, "Trying To gET Address", Toast.LENGTH_LONG).show();
-          addresses =  geocoder.getFromLocation(ShopLatitude, ShopLongitude, 1);
-          SelectedState=addresses.get(0).getAdminArea();
-          SelectedCommune=addresses.get(0).getLocality();
-            Toast.makeText(this, SelectedCommune, Toast.LENGTH_LONG).show();
-            Toast.makeText(this, SelectedState, Toast.LENGTH_LONG).show();
-            Toast.makeText(this, addresses.get(0).getAddressLine(0), Toast.LENGTH_LONG).show();
-            Toast.makeText(this, addresses.get(0).getCountryName(), Toast.LENGTH_LONG).show();
-            Toast.makeText(this, addresses.get(0).getPostalCode(), Toast.LENGTH_LONG).show();
-            Toast.makeText(this, addresses.get(0).getFeatureName(), Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-    }
+
     @Override
     public void onBackPressed() {
         if(requestWasSentToServer){
@@ -253,13 +207,13 @@ setUpViews();
         map.put("ShopName", salonName);
         map.put("SelectedState", selectedState);
         map.put("SelectedCommune", selectedCommune);
-        map.put("UseCoordinatesAKAaddMap", useCoordinatesAKAaddMap);
+        map.put("UseCoordinatesAKAaddMap", hasLocation);
         map.put("ShopLatitude", shopLatitude);
         map.put("ShopLongitude", shopLongitude);
         map.put("IsMen", isMen);
-       // map.put("SelectedImage", CommonMethods.convertBitmapToString(selectedImage));
+
         map.put("ShopPhoneNumber", shopPhoneNumber);
-       List<String> servicesName=new ArrayList<>();
+        List<String> servicesName=new ArrayList<>();
         List<String> servicesPrices=new  ArrayList<>();
         List<String> servicesDurations=new ArrayList<>();
         for(int i=0;i<services.size();i++){
@@ -270,13 +224,6 @@ setUpViews();
         map.put("ServicesHairCutsNames", servicesName);
         map.put("ServicesHairCutsPrices", servicesPrices);
         map.put("ServicesHairCutsDuration", servicesDurations);
-        map.put("Saturday", saturday);
-        map.put("Sunday", sunday);
-        map.put("Monday", monday);
-        map.put("Tuesday", tuesday);
-        map.put("Wednesday", wednesday);
-        map.put("Thursday", thursday);
-        map.put("Friday", friday);
 
 
     firebaseFirestore.collection("Shops").document(firebaseUser.getUid()).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -287,24 +234,15 @@ setUpViews();
             }else{
                 successful();
             }
-
         }
     }).addOnFailureListener(new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
             notSuccessful("couldn't send shop data to cloud");
-            try {
-                throw e;
+            Log.e("AppFilter", "Something went wrong continueSignUp()"  + e.getMessage());
             }
-            catch(Exception ee){
-                Log.v("MyFirebase", "Something went wrong continueSignUp()"  + ee.getMessage());
-            }
-        }
     });
-
-
 }
-
     private void pushPhotoToServer(final String imageReferenceInStorage, final Bitmap imageToPush) {
         turnOnProgressBar();
         StorageReference imageReference = firebaseStorage.getReference();
@@ -319,13 +257,12 @@ setUpViews();
                 if (task.isSuccessful()) {
                     turnOffProgressBar();
                     Toast.makeText(getApplicationContext(), "Done Signing  up", Toast.LENGTH_LONG).show();
-                    Log.v("MyFirebase", "Done Uploading Profile image");
                     successful();
                 } else {
 
                     turnOffProgressBar();
                     Toast.makeText(getApplicationContext(), "Something went wrong we couldn't sign you up", Toast.LENGTH_LONG).show();
-                    Log.v("MyFirebase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
+                    Log.e("AppFilter", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
                     somethingWentWrongPleaseTryAgainImageProblem(imageReferenceInStorage,imageToPush);
 
                 }
@@ -334,12 +271,7 @@ setUpViews();
             @Override
             public void onFailure(@NonNull Exception e) {
                 turnOffProgressBar();
-                try {
-                    throw e;
-                }
-                catch (Exception ee){
-                    Log.v("MyFirebase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + ee.getMessage());
-                }
+                Log.e("AppFilter", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + e.getMessage());
             }
         });
 
@@ -379,18 +311,12 @@ setUpViews();
                 firebaseUser=task.getResult().getUser();
                 viewPagerSignUP.setCurrentItem(1);
             }
-
         }
     }).addOnFailureListener(new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
             notSuccessful("couldn't create an account");
-            try {
-                throw e;
-            }
-            catch(Exception ee){
-                Log.v("MyFirebase", "Something went wrong createAccount()"  + ee.getMessage());
-            }
+            Log.e("AppFilter", "couldn't create an account "  + e.getMessage());
         }
     });
 }
@@ -437,10 +363,6 @@ setUpViews();
         else if(CallingFragmentIndex==4){
             findViewById(R.id.MainConstraintLayout_Frag5).setVisibility(View.GONE);
         }
-        else if(CallingFragmentIndex==5){
-            findViewById(R.id.MainScrollView_Frag6).setVisibility(View.GONE);
-        }
-
     }
     public void turnOffProgressBar(){
 
@@ -467,9 +389,6 @@ setUpViews();
         }
         else if(CallingFragmentIndex==4){
             findViewById(R.id.MainConstraintLayout_Frag5).setVisibility(View.VISIBLE);
-        }
-        else if(CallingFragmentIndex==5){
-            findViewById(R.id.MainScrollView_Frag6).setVisibility(View.VISIBLE);
         }
     }
 

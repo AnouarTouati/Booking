@@ -16,4 +16,7 @@
     <string name="Could_not_delete_person_from_pending">Could not delete person from pending</string>
     <string name="Failed_to_update_location_info">Failed to update location info</string>
     <string name="Unexpected_error_occurred">Unexpected error occurred</string>
+    <string name="Failed_to_upload_image">Failed to upload image </string>
+    <string name="Failed_to_load_image_from_phone_gallery">Failed to load image from phone gallery </string>
+    <string name="Failed_to_get_image_from_server">Failed to get image from server </string>
 </resources>

@@ -11,130 +11,58 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <Button
             android:id="@+id/submitFrag4"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
+            android:layout_width="308dp"
+            android:layout_height="57dp"
             android:background="@drawable/button_type_04"
             android:text="SUBMIT"
             android:textAppearance="@style/text_style_4"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageView8" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.891" />
 
         <EditText
             android:id="@+id/ShopPhoneNumberFrag4"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
+            android:layout_width="294dp"
+            android:layout_height="66dp"
+
             android:background="@drawable/edit_text_type_01"
             android:hint="Shop Phone Number"
             android:inputType="phone"
             android:textAppearance="@style/text_style_1"
-            app:layout_constraintBottom_toTopOf="@id/imageView7"
-
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageViewFrag4" />
-
-        <EditText
-            android:id="@+id/facebookFrag4"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:background="@drawable/edit_text_type_01"
-            android:hint="facebook.com/"
-            android:inputType="textPersonName"
-            android:textAppearance="@style/text_style_1"
-
-            app:layout_constraintBottom_toTopOf="@id/instagramFrag4"
-
-            app:layout_constraintLeft_toRightOf="@id/imageView7"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ShopPhoneNumberFrag4" />
-
-
-        <EditText
-            android:id="@+id/instagramFrag4"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:background="@drawable/edit_text_type_01"
-            android:hint="instagram.com/"
-            android:inputType="textPersonName"
-            android:textAppearance="@style/text_style_1"
-
-            app:layout_constraintBottom_toTopOf="@id/submitFrag4"
-            app:layout_constraintLeft_toRightOf="@id/imageView8"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/facebookFrag4" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.69" />
 
         <ImageView
             android:id="@+id/imageView6"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            app:layout_constraintBottom_toTopOf="@id/divider10"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="170dp"
+            android:layout_height="133dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread"
+            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/diamond" />
 
         <ImageView
             android:id="@+id/imageViewFrag4"
-            android:layout_width="300dp"
-            android:layout_height="200dp"
-            app:layout_constraintBottom_toTopOf="@id/ShopPhoneNumberFrag4"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider10"
+            android:layout_width="345dp"
+            android:layout_height="276dp"
 
-            app:srcCompat="@android:color/darker_gray" />
-
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@id/imageView8"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/facebookFrag4"
-            app:layout_constraintTop_toBottomOf="@id/ShopPhoneNumberFrag4"
-            app:srcCompat="@drawable/facebook_icon" />
-
-        <ImageView
-            android:id="@+id/imageView8"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@id/submitFrag4"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/instagramFrag4"
-            app:layout_constraintTop_toBottomOf="@id/imageView7"
-
-            app:srcCompat="@drawable/instagram_icon" />
-
-        <View
-            android:id="@+id/divider10"
-            android:layout_width="140dp"
-            android:layout_height="10dp"
-            android:background="@drawable/divider_horizontal_gradient"
-            app:layout_constraintBottom_toTopOf="@id/imageViewFrag4"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/divider11"
-            app:layout_constraintTop_toBottomOf="@id/imageView6" />
-
-        <View
-            android:id="@+id/divider11"
-            android:layout_width="140dp"
-            android:layout_height="10dp"
-            android:background="@drawable/divider_horizontal_gradient"
-            app:layout_constraintBottom_toTopOf="@id/imageViewFrag4"
-            app:layout_constraintLeft_toRightOf="@id/divider10"
-            app:layout_constraintRight_toRightOf="parent"
-
-            app:layout_constraintTop_toBottomOf="@id/imageView6" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.323"
+            app:srcCompat="@android:color/darker_gray"
+            tools:srcCompat="@drawable/image" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -106,7 +106,6 @@ public class SignInActivity extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 try{
                     throw Objects.requireNonNull(e);
-
                 }
                 catch (FirebaseAuthException ee){
 
@@ -116,13 +115,15 @@ public class SignInActivity extends AppCompatActivity {
                         case  "ERROR_USER_NOT_FOUND" : Toast.makeText(getApplicationContext(),"This account doesn't exist",Toast.LENGTH_LONG).show();notSuccessful("This account doesn't exist");break;
                         case  "ERROR_WRONG_PASSWORD" : Toast.makeText(getApplicationContext(),"Invalid Password",Toast.LENGTH_LONG).show();notSuccessful("Invalid Password");break;
                         default: Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
-                            Log.v("MyFirebase",e.getMessage() +" the  cause is "+e.getCause() );notSuccessful("Something went wrong and we couldn't sign you in");break;
+                            Log.e("AppFilter",e.getMessage() +" the  cause is "+e.getCause() );
+                            notSuccessful("Something went wrong and we couldn't sign you in");
+                            break;
 
                     }
                 }
-                catch (Exception ee) {
+                catch (Exception eee) {
 
-                    Log.v("MyFirebase",ee.getMessage() +" the  cause is "+ee.getCause() );
+                    Log.e("AppFilter",eee.getMessage() +" the  cause is "+eee.getCause() );
                     Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
                     notSuccessful("Something went wrong and we couldn't sign you in");
                     turnOffProgressBar();

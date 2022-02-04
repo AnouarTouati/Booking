@@ -16,10 +16,10 @@ import java.util.ArrayList;
 
 public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder> {
 
-    ArrayList<Bitmap> portfolioImages =new ArrayList<>();
+    ArrayList<Image> portfolioImages =new ArrayList<>();
     Context mContext;
     Portfolio parentActivity;
-    public CustomRecyclerAdapter(ArrayList<Bitmap> portfolioImages, Context mContext, Portfolio parentActivity) {
+    public CustomRecyclerAdapter( ArrayList<Image> portfolioImages, Context mContext, Portfolio parentActivity) {
         this.portfolioImages = portfolioImages;
         this.mContext=mContext;
         this.parentActivity=parentActivity;
@@ -35,12 +35,11 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-            viewHolder.imageView.setImageBitmap(portfolioImages.get(i));
+            viewHolder.imageView.setImageBitmap(portfolioImages.get(i).bitmap);
             viewHolder.deletePortfolioImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                  //  Portfolio.removeImageFromServer(i);
-                    parentActivity.removeImageFromServer(i);
+                    parentActivity.removeImageFromServer(portfolioImages.get(i).reference);
                 }
             });
     }

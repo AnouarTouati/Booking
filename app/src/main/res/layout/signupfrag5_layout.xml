@@ -6,31 +6,36 @@
     android:layout_height="match_parent"
 
     >
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/MainConstraintLayout_Frag5"
-        >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <EditText
             android:id="@+id/serviceName_Frag5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="43dp"
-            android:layout_marginTop="251dp"
+            android:layout_marginStart="26dp"
+            android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="@string/Hint_Service_Name_SignUp_Frag5"
             android:inputType="textPersonName"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toTopOf="@+id/serviceDuration"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <EditText
             android:id="@+id/serviceDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="17dp"
+            android:layout_marginBottom="14dp"
             android:ems="10"
             android:hint="@string/Hint_Service_Duration_SignUp_Frag5"
             android:inputType="number"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toTopOf="@+id/servicePrice"
             app:layout_constraintStart_toStartOf="@+id/serviceName_Frag5"
             app:layout_constraintTop_toBottomOf="@+id/serviceName_Frag5" />
 
@@ -38,10 +43,12 @@
             android:id="@+id/servicePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="13dp"
+            android:layout_marginBottom="15dp"
             android:ems="10"
             android:hint="@string/Hint_Service_Price_SignUp_Frag5"
             android:inputType="number"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toTopOf="@+id/addButton_Frag5"
             app:layout_constraintStart_toStartOf="@+id/serviceDuration"
             app:layout_constraintTop_toBottomOf="@+id/serviceDuration" />
 
@@ -49,30 +56,35 @@
             android:id="@+id/addButton_Frag5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="46dp"
-            android:layout_marginBottom="181dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="170dp"
             android:background="@drawable/button_type_02"
             android:text="@string/Add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintBottom_toTopOf="@+id/finishButton_Frag5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/servicePrice" />
 
         <Button
             android:id="@+id/finishButton_Frag5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="61dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/button_type_04"
             android:text="@string/Finish"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addButton_Frag5" />
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="49dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="53dp"
             android:text="@string/Instructions_Frag5"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/serviceName_Frag5"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>

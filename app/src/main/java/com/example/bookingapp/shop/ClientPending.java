@@ -1,10 +1,10 @@
 package com.example.bookingapp.shop;
 
 class ClientPending {
-    private String clientName;
-    private String clientFirebaseUid;
-    private String clientRequestedServices;
-    private String clientFakeFirebaseUid;//for people added by the shop owner manually
+    private final String clientName;
+    private final String clientFirebaseUid;
+    private final String clientRequestedServices;
+    private final String clientFakeFirebaseUid;//for people added by the shop owner manually
 
 
 

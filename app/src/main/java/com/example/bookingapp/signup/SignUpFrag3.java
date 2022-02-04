@@ -1,14 +1,14 @@
 
 package com.example.bookingapp.signup;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,19 +32,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SignUpFrag3 extends Fragment {
-    public List<String> stateList =new ArrayList<>();
-    public List<String> communesForSelectedStateList =new ArrayList<>();
 
-
-    public String salonName;
-    public String selectedState;
-    public String selectedCommune;
-    public Boolean isMen=false;
-    public Boolean isWomen=false;
+    private List<String> states=new ArrayList<>();
+    private List<List<String>> communes=new ArrayList<>();
+    private List<String> communesForSelectedState=new ArrayList<>();
+    private String selectedState;
+    private String selectedCommune;
+    private Boolean isMen=false;
+    private Boolean isWomen=false;
     public Boolean hasLocation =false;
-
+    private CheckBox menCheckBox;
+    private CheckBox womenCheckBox;
+    private Button submitButton;
+    private boolean geoLocation=false;
+    private int communeFromGeoLocationIndex=-1;
     View view;
 
 
@@ -53,37 +57,37 @@ public class SignUpFrag3 extends Fragment {
     public CheckBox addMapToYourShopCheckBox;
 
     ArrayAdapter<String> communesSpinnerArrayAdapter;
+    private final SignUpActivity signUpActivity;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.signupfrag3_layout, container,false);
 
-        IntentFilter filter=new IntentFilter();
-        filter.addAction("ComingFromSignUpActivity");
-        BroadcastReceiver broadcastReceiver=new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-               String action=intent.getAction();
-                if(action.equals("ComingFromSignUpActivity")){
-                    hasLocation =intent.getBooleanExtra(" UseCoordinatesAKAaddMap", true);
-                 addMapToYourShopCheckBox.setChecked(hasLocation);
-
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver,filter);
-
         loadStateList();
+        getViewsReferences();
+        setUpViews();
+
+        return view;
+    }
+
+    public SignUpFrag3(SignUpActivity signUpActivity){
+        this.signUpActivity=signUpActivity;
+    }
+    private void getViewsReferences(){
         stateSpinner=view.findViewById(R.id.stateSpinner);
         communesSpinner=view.findViewById(R.id.communesSpinner);
-
-        ArrayAdapter<String> stateSpinnerArrayAdapter=new ArrayAdapter<>(getActivity(),R.layout.support_simple_spinner_dropdown_item, stateList);
+        menCheckBox=view.findViewById(R.id.men);
+        womenCheckBox=view.findViewById(R.id.women);
+        addMapToYourShopCheckBox=view.findViewById(R.id.addMap);
+        submitButton=view.findViewById(R.id.submit);
+    }
+    private void setUpViews(){
+        ArrayAdapter<String> stateSpinnerArrayAdapter=new ArrayAdapter<>(getActivity(),R.layout.support_simple_spinner_dropdown_item, states);
         stateSpinner.setAdapter(stateSpinnerArrayAdapter);
         stateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedState = stateList.get(i);
-                loadCommunesForSelectedState(i);
+                    setState(i);
             }
 
             @Override
@@ -92,12 +96,12 @@ public class SignUpFrag3 extends Fragment {
             }
         });
 
-       communesSpinnerArrayAdapter=new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item, communesForSelectedStateList);
+        communesSpinnerArrayAdapter=new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item, communesForSelectedState);
         communesSpinner.setAdapter(communesSpinnerArrayAdapter);
         communesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedCommune = communesForSelectedStateList.get(i);
+                selectedCommune = communesForSelectedState.get(i);
             }
 
             @Override
@@ -105,8 +109,7 @@ public class SignUpFrag3 extends Fragment {
 
             }
         });
-        final CheckBox menCheckBox=view.findViewById(R.id.men);
-        final CheckBox womenCheckBox=view.findViewById(R.id.women);
+
 
         menCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,35 +131,30 @@ public class SignUpFrag3 extends Fragment {
                 isWomen=womenCheckBox.isChecked();
             }
         });
-       addMapToYourShopCheckBox=view.findViewById(R.id.addMap);
-
-     addMapToYourShopCheckBox.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               addMapToYourShopCheckBox.setChecked(false);
-               if(hasLocation){
-                   hasLocation =false;
-
-               }else{
-                   ((SignUpActivity)getActivity()).findLocationUsingGPS();
-               }
-
-           }
 
 
-       });
- Button submitButton=view.findViewById(R.id.submit);
- submitButton.setOnClickListener(new View.OnClickListener() {
-     @Override
-     public void onClick(View view) {
-         doneFillingFieldsGoNextFrag();
-     }
- });
+        addMapToYourShopCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addMapToYourShopCheckBox.setChecked(false);
+                if(hasLocation){
+                    hasLocation =false;
 
-        return view;
+                }else{
+                    signUpActivity.turnOnProgressBar();
+                    signUpActivity.findLocationUsingGPS();
+                }
+
+            }
+
+        });
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doneFillingFieldsGoNextFrag();
+            }
+        });
     }
-
-
     public String loadJSONFromAsset(String jsonFileName) {
         String json = null;
         try {
@@ -166,73 +164,94 @@ public class SignUpFrag3 extends Fragment {
             is.read(buffer);
             is.close();
             json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+        } catch (Exception e) {
+            Log.e("AppFilter", "Error parsing JSON "+e);
         }
         return json;
     }
+
     void loadStateList(){
         try {
 
            JSONArray jsonArray=new JSONArray(loadJSONFromAsset("wilayas"));
-
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-              stateList.add(jsonObject.getString("nom")) ;
-
+                states.add(jsonObject.getString("nom"));
+                communes.add(new ArrayList<>());
             }
+            loadCommunesForSelectedState();
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("AppFilter", "Error parsing JSON "+e);
         }
     }
-    void loadCommunesForSelectedState(int wilayaIndexInStateList){
-        communesForSelectedStateList.clear();
+
+    void loadCommunesForSelectedState(){
         try {
             JSONArray jsonArray=new JSONArray(loadJSONFromAsset("communes"));
-            Boolean FoundCommunesNoNeedToContinue=false;
             for (int i=0;i<jsonArray.length();i++){
-            if(jsonArray.getJSONObject(i).getInt("wilaya_id")==wilayaIndexInStateList+1){
-             communesForSelectedStateList.add(jsonArray.getJSONObject(i).getString("nom"));
-             FoundCommunesNoNeedToContinue=true;
-            }else if(FoundCommunesNoNeedToContinue){
-              break;
+                int wilayaId=jsonArray.getJSONObject(i).getInt("wilaya_id")-1;
+                String communeName=jsonArray.getJSONObject(i).getString("nom");
+                communes.get(wilayaId).add(communeName);
             }
-                        }
+            communesForSelectedState=communes.get(0);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("AppFilter", "Error parsing JSON "+e);
         }
-        communesSpinnerArrayAdapter.notifyDataSetChanged();
     }
 
+    public void getAddressFromLocation(Location location){
+        Geocoder geocoder=new Geocoder(signUpActivity, Locale.getDefault());
+        List<Address> addresses;
+        try {
+            addresses =  geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 
+            for(int i=0;i<communes.size();i++){
+                for(int j=0;j<communes.get(i).size();j++){
+                    if(addresses.get(0).getAddressLine(0).contains(communes.get(i).get(j))){
+                        stateSpinner.setSelection(i);
+                        communeFromGeoLocationIndex=j;
+                        geoLocation=true;
+                    }
+                }
+            }
+            Toast.makeText(signUpActivity, addresses.get(0).getAddressLine(0), Toast.LENGTH_LONG).show();
+
+        } catch (Exception e) {
+            Log.e("AppFilter", "Error getting geolocation address "+e);
+            Toast.makeText(signUpActivity, "Could not get location address", Toast.LENGTH_LONG).show();
+        }
+        signUpActivity.turnOffProgressBar();
+    }
+private void setState(int stateIndex){
+    selectedState = states.get(stateIndex);
+    communesForSelectedState = communes.get(stateIndex);
+    communesSpinnerArrayAdapter=new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item, communesForSelectedState);
+    communesSpinner.setAdapter(communesSpinnerArrayAdapter);
+    if(geoLocation){
+        communesSpinner.setSelection(communeFromGeoLocationIndex);
+        geoLocation=false;
+        communeFromGeoLocationIndex=-1;
+    }
+}
     void doneFillingFieldsGoNextFrag(){
-
-        Boolean somethingWentWrong=false;
         EditText salonNameEditText=view.findViewById(R.id.salonName);
-        salonName =salonNameEditText.getText().toString();
+        String salonName = salonNameEditText.getText().toString();
 
         Toast.makeText(getActivity(), salonName, Toast.LENGTH_LONG).show();
         if(salonName.length()<=0){
-            somethingWentWrong=true;
             Toast.makeText(getActivity(), "Please Make Sure to Enter Your Salon Name", Toast.LENGTH_LONG).show();
+            return;
         }
         if(!isMen && !isWomen){
-            somethingWentWrong=true;
             Toast.makeText(getActivity(), "Please Choose a Nature", Toast.LENGTH_LONG).show();
+            return;
         }
-        //NO NEED TO CHECK FOR ADDRESS BECAUSE THERE ARE DEFAULT VALUES APPLIED
-        if(!somethingWentWrong){
+            signUpActivity.salonName = salonName;
+            signUpActivity.selectedState = selectedState;
+            signUpActivity.selectedCommune = selectedCommune;
+            signUpActivity.isMen=isMen;
 
-            ((SignUpActivity)getActivity()).salonName = salonName;
-            ((SignUpActivity)getActivity()).selectedState = selectedState;
-            ((SignUpActivity)getActivity()).selectedCommune = selectedCommune;
-            ((SignUpActivity)getActivity()).isMen=isMen;
-
-            ((SignUpActivity)getActivity()).setCurrentItemViewPager(3);
-        }
-
-
+            signUpActivity.setCurrentItemViewPager(3);
     }
 
 }
