@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import android.content.Context;
 import androidx.annotation.NonNull;

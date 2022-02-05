@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop.portfolio;
+package com.example.coifsalonbusiness.shop.portfolio;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +21,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.bookingapp.CommonMethods;
-import com.example.bookingapp.R;
-import com.example.bookingapp.shop.ShopActivity;
+import com.example.coifsalonbusiness.CommonMethods;
+import com.example.coifsalonbusiness.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +37,6 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class Portfolio extends AppCompatActivity {

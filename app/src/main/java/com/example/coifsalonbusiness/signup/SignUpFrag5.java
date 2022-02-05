@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -10,8 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.bookingapp.R;
-import com.example.bookingapp.signup.Service_Frag5;
+import com.example.coifsalonbusiness.R;
 
 public class SignUpFrag5 extends Fragment {
 

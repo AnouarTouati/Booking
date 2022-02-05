@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 import java.util.ArrayList;
 

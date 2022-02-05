@@ -1,7 +1,7 @@
-package com.example.bookingapp.shop.portfolio;
+package com.example.coifsalonbusiness.shop.portfolio;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 import java.util.ArrayList;
 

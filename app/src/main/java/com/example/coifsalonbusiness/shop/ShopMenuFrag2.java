@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop;
+package com.example.coifsalonbusiness.shop;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.bookingapp.R;
-import com.example.bookingapp.shop.portfolio.Portfolio;
+import com.example.coifsalonbusiness.R;
+import com.example.coifsalonbusiness.shop.portfolio.Portfolio;
 
 public class ShopMenuFrag2 extends Fragment {
 

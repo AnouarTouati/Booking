@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop;
+package com.example.coifsalonbusiness.shop;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 import android.os.Bundle;
 
@@ -14,7 +14,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 public class SignUpFrag2 extends Fragment {
     private Boolean isEmployee = false;

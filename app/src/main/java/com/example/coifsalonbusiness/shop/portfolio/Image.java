@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop.portfolio;
+package com.example.coifsalonbusiness.shop.portfolio;
 
 import android.graphics.Bitmap;
 

@@ -1,5 +1,5 @@
 
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,15 +20,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;

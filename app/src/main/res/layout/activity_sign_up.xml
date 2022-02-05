@@ -21,7 +21,7 @@
         app:layout_constraintRight_toRightOf="parent"
         />
 
-    <com.example.bookingapp.NonSwipeableViewPager
+    <com.example.coifsalonbusiness.NonSwipeableViewPager
         android:id="@+id/viewPagerSignUP"
         android:layout_width="0dp"
         android:layout_height="0dp"

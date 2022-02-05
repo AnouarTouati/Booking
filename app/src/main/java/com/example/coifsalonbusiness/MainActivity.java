@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import android.content.Intent;
 
@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.bookingapp.signup.SignUpActivity;
+import com.example.coifsalonbusiness.signup.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {

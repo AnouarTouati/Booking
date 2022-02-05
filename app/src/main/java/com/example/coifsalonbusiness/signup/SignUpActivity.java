@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,11 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.bookingapp.ActivityWithLocation;
-import com.example.bookingapp.CustomFragmentPagerAdapter;
-import com.example.bookingapp.MainActivity;
-import com.example.bookingapp.R;
-import com.example.bookingapp.shop.ShopActivity;
+import com.example.coifsalonbusiness.ActivityWithLocation;
+import com.example.coifsalonbusiness.CustomFragmentPagerAdapter;
+import com.example.coifsalonbusiness.MainActivity;
+import com.example.coifsalonbusiness.R;
+import com.example.coifsalonbusiness.shop.ShopActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

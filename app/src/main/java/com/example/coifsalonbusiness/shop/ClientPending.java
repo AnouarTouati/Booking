@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop;
+package com.example.coifsalonbusiness.shop;
 
 class ClientPending {
     private final String clientName;

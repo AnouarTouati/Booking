@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,8 +19,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.bookingapp.CommonMethods;
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.CommonMethods;
+import com.example.coifsalonbusiness.R;
 
 import java.io.IOException;
 

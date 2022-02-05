@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import android.content.Intent;
 import androidx.annotation.NonNull;
@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bookingapp.signup.SignUpActivity;
+import com.example.coifsalonbusiness.signup.SignUpActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;

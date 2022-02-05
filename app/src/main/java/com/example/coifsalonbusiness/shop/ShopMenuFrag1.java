@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop;
+package com.example.coifsalonbusiness.shop;
 
 import android.os.Bundle;
 
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.bookingapp.R;
+import com.example.coifsalonbusiness.R;
 
 public class ShopMenuFrag1 extends Fragment {
     EditText emailAddressEditText;

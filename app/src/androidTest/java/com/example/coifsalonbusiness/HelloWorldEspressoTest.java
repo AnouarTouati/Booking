@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;

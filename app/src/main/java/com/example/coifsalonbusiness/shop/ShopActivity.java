@@ -1,4 +1,4 @@
-package com.example.bookingapp.shop;
+package com.example.coifsalonbusiness.shop;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,18 +16,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.bookingapp.ActivityWithLocation;
-import com.example.bookingapp.CustomFragmentPagerAdapter;
-import com.example.bookingapp.R;
-import com.example.bookingapp.SignInActivity;
+import com.example.coifsalonbusiness.ActivityWithLocation;
+import com.example.coifsalonbusiness.CustomFragmentPagerAdapter;
+import com.example.coifsalonbusiness.R;
+import com.example.coifsalonbusiness.SignInActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;

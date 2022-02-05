@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;

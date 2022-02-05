@@ -1,29 +1,11 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Looper;
-import android.provider.Settings;
-
-import com.example.bookingapp.shop.ShopActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
+import com.example.coifsalonbusiness.shop.ShopActivity;
 import com.google.firebase.auth.FirebaseUser;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;

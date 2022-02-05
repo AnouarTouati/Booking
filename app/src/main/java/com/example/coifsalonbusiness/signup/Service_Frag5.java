@@ -1,4 +1,4 @@
-package com.example.bookingapp.signup;
+package com.example.coifsalonbusiness.signup;
 
 class Service_Frag5 {
     String serviceName,servicePrice,serviceDuration;

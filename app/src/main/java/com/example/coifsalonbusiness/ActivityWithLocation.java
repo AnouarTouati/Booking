@@ -1,4 +1,4 @@
-package com.example.bookingapp;
+package com.example.coifsalonbusiness;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
